@@ -687,7 +687,7 @@ updateLocIndicator()}
 function updateLocIndicator(){
 var el=document.getElementById('locIndicator');if(!el)return;
 var n=PR.name||'Centro PR';
-var txt=PR.gps?(langES?'📍 Ubicación GPS: ':'📍 GPS Location: ')+PR.lat.toFixed(4)+'°N, '+Math.abs(PR.lon).toFixed(4)+'°W':(langES?'📍 Datos para: ':'📍 Data for: ')+n;
+var txt=PR.gps?(langES?'📍 Ubicación GPS: ':'📍 GPS Location: ')+n+' — '+PR.lat.toFixed(4)+'°N, '+Math.abs(PR.lon).toFixed(4)+'°W':(langES?'📍 Datos para: ':'📍 Data for: ')+n;
 el.textContent=txt;
 var hf=document.getElementById('hFactors');if(hf)hf.textContent=langES?'📊 Factores del Risk Score — '+n:'📊 Risk Score Factors — '+n;
 var hh=document.getElementById('hHourly');if(hh)hh.textContent=langES?'🔮 Pronóstico 1-6 Horas — '+n:'🔮 Forecast 1-6 Hours — '+n}
