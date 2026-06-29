@@ -682,8 +682,8 @@ MUNICIPIOS.forEach(function(m,i){
 var opt=document.createElement('option');opt.value=i;opt.textContent=m.name;
 sel.appendChild(opt)});
 if(PR.name&&PR.name!=='Centro PR'){
-for(var i=0;i<MUNICIPIOS.length;i++){if(MUNICIPIOS[i].name===PR.name){sel.value=i;break}}}
-if(PR.name&&PR.gps)sel.value='centro';
+var matchName=PR.name.replace(' (GPS)','');
+for(var i=0;i<MUNICIPIOS.length;i++){if(MUNICIPIOS[i].name===matchName){sel.value=i;break}}}
 updateLocIndicator()}
 function updateLocIndicator(){
 var el=document.getElementById('locIndicator');if(!el)return;
@@ -711,7 +711,7 @@ var closest=null,minD=Infinity;
 MUNICIPIOS.forEach(function(m){var d=haversine(lat,lon,m.lat,m.lon);if(d<minD){minD=d;closest=m}});
 PR.lat=lat;PR.lon=lon;PR.name=(closest?closest.name:'GPS')+' (GPS)';PR.gps=true;
 localStorage.setItem('kwint_location',JSON.stringify(PR));
-document.getElementById('locSelect').value='centro';
+var sel=document.getElementById('locSelect');for(var j=0;j<MUNICIPIOS.length;j++){if(MUNICIPIOS[j].name===closest.name){sel.value=j;break}}
 updateLocIndicator();prevWeather=null;fetchWeather();fetchForecast();fetchDust();
 btn.textContent='📡 GPS'},function(){
 btn.textContent='📡 GPS';alert(langES?'No se pudo obtener ubicación. Verifique permisos del navegador.':'Could not get location. Check browser permissions.')},
@@ -726,6 +726,7 @@ var closest=null,minD=Infinity;
 MUNICIPIOS.forEach(function(m){var d=haversine(lat,lon,m.lat,m.lon);if(d<minD){minD=d;closest=m}});
 PR.lat=lat;PR.lon=lon;PR.name=(closest?closest.name:'GPS')+' (GPS)';PR.gps=true;
 localStorage.setItem('kwint_location',JSON.stringify(PR));
+var sel2=document.getElementById('locSelect');if(sel2&&closest){for(var j=0;j<MUNICIPIOS.length;j++){if(MUNICIPIOS[j].name===closest.name){sel2.value=j;break}}}
 updateLocIndicator();prevWeather=null;fetchWeather();fetchForecast();fetchDust()}},function(){},{enableHighAccuracy:false,timeout:8000})}
 
 var prevWeather=null;
