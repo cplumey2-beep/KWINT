@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KWINT — Kriz Iron Weather Intelligence | Puerto Rico</title>
+  <title>KWINT — Kriz Weather Intelligence | Puerto Rico</title>
   <style>
     :root {
       --gold:#ffd700;--gold-dim:rgba(255,215,0,.12);--text:#e8e8e8;--text-dim:rgba(255,255,255,.5);
@@ -239,9 +239,9 @@
 <div class="wrap">
 
 <header class="card span-2 no-anim">
-  <h1>KWINT &mdash; Kriz Iron Weather Intelligence</h1>
+  <h1>KWINT &mdash; Kriz Weather Intelligence</h1>
   <p class="subtitle"><strong>Puerto Rico Weather &amp; Space Monitoring System</strong></p>
-  <p class="author">Engineered by Christian Plumey</p>
+  <p class="author">Engineered by Christian Plumey D&iacute;az</p>
   <div class="status-bar">
     <div class="status-item"><div class="label">Local Time</div><div class="value" id="sClock">--:--</div><div class="sub" id="sClockSub">AST (UTC-4)</div></div>
     <div class="status-item"><div class="label">Sunrise</div><div class="value" id="sunrise">--:--</div><div class="sub" id="sunriseSub">AM</div></div>
@@ -258,7 +258,7 @@
 <section class="card span-2 no-anim" id="about">
   <div class="about-hero">
     <div class="about-logo">KWINT</div>
-    <div class="about-tagline">Kriz Iron Weather Intelligence</div>
+    <div class="about-tagline">Kriz Weather Intelligence</div>
     <div class="about-since">Plataforma de Inteligencia Meteorol&oacute;gica &bull; Desde 2017</div>
   </div>
 
@@ -321,7 +321,7 @@
   <div class="about-block">
     <div class="about-block-title">&#128736; Ingenier&iacute;a del Sistema</div>
     <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
-      KWINT fue dise&ntilde;ado, desarrollado y es mantenido por <strong>Christian Plumey</strong> &mdash; Ingeniero Aeroespacial, Ingeniero El&eacute;ctrico e Ingeniero de Sistemas. La arquitectura del sistema refleja principios de ingenier&iacute;a de sistemas aplicados a la meteorolog&iacute;a operacional:
+      KWINT fue dise&ntilde;ado, desarrollado y es mantenido por <strong>Christian Plumey D&iacute;az</strong> &mdash; Ingeniero El&eacute;ctrico, Ingeniero de Sistemas e Ingeniero Aeroespacial. La arquitectura del sistema refleja principios de ingenier&iacute;a de sistemas aplicados a la meteorolog&iacute;a operacional:
     </p>
     <ul class="about-list" style="margin-top:8px">
       <li><strong>Resiliencia</strong> &mdash; opera sin servidores propios, sin bases de datos, sin dependencias cr&iacute;ticas. Si una fuente falla, las dem&aacute;s contin&uacute;an</li>
@@ -339,11 +339,11 @@
 
   <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
     <p style="font-size:.82rem;color:var(--text);line-height:1.6">
-      <strong style="color:var(--gold)">KWINT</strong> es una de m&uacute;ltiples plataformas de alertas inteligentes desarrolladas por Kriz Iron.<br>
+      <strong style="color:var(--gold)">KWINT</strong> es una de m&uacute;ltiples plataformas de alertas inteligentes desarrolladas por Christian Plumey D&iacute;az.<br>
       Dise&ntilde;ada para Puerto Rico. Probada en huracanes. Impulsada por ingenier&iacute;a.
     </p>
     <p style="font-size:.72rem;color:var(--text-dim);margin-top:8px">
-      &copy; 2017&ndash;2026 Kriz Iron &bull; Christian Plumey &bull; Todos los derechos reservados
+      &copy; 2017&ndash;2026 Christian Plumey D&iacute;az &bull; KWINT &bull; Todos los derechos reservados
     </p>
   </div>
 </section>
@@ -1127,7 +1127,7 @@ if(gusts.length){var gMax=Math.max.apply(null,gusts);html+='🌬️ Ráfaga máx
 if(presses.length>=2){var pChange=presses[presses.length-1]-presses[0];var pChangeDisp=unitC?Math.round(pChange*10)/10+' hPa':Math.round(pChange*0.02953*100)/100+' inHg';html+='📉 Cambio de presión proyectado: <strong><span data-hpa="'+Math.round(pChange*10)/10+'">'+pChangeDisp+'</span></strong><br>'}
 html+='</div>';
 
-html+='<div style="margin-top:10px;font-size:.72rem;color:var(--text-dim)">📡 Fuentes: Open-Meteo + NOAA/NWS<br>Sistema: KRIZ IRON - CLIMA | KWINT</div>';
+html+='<div style="margin-top:10px;font-size:.72rem;color:var(--text-dim)">📡 Fuentes: Open-Meteo + NOAA/NWS<br>Christian Plumey Díaz | KWINT</div>';
 el.innerHTML=html;
 
 }).catch(function(){document.getElementById('forecastContent').innerHTML='<p style="color:var(--text-dim)">Forecast unavailable</p>'})}
@@ -1187,7 +1187,7 @@ html+='</div>';
 html+='<div style="margin-top:12px;padding:10px 14px;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.15);border-radius:10px;font-size:.82rem;line-height:1.5">';
 html+='<strong>Juzgue usted, llegue a sus conclusiones.</strong><br>';
 html+='<em>No todo lo que te cuentan es verdad y no todo lo que es verdad te lo cuentan.</em><br>';
-html+='— Kriz Iron</div>';
+html+='— Christian Plumey Díaz</div>';
 }else{
 var nextSeason=new Date(ast.getFullYear()+(m>11?1:0),5,1);
 var daysUntil=Math.floor((nextSeason-ast)/864e5);
@@ -1408,7 +1408,7 @@ html+='<div style="font-size:.82rem;font-weight:700;color:var(--gold);margin-bot
 html+='<div style="font-size:.82rem;line-height:1.5">'+prepText+'</div></div>';
 
 html+='<div style="text-align:center;font-size:.72rem;color:var(--text-dim)">'+
-'🔗 Fuente oficial: <a class="fire-link" href="https://www.nhc.noaa.gov/" target="_blank">nhc.noaa.gov</a> | 📡 KRIZ IRON - CLIMA | KWINT</div>';
+'🔗 Fuente oficial: <a class="fire-link" href="https://www.nhc.noaa.gov/" target="_blank">nhc.noaa.gov</a> | 📡 Christian Plumey Díaz | KWINT</div>';
 
 html+='</div>';
 
@@ -1567,8 +1567,8 @@ alertas.forEach(function(a){html+='&nbsp;&nbsp;'+a.info.e+' '+a.name+' — '+a.i
 html+='</div>'}
 
 html+='<div style="margin-top:10px;font-size:.72rem;color:var(--text-dim)">'+
-'📡 KRIZ IRON — EMBALSES PR | Datos USGS tiempo real + umbrales AAA<br>'+
-'Creado, diseñado y codificado por KRIZ IRON</div></div>';
+'📡 Christian Plumey Díaz | KWINT — EMBALSES PR | Datos USGS tiempo real + umbrales AAA<br>'+
+'Creado, diseñado y codificado por Christian Plumey Díaz</div></div>';
 
 localStorage.setItem('kwint_emb_prev',JSON.stringify(newEmb));
 el.innerHTML=html}
@@ -1760,7 +1760,7 @@ footer.innerHTML='<div class="fire-icon">📡</div><div class="fire-info">'+
 '🟠 MODERADA — actividad de calor significativa<br>'+
 '🟡 BAJA — punto de calor menor detectado<br><br>'+
 '⚠️ Detección satelital de puntos de calor. Puede incluir quemas agrícolas. No confirma causa.<br><br>'+
-'<em>Creado, diseñado y codificado por KRIZ IRON</em>'+
+'<em>Creado, diseñado y codificado por Christian Plumey Díaz</em>'+
 '</div></div>';
 list.appendChild(footer)}
 
