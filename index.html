@@ -319,6 +319,12 @@
     <div class="zone-card"><div class="zone-name">Humidity</div><div class="zone-temp" id="dHumid">--</div><div class="zone-detail">%</div></div>
     <div class="zone-card"><div class="zone-name">Pressure</div><div class="zone-temp" id="dPress">--</div><div class="zone-detail" id="dPressUnit">hPa (MSL)</div></div>
     <div class="zone-card"><div class="zone-name">UV Index</div><div class="zone-temp" id="dUV">--</div><div class="zone-detail" id="dUVLabel">--</div></div>
+    <div class="zone-card"><div class="zone-name">Dew Point</div><div class="zone-temp" id="dDew">--</div><div class="zone-detail" id="dDewLabel">--</div></div>
+    <div class="zone-card"><div class="zone-name">Visibility</div><div class="zone-temp" id="dVis">--</div><div class="zone-detail" id="dVisLabel">km</div></div>
+    <div class="zone-card"><div class="zone-name">Rain Prob.</div><div class="zone-temp" id="dRainProb">--</div><div class="zone-detail">%</div></div>
+    <div class="zone-card"><div class="zone-name">Cloud Cover</div><div class="zone-temp" id="dCloud">--</div><div class="zone-detail" id="dCloudLabel">%</div></div>
+    <div class="zone-card"><div class="zone-name">CAPE</div><div class="zone-temp" id="dCape">--</div><div class="zone-detail" id="dCapeLabel">J/kg</div></div>
+    <div class="zone-card"><div class="zone-name">Press. Trend</div><div class="zone-temp" id="dPressTrend">--</div><div class="zone-detail" id="dPressTrendLabel">vs anterior</div></div>
     <div class="zone-card"><div class="zone-name">Condition</div><div class="zone-temp" id="dCondIcon">--</div><div class="zone-detail" id="dCondText">--</div></div>
   </div>
   <p class="refresh-info"><span class="live-dot"></span>Open-Meteo API &mdash; auto-refresh every 5 min</p>
@@ -565,7 +571,7 @@ document.getElementById('lblF').className=unitC?'':'active'}})();
 
 var prevWeather=null;
 
-function calcRisk(w){var s=0,reasons=[];var wind=w.wind_kmh||0,gust=w.gust_kmh||0,rain=w.precipitation||0,press=w.pressure_msl||1013,humid=w.humidity||0,hi=w.heat_index_f||0,code=w.code||0,uv=w.uv_index;
+function calcRisk(w){var s=0,reasons=[];var wind=w.wind_kmh||0,gust=w.gust_kmh||0,rain=w.precipitation||0,press=w.pressure_msl||1013,humid=w.humidity||0,hi=w.heat_index_f||0,code=w.code||0,uv=w.uv_index,cape=w.cape||0,vis=w.visibility;
 if(hi>=110){s+=30;reasons.push('🔴 Índice de calor extremo: +30')}else if(hi>=105){s+=25;reasons.push('🔴 Calor crítico: +25')}else if(hi>=100){s+=20;reasons.push('🔴 Calor peligroso: +20')}else if(hi>=95){s+=12;reasons.push('🟠 Calor fuerte: +12')}else if(hi>=90){s+=6;reasons.push('🟡 Calor moderado: +6')}
 if(uv!=null&&uv>=11){s+=8;reasons.push('☀️ UV extremo ('+uv+'): +8')}else if(uv!=null&&uv>=8){s+=5;reasons.push('☀️ UV muy alto ('+uv+'): +5')}else if(uv!=null&&uv>=6){s+=3;reasons.push('☀️ UV alto ('+uv+'): +3')}
 if(humid>=95){s+=10;reasons.push('💧 Humedad extrema: +10')}else if(humid>=90){s+=6;reasons.push('💧 Humedad alta: +6')}
@@ -574,6 +580,8 @@ if(gust>=120){s+=35;reasons.push('🌬️ Ráfagas destructivas: +35')}else if(g
 if(rain>=20){s+=25;reasons.push('🌧️ Lluvia muy intensa: +25')}else if(rain>=10){s+=18;reasons.push('🌧️ Lluvia intensa: +18')}else if(rain>=5){s+=12;reasons.push('🌧️ Lluvia significativa: +12')}else if(rain>0){s+=5;reasons.push('🌧️ Lluvia detectada: +5')}
 if(press<=990){s+=35;reasons.push('📉 Presión muy baja: +35')}else if(press<=1000){s+=25;reasons.push('📉 Presión baja: +25')}else if(press<=1006){s+=12;reasons.push('📉 Presión bajando: +12')}
 if(code>=95){s+=25;var st=CODES[code]||'Tormenta';reasons.push('⛈️ '+st+' detectada: +25')}else if(code>=61){s+=10;reasons.push('🌧️ Condiciones de lluvia: +10')}
+if(cape>=2500){s+=15;reasons.push('⚡ CAPE extremo ('+cape+' J/kg): +15')}else if(cape>=1500){s+=10;reasons.push('⚡ CAPE severo ('+cape+' J/kg): +10')}else if(cape>=1000){s+=5;reasons.push('⚡ CAPE elevado ('+cape+' J/kg): +5')}
+if(vis!=null&&vis<1){s+=10;reasons.push('🌫️ Visibilidad muy pobre (<1 km): +10')}else if(vis!=null&&vis<4){s+=5;reasons.push('🌫️ Visibilidad reducida ('+vis.toFixed(1)+' km): +5')}
 s=Math.min(s,100);
 var lv,cl,ac;
 if(s>=85){lv="EXTREME";cl="var(--red)";ac="Condiciones peligrosas. Manténgase pendiente a boletines oficiales."}
@@ -618,17 +626,28 @@ else{bar.style.display='flex';txt.innerHTML='<span style="color:var(--accent)">O
 
 // Fetch central weather + risk
 function fetchWeather(){
-fetch('https://api.open-meteo.com/v1/forecast?latitude='+PR.lat+'&longitude='+PR.lon+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,pressure_msl,uv_index&timezone=America/Puerto_Rico')
+fetch('https://api.open-meteo.com/v1/forecast?latitude='+PR.lat+'&longitude='+PR.lon+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,precipitation_probability,pressure_msl,uv_index,visibility,cloud_cover,cape&timezone=America/Puerto_Rico')
 .then(function(r){return r.json()}).then(function(d){
 var c=d.current||{};
 var tc=Math.round(c.temperature_2m*10)/10,fc=Math.round(c.apparent_temperature*10)/10;
 var tf=cToF(c.temperature_2m),hi=heatIndex(tf,c.relative_humidity_2m),hic=fToC(hi);
 var uv=c.uv_index!=null?Math.round(c.uv_index*10)/10:null;
-var w={temp_f:tf,feels_f:cToF(fc),heat_index_f:hi,humidity:c.relative_humidity_2m,wind_kmh:c.wind_speed_10m,gust_kmh:c.wind_gusts_10m,precipitation:c.precipitation,pressure_msl:c.pressure_msl,code:c.weather_code,uv_index:uv};
+var w={temp_f:tf,feels_f:cToF(fc),heat_index_f:hi,humidity:c.relative_humidity_2m,wind_kmh:c.wind_speed_10m,gust_kmh:c.wind_gusts_10m,precipitation:c.precipitation,pressure_msl:c.pressure_msl,code:c.weather_code,uv_index:uv,cape:c.cape||0,visibility:c.visibility!=null?c.visibility/1000:null,dew_point:c.dew_point_2m,cloud_cover:c.cloud_cover};
 var eTmp=document.getElementById('dTemp');eTmp.textContent=tempStr(tc);eTmp.setAttribute('data-tc',tc);
 var eFl=document.getElementById('dFeels');eFl.textContent=tempStr(fc);eFl.setAttribute('data-tc',fc);
 var eHi=document.getElementById('dHeat');eHi.textContent=tempStr(hic);eHi.setAttribute('data-tc',hic);
 var uvInfo=uvLabel(uv);document.getElementById('dUV').textContent=uv!=null?uv:'--';document.getElementById('dUV').style.color=uvInfo.cl;document.getElementById('dUVLabel').textContent=uvInfo.txt;
+var dew=c.dew_point_2m!=null?Math.round(c.dew_point_2m*10)/10:null;
+var eDew=document.getElementById('dDew');if(dew!=null){eDew.textContent=tempStr(dew);eDew.setAttribute('data-tc',dew);var dewLbl=dew>=26?'Opresivo':dew>=24?'Muy húmedo':dew>=21?'Húmedo':dew>=16?'Confortable':'Seco';document.getElementById('dDewLabel').textContent=dewLbl;if(dew>=26)eDew.style.color='var(--red)';else if(dew>=24)eDew.style.color='var(--orange)'}
+var vis=c.visibility!=null?Math.round(c.visibility/1000*10)/10:null;
+if(vis!=null){document.getElementById('dVis').textContent=vis;var visLbl=vis<1?'Muy pobre':vis<4?'Pobre':vis<10?'Moderada':'Buena';document.getElementById('dVisLabel').textContent=visLbl+' (km)';if(vis<1)document.getElementById('dVis').style.color='var(--red)';else if(vis<4)document.getElementById('dVis').style.color='var(--orange)'}
+var rProb=c.precipitation_probability!=null?c.precipitation_probability:null;
+if(rProb!=null){document.getElementById('dRainProb').textContent=rProb;if(rProb>=70)document.getElementById('dRainProb').style.color='var(--blue)';else if(rProb>=40)document.getElementById('dRainProb').style.color='var(--orange)'}
+var cloud=c.cloud_cover!=null?c.cloud_cover:null;
+if(cloud!=null){document.getElementById('dCloud').textContent=cloud;var clLbl=cloud>=80?'Nublado':cloud>=50?'Parcial':cloud>=20?'Poco nublado':'Despejado';document.getElementById('dCloudLabel').textContent=clLbl+' (%)'}
+var cape=c.cape!=null?Math.round(c.cape):null;
+if(cape!=null){document.getElementById('dCape').textContent=cape;var capeLbl=cape>=2500?'Extremo':cape>=1500?'Tormentas severas':cape>=1000?'Tormentas':cape>=500?'Convección moderada':'Estable';document.getElementById('dCapeLabel').textContent=capeLbl;if(cape>=2500)document.getElementById('dCape').style.color='var(--red)';else if(cape>=1500)document.getElementById('dCape').style.color='var(--orange)';else if(cape>=1000)document.getElementById('dCape').style.color='var(--yellow)'}
+if(prevWeather&&prevWeather.pressure_msl){var pDiff=Math.round((c.pressure_msl-prevWeather.pressure_msl)*10)/10;var pArrow=pDiff>0.5?'↑ +'+pDiff:pDiff<-0.5?'↓ '+pDiff:'→ '+pDiff;document.getElementById('dPressTrend').textContent=pArrow;document.getElementById('dPressTrendLabel').textContent='hPa vs anterior';if(pDiff<-2)document.getElementById('dPressTrend').style.color='var(--red)';else if(pDiff<-0.5)document.getElementById('dPressTrend').style.color='var(--orange)';else if(pDiff>0.5)document.getElementById('dPressTrend').style.color='var(--accent)'}
 var eWn=document.getElementById('dWind');eWn.textContent=windStr(c.wind_speed_10m);eWn.setAttribute('data-kmh',c.wind_speed_10m);
 document.getElementById('dWindDir').textContent=degToDir(c.wind_direction_10m)+' | '+windUnit()+' ('+toKt(c.wind_speed_10m)+' kt)';
 var eGu=document.getElementById('dGust');eGu.textContent=windStr(c.wind_gusts_10m);eGu.setAttribute('data-kmh',c.wind_gusts_10m);
