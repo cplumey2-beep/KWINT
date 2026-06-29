@@ -259,6 +259,19 @@
   <div class="alert-scroll" id="alertScroll"><div class="alert-ok">Loading alerts...</div></div>
 </div></div>
 
+<div id="prepBanner" class="prep-banner prep-normal" style="max-width:1400px;margin:0 auto">
+  <div class="prep-header">
+    <span class="prep-icon" id="prepIcon">&#9989;</span>
+    <div>
+      <div class="prep-title" id="prepTitle">NORMAL</div>
+    </div>
+  </div>
+  <div class="prep-subtitle" id="prepSubtitle">No hay sistemas tropicales amenazando a Puerto Rico. Monitoreo rutinario activo.</div>
+  <div id="prepContent"></div>
+  <button class="prep-toggle" id="prepToggle" onclick="togglePrepDetails()" style="display:none">&#9660; Ver checklist de preparaci&oacute;n</button>
+  <div id="prepChecklist" style="display:none;margin-top:10px"></div>
+</div>
+
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" aria-label="Close">&times;</button>
   <img id="lightbox-img" src="" alt="" />
@@ -343,20 +356,6 @@
     <a class="qa-link" data-cat="science" href="https://redsismica.uprm.edu/Spanish/" target="_blank"><span class="qa-icon">&#128200;</span> Red Sísmica PR</a>
   </div>
 </section>
-
-<!-- ===== PREPAREDNESS BANNER ===== -->
-<div class="prep-banner prep-normal span-2" id="prepBanner">
-  <div class="prep-header">
-    <span class="prep-icon" id="prepIcon">&#9989;</span>
-    <div>
-      <div class="prep-title" id="prepTitle">NORMAL</div>
-    </div>
-  </div>
-  <div class="prep-subtitle" id="prepSubtitle">Condiciones estables. Monitoreo rutinario activo.</div>
-  <div id="prepContent"></div>
-  <button class="prep-toggle" id="prepToggle" onclick="togglePrepDetails()" style="display:none">&#9660; Ver checklist de preparaci&oacute;n</button>
-  <div id="prepChecklist" style="display:none;margin-top:10px"></div>
-</div>
 
 <!-- ===== TIER 1: LIVE DASHBOARD ===== -->
 <div class="tier-header"><span class="tier-label t1">LIVE</span><span class="tier-line"></span><span class="tier-title">Real-Time Dashboard</span><span class="tier-line"></span></div>
