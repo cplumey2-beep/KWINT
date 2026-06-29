@@ -148,6 +148,23 @@
     .live-dot{display:inline-block;width:7px;height:7px;background:var(--accent);border-radius:50%;margin-right:5px;animation:p 2s infinite}
     @keyframes p{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(6,209,33,.5)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(6,209,33,0)}}
 
+    .prep-banner{border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid;transition:var(--tr)}
+    .prep-banner.prep-normal{background:rgba(6,209,33,.06);border-color:rgba(6,209,33,.2)}
+    .prep-banner.prep-watch{background:rgba(255,235,59,.08);border-color:rgba(255,235,59,.25)}
+    .prep-banner.prep-active{background:rgba(255,152,0,.1);border-color:rgba(255,152,0,.3)}
+    .prep-banner.prep-urgent{background:rgba(255,68,68,.1);border-color:rgba(255,68,68,.3)}
+    .prep-banner.prep-emergency{background:rgba(255,0,64,.12);border-color:rgba(255,0,64,.4);animation:prepPulse 2s infinite}
+    @keyframes prepPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,0,64,.3)}50%{box-shadow:0 0 20px 4px rgba(255,0,64,.15)}}
+    .prep-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .prep-icon{font-size:1.6rem}
+    .prep-title{font-size:1rem;font-weight:800;letter-spacing:.5px}
+    .prep-subtitle{font-size:.78rem;color:var(--text-dim);margin-bottom:10px}
+    .prep-actions{list-style:none;padding:0;margin:0;font-size:.82rem;line-height:1.8}
+    .prep-actions li{padding:2px 0}
+    .prep-actions li::before{content:"▸ ";color:var(--gold);font-weight:700}
+    .prep-toggle{background:none;border:1px solid var(--border);color:var(--text-dim);font-size:.72rem;padding:4px 12px;border-radius:8px;cursor:pointer;margin-top:8px;transition:var(--tr)}
+    .prep-toggle:hover{border-color:var(--gold);color:var(--gold)}
+
     .season-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);border-radius:10px;margin-top:10px;font-size:.82rem}
 
     .emb-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;transition:var(--tr)}
@@ -326,6 +343,20 @@
     <a class="qa-link" data-cat="science" href="https://redsismica.uprm.edu/Spanish/" target="_blank"><span class="qa-icon">&#128200;</span> Red Sísmica PR</a>
   </div>
 </section>
+
+<!-- ===== PREPAREDNESS BANNER ===== -->
+<div class="prep-banner prep-normal span-2" id="prepBanner">
+  <div class="prep-header">
+    <span class="prep-icon" id="prepIcon">&#9989;</span>
+    <div>
+      <div class="prep-title" id="prepTitle">NORMAL</div>
+    </div>
+  </div>
+  <div class="prep-subtitle" id="prepSubtitle">Condiciones estables. Monitoreo rutinario activo.</div>
+  <div id="prepContent"></div>
+  <button class="prep-toggle" id="prepToggle" onclick="togglePrepDetails()" style="display:none">&#9660; Ver checklist de preparaci&oacute;n</button>
+  <div id="prepChecklist" style="display:none;margin-top:10px"></div>
+</div>
 
 <!-- ===== TIER 1: LIVE DASHBOARD ===== -->
 <div class="tier-header"><span class="tier-label t1">LIVE</span><span class="tier-line"></span><span class="tier-title">Real-Time Dashboard</span><span class="tier-line"></span></div>
@@ -1113,7 +1144,108 @@ else if(a.indexOf('✅')>=0){bg='rgba(6,209,33,.06)';bc='rgba(6,209,33,.15)'}
 html+='<div style="padding:8px 12px;margin-bottom:6px;border-radius:8px;font-size:.84rem;background:'+bg+';border:1px solid '+bc+';line-height:1.5">';
 lines.forEach(function(l){html+=l+'<br>'});
 html+='</div>'});
-el.innerHTML=html}
+el.innerHTML=html;
+updatePrepBanner()}
+
+// Preparedness Engine
+var PREP_LEVELS=[
+{id:'normal',icon:'✅',title:'NORMAL',titleEN:'NORMAL',cls:'prep-normal',
+sub:'Condiciones estables. Monitoreo rutinario activo.',subEN:'Stable conditions. Routine monitoring active.',
+actions:['Mantén tu kit de emergencia actualizado','Verifica que tienes agua almacenada para 3 días','Monitorea KWINT periódicamente'],
+actionsEN:['Keep your emergency kit updated','Verify you have 3 days of stored water','Monitor KWINT periodically']},
+{id:'watch',icon:'🟡',title:'VIGILANCIA',titleEN:'WATCH',cls:'prep-watch',
+sub:'Condiciones bajo observación. Prepárate por si escalan.',subEN:'Conditions under observation. Prepare in case they escalate.',
+actions:['Revisa tu lista de suministros de emergencia','Llena tinacos y cisternas','Carga todos los dispositivos electrónicos','Verifica combustible del generador','Monitorea KWINT y NWS cada 6 horas'],
+actionsEN:['Review your emergency supply list','Fill water tanks and cisterns','Charge all electronic devices','Check generator fuel','Monitor KWINT and NWS every 6 hours']},
+{id:'active',icon:'🟠',title:'PREPARACIÓN ACTIVA',titleEN:'ACTIVE PREPARATION',cls:'prep-active',
+sub:'Amenaza detectada. Ejecuta preparativos ahora.',subEN:'Threat detected. Execute preparations now.',
+actions:['Completa suministros de agua y alimentos para 7+ días','Protege ventanas con persianas o tablas','Llena tanque de gasolina COMPLETO','Retira objetos sueltos de patios y balcones','Asegura documentos importantes en bolsa impermeable','Prepara efectivo en billetes pequeños','Carga power banks al 100%','Monitorea NWS y KWINT cada 3 horas','Identifica tu refugio más cercano'],
+actionsEN:['Complete water and food supplies for 7+ days','Protect windows with shutters or boards','Fill gas tank FULL','Remove loose objects from yards and balconies','Secure important documents in waterproof bag','Prepare cash in small bills','Charge power banks to 100%','Monitor NWS and KWINT every 3 hours','Identify your nearest shelter']},
+{id:'urgent',icon:'🔴',title:'PREPARACIÓN URGENTE',titleEN:'URGENT PREPARATION',cls:'prep-urgent',
+sub:'Amenaza alta e inminente. Completa preparativos de inmediato.',subEN:'High and imminent threat. Complete preparations immediately.',
+actions:['🚨 COMPLETA TODOS LOS PREPARATIVOS AHORA','Llena bañeras y recipientes adicionales de agua','Desconecta equipos eléctricos sensibles','Mueve vehículos a zona segura','Asegura generador y combustible bajo techo','Congela botellas de agua (mantienen frío si se va la luz)','Ten radio de baterías listo en frecuencia NOAA Weather','Confirma plan familiar: punto de reunión y contactos','Carga teléfonos y radios al 100%','NO esperes al último momento — actúa AHORA'],
+actionsEN:['🚨 COMPLETE ALL PREPARATIONS NOW','Fill bathtubs and extra water containers','Unplug sensitive electronics','Move vehicles to safe area','Secure generator and fuel indoors','Freeze water bottles (keeps cold if power goes out)','Have battery radio ready on NOAA Weather frequency','Confirm family plan: meeting point and contacts','Charge phones and radios to 100%','DO NOT wait until the last moment — act NOW']},
+{id:'emergency',icon:'🚨',title:'EMERGENCIA',titleEN:'EMERGENCY',cls:'prep-emergency',
+sub:'Condiciones peligrosas activas. Protege tu vida ahora.',subEN:'Dangerous conditions active. Protect your life now.',
+actions:['🚨 EJECUTA TU PLAN DE EMERGENCIA AHORA','Permanece en estructura segura — NO salgas','Aléjate de ventanas y puertas de vidrio','Ubícate en habitación interior sin ventanas','Mantén radio encendido en frecuencia de emergencia','Si hay inundación: muévete a terreno alto INMEDIATAMENTE','NO cruces carreteras inundadas — NUNCA','NO uses elevadores','Mantén calma — sigue instrucciones de autoridades','Si necesitas rescate: llama 911 o contacta PREMA'],
+actionsEN:['🚨 EXECUTE YOUR EMERGENCY PLAN NOW','Stay in secure structure — DO NOT go outside','Stay away from windows and glass doors','Move to interior room without windows','Keep radio on emergency frequency','If flooding: move to high ground IMMEDIATELY','DO NOT cross flooded roads — NEVER','DO NOT use elevators','Stay calm — follow authorities instructions','If you need rescue: call 911 or contact PREMA']}
+];
+
+window.togglePrepDetails=function(){
+var cl=document.getElementById('prepChecklist');var btn=document.getElementById('prepToggle');
+if(cl.style.display==='none'){cl.style.display='block';btn.innerHTML='&#9650; Ocultar checklist'}
+else{cl.style.display='none';btn.innerHTML='&#9660; Ver checklist de preparaci&oacute;n'}};
+
+function updatePrepBanner(){
+var level=0;
+var reasons=[];
+var w=alertasData.weather;
+var nws=alertasData.nwsAlerts||[];
+var storms=alertasData.storms||[];
+
+// Factor 1: Risk Score
+var scoreEl=document.getElementById('riskScore');
+var score=scoreEl?parseInt(scoreEl.textContent):0;
+if(score>=85){level=Math.max(level,4);reasons.push('Risk Score EXTREMO ('+score+')')}
+else if(score>=65){level=Math.max(level,3);reasons.push('Risk Score ALTO ('+score+')')}
+else if(score>=40){level=Math.max(level,2);reasons.push('Risk Score MODERADO ('+score+')')}
+else if(score>=20){level=Math.max(level,1);reasons.push('Risk Score BAJO ('+score+')')}
+
+// Factor 2: NWS Alerts
+var hasWarning=false,hasWatch=false;
+nws.forEach(function(a){
+if(a.severity==='warning'){hasWarning=true}
+else if(a.severity==='watch'){hasWatch=true}});
+if(hasWarning){
+var isTropical=nws.some(function(a){return a.cat==='tropical'});
+if(isTropical){level=Math.max(level,4);reasons.push('⚠️ Alerta tropical WARNING activa')}
+else{level=Math.max(level,3);reasons.push('⚠️ NWS WARNING activo')}}
+if(hasWatch){level=Math.max(level,2);reasons.push('🟡 NWS WATCH activo')}
+
+// Factor 3: Storm proximity
+storms.forEach(function(st){
+if(st.dist<300){level=Math.max(level,4);reasons.push('🌀 '+st.name+' a '+st.dist+' km — INMINENTE')}
+else if(st.dist<600){level=Math.max(level,3);reasons.push('🌀 '+st.name+' a '+st.dist+' km — Amenaza alta')}
+else if(st.dist<1000){level=Math.max(level,2);reasons.push('🌀 '+st.name+' a '+st.dist+' km — Amenaza moderada')}
+else if(st.dist<1500){level=Math.max(level,1);reasons.push('🌀 '+st.name+' a '+st.dist+' km — Vigilancia')}});
+
+// Factor 4: Pressure drop (aggressive)
+if(w&&prevWeather&&prevWeather.pressure_msl){
+var pDrop=prevWeather.pressure_msl-(w.pressure_msl||1013);
+if(pDrop>=6){level=Math.max(level,3);reasons.push('📉 Presión cayendo agresivamente: -'+pDrop.toFixed(1)+' hPa')}
+else if(pDrop>=3){level=Math.max(level,2);reasons.push('📉 Presión bajando rápido: -'+pDrop.toFixed(1)+' hPa')}}
+
+// Factor 5: Extreme wind
+if(w){
+if(w.wind_kmh>=119||w.gust_kmh>=150){level=Math.max(level,4);reasons.push('💨 Vientos con fuerza de huracán')}
+else if(w.wind_kmh>=63||w.gust_kmh>=90){level=Math.max(level,3);reasons.push('💨 Vientos de tormenta tropical')}
+else if(w.gust_kmh>=60){level=Math.max(level,2);reasons.push('🌬️ Ráfagas fuertes detectadas')}}
+
+// Render
+var prep=PREP_LEVELS[level];
+var banner=document.getElementById('prepBanner');
+banner.className='prep-banner span-2 '+prep.cls;
+document.getElementById('prepIcon').textContent=prep.icon;
+document.getElementById('prepTitle').textContent=langES?prep.title:prep.titleEN;
+document.getElementById('prepSubtitle').textContent=langES?prep.sub:prep.subEN;
+
+var contentHtml='';
+if(reasons.length&&level>0){
+contentHtml+='<div style="font-size:.78rem;color:var(--text-dim);margin-bottom:8px">';
+reasons.forEach(function(r){contentHtml+='<div>'+r+'</div>'});
+contentHtml+='</div>'}
+document.getElementById('prepContent').innerHTML=contentHtml;
+
+var actions=langES?prep.actions:prep.actionsEN;
+var checkHtml='<ul class="prep-actions">';
+actions.forEach(function(a){checkHtml+='<li>'+a+'</li>'});
+checkHtml+='</ul>';
+document.getElementById('prepChecklist').innerHTML=checkHtml;
+
+var btn=document.getElementById('prepToggle');
+btn.style.display=level>=1?'inline-block':'none';
+if(level>=3){document.getElementById('prepChecklist').style.display='block';btn.innerHTML='&#9650; Ocultar checklist'}
+else{document.getElementById('prepChecklist').style.display='none';btn.innerHTML='&#9660; Ver checklist de preparaci&oacute;n'}}
 
 // Hourly Forecast 1-6h
 function fetchForecast(){
