@@ -1385,8 +1385,12 @@ try{results[sid]={level:parseFloat(latest.value),dt:latest.dateTime}}catch(e){}}
 renderEmbalses(results);
 }).catch(function(){document.getElementById('embalsesContent').innerHTML='<p class="center" style="color:var(--text-dim)">⚠️ USGS data unavailable</p>'})}
 
+var prevEmb=JSON.parse(localStorage.getItem('kwint_emb_prev')||'{}');
+
 function renderEmbalses(levels){
 var el=document.getElementById('embalsesContent');
+var changes=[];
+var newEmb={};
 var ast=getAST();
 var timeStr=pad(ast.getHours())+':'+pad(ast.getMinutes());
 var dayNames=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -1408,11 +1412,14 @@ if(!d){html+='<div class="emb-card"><div class="emb-header"><span>⚪</span><spa
 var cl=classifyEmb(d.level,r.u);var info=EMB_LEVELS[cl.idx];
 if(cl.idx<worstIdx)worstIdx=cl.idx;
 if(cl.idx!==4)alertas.push({name:r.n,info:info,pct:cl.pct});
+newEmb[r.s]={idx:cl.idx,level:d.level,name:r.n};
+var chgHtml='';
+if(prevEmb[r.s]&&prevEmb[r.s].idx!==cl.idx){var prev=EMB_LEVELS[prevEmb[r.s].idx];var arrow=cl.idx>prevEmb[r.s].idx?'📈 MEJORA':'📉 BAJA';changes.push({name:r.n,from:prev,to:info,arrow:arrow});chgHtml='<div style="font-size:.72rem;margin-top:4px;padding:3px 8px;border-radius:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);display:inline-block">'+arrow+' — '+prev.e+' '+prev.l+' → '+info.e+' '+info.l+'</div>'}
 
 var barColor=info.cl;
 
 html+='<div class="emb-card"><div class="emb-header"><span>'+info.e+'</span><span class="emb-name">'+r.n+'</span><span class="emb-entity">'+r.e+'</span>'+
-'<span class="emb-level-tag" style="background:'+info.bg+';color:'+info.cl+'">'+info.l+'</span></div>'+
+'<span class="emb-level-tag" style="background:'+info.bg+';color:'+info.cl+'">'+info.l+'</span></div>'+chgHtml+
 '<div class="emb-bar-wrap"><div class="emb-bar-fill" style="width:'+Math.max(0,Math.min(100,cl.pct))+'%;background:'+barColor+'"></div></div>'+
 '<div class="emb-stats"><span>'+embProgressBar(cl.pct)+' '+cl.pct.toFixed(1)+'%</span><span>'+d.level.toFixed(2)+'m / '+r.u.s.toFixed(2)+'m</span></div></div>'});
 
@@ -1422,11 +1429,15 @@ var d=levels[r.s];
 if(!d){html+='<div class="emb-card" style="padding:8px 12px"><span>⚪ '+r.n+' — sin datos</span></div>';return}
 var cl=classifyEmb(d.level,r.u);var info=EMB_LEVELS[cl.idx];
 if(cl.idx!==4)alertas.push({name:r.n,info:info,pct:cl.pct});
+newEmb[r.s]={idx:cl.idx,level:d.level,name:r.n};
+var chgHtml='';
+if(prevEmb[r.s]&&prevEmb[r.s].idx!==cl.idx){var prev=EMB_LEVELS[prevEmb[r.s].idx];var arrow=cl.idx>prevEmb[r.s].idx?'📈 MEJORA':'📉 BAJA';changes.push({name:r.n,from:prev,to:info,arrow:arrow});chgHtml='<div style="font-size:.7rem;margin:4px 0 0;padding:2px 8px;border-radius:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);display:inline-block">'+arrow+' — '+prev.e+' '+prev.l+' → '+info.e+' '+info.l+'</div>'}
 
 html+='<div class="emb-card" style="padding:8px 12px"><div class="emb-header" style="margin-bottom:0">'+
 '<span>'+info.e+'</span><span class="emb-name" style="font-size:.82rem">'+r.n+'</span>'+
 '<span class="emb-entity">'+r.e+'</span>'+
 '<span style="font-size:.78rem;color:var(--text-dim)">'+info.l+' ('+cl.pct.toFixed(1)+'%)</span></div>'+
+chgHtml+
 '<div class="emb-bar-wrap" style="height:6px;margin:6px 0 0"><div class="emb-bar-fill" style="width:'+Math.max(0,Math.min(100,cl.pct))+'%;background:'+info.cl+'"></div></div></div>'});
 
 // Summary
@@ -1434,6 +1445,11 @@ var overall=EMB_LEVELS[worstIdx];
 html+='<div class="emb-summary"><div class="emb-summary-title">📋 RESUMEN Y RECOMENDACIÓN</div>'+
 '<div style="font-size:.88rem">Estado del sistema principal: '+overall.e+' <strong>'+overall.l+'</strong></div>'+
 '<div class="emb-rec">'+EMB_RECS[worstIdx]+'</div>';
+
+if(changes.length){
+html+='<div class="emb-alert-list" style="margin-bottom:8px"><strong>🔄 Cambios de Nivel Detectados:</strong><br>';
+changes.forEach(function(c){html+='&nbsp;&nbsp;'+c.arrow+' '+c.name+' — '+c.from.e+' '+c.from.l+' → '+c.to.e+' '+c.to.l+'<br>'});
+html+='</div>'}
 
 if(alertas.length){
 html+='<div class="emb-alert-list"><strong>⚠️ Embalses fuera de Seguridad:</strong><br>';
@@ -1444,6 +1460,7 @@ html+='<div style="margin-top:10px;font-size:.72rem;color:var(--text-dim)">'+
 '📡 KRIZ IRON — EMBALSES PR | Datos USGS tiempo real + umbrales AAA<br>'+
 'Creado, diseñado y codificado por KRIZ IRON</div></div>';
 
+localStorage.setItem('kwint_emb_prev',JSON.stringify(newEmb));
 el.innerHTML=html}
 
 fetchEmbalses();setInterval(fetchEmbalses,3600000);
