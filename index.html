@@ -25,8 +25,8 @@
     .nav-link{color:var(--text);text-decoration:none;font-size:.76rem;font-weight:500;padding:5px 10px;border-radius:20px;white-space:nowrap;transition:var(--tr);opacity:.6}
     .nav-link:hover,.nav-link.active{background:var(--gold-dim);color:var(--gold);opacity:1}
     .nav-flag{font-size:1rem;margin-left:auto}
-    .nav-visits{display:flex;align-items:center;gap:4px;white-space:nowrap;font-size:.68rem;color:var(--text-dim)}
-    .nav-visits img{height:12px;filter:brightness(1.8) contrast(.8);vertical-align:middle}
+    .nav-visits{font-size:.72rem;color:var(--gold);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;opacity:.8}
+    .nav-counter-hidden{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
     .nav-clock{font-size:.78rem;color:var(--gold);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
 
     .alert-banner{background:linear-gradient(90deg,rgba(255,68,68,.15),rgba(255,152,0,.1));border-bottom:1px solid rgba(255,68,68,.3);overflow:hidden;max-height:0;transition:max-height .5s ease}
@@ -232,7 +232,8 @@
   <a class="nav-link" style="color:var(--blue)" href="index2.html">Radar & Sat</a>
   <a class="nav-link" style="color:var(--blue)" href="index3.html">Forecast</a>
   <span class="nav-flag">&#127477;&#127479;</span>
-  <span class="nav-visits">&#128065;<img src="https://hitwebcounter.com/counter/counter.php?page=21394163&style=0025&nbdigits=7&type=page&initCount=386877" alt="Visits" /></span>
+  <span class="nav-visits" id="navVisits">&#128065; 387,000+</span>
+  <img class="nav-counter-hidden" src="https://hitwebcounter.com/counter/counter.php?page=21394163&style=0006&nbdigits=9&type=page&initCount=386877" alt="" />
   <span class="nav-clock" id="navClock">--:--:-- AST</span>
 </div></nav>
 
