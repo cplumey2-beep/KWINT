@@ -120,6 +120,14 @@
     .qa-link .qa-icon{font-size:.95rem;flex-shrink:0}
     .qa-link.hidden{display:none}
 
+    .loc-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    .loc-select{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:.78rem;font-family:inherit;cursor:pointer;max-width:220px}
+    .loc-select:focus{outline:none;border-color:var(--gold)}
+    .loc-select option{background:#1a1d35;color:var(--text)}
+    .loc-btn{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:.78rem;cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:4px}
+    .loc-btn:hover{border-color:var(--gold);color:var(--gold)}
+    .loc-indicator{font-size:.72rem;color:var(--text-dim);text-align:center;margin-bottom:6px}
+
     .widget-wrap{border-radius:var(--radius);overflow:hidden;min-height:100px}
     iframe{border-radius:8px}
 
@@ -310,6 +318,12 @@
       <label id="lblES" class="active">ES</label>
     </div>
   </div>
+  <div class="loc-bar">
+    <span style="font-size:.78rem">&#128205;</span>
+    <select class="loc-select" id="locSelect" onchange="changeLocation()"></select>
+    <button class="loc-btn" id="locGpsBtn" onclick="useGPS()" title="Usar mi ubicación GPS">&#128225; GPS</button>
+  </div>
+  <div class="loc-indicator" id="locIndicator"></div>
   <div class="risk-meter">
     <div class="risk-score" id="riskScore">--</div>
     <div class="risk-label" id="riskLevel">Loading...</div>
@@ -322,7 +336,7 @@
       <span style="color:var(--red)" data-lang-key="riskLeg3">65-84 ALTO</span>
       <span style="color:#ff0040" data-lang-key="riskLeg4">85-100 EXTREMO</span>
     </div>
-    <div style="font-size:.68rem;color:var(--text-dim);text-align:center;margin-top:6px;line-height:1.5" id="riskExplain">Índice compuesto basado en: calor, viento, ráfagas, lluvia, presión, humedad, UV, CAPE y visibilidad.<br>Los valores se actualizan cada 5 min desde Open-Meteo API para Centro PR.</div>
+    <div style="font-size:.68rem;color:var(--text-dim);text-align:center;margin-top:6px;line-height:1.5" id="riskExplain"></div>
   </div>
   <div class="zone-grid" id="currentData" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
     <div class="zone-card"><div class="zone-name">Temp</div><div class="zone-temp" id="dTemp">--</div><div class="zone-detail">Actual</div></div>
@@ -369,13 +383,13 @@
 
 <!-- Risk Factors + Trend Intelligence -->
 <section class="card" id="riskFactors">
-  <h2>📊 Factores del Risk Score — Centro PR</h2>
+  <h2 id="hFactors">📊 Factores del Risk Score — Centro PR</h2>
   <div id="riskReasons"><p class="center" style="color:var(--text-dim);font-size:.82rem">Calculating...</p></div>
 </section>
 
 <!-- Forecast 1-6 hours -->
 <section class="card" id="forecastHourly">
-  <h2>🔮 Pronóstico 1-6 Horas — Centro PR</h2>
+  <h2 id="hHourly">🔮 Pronóstico 1-6 Horas — Centro PR</h2>
   <div id="forecastContent"><p class="center" style="color:var(--text-dim);font-size:.82rem">Loading forecast...</p></div>
 </section>
 
@@ -541,7 +555,49 @@
 
 <script>
 (function(){
-var PR={lat:18.2208,lon:-66.5901};
+var MUNICIPIOS=[
+{name:'Adjuntas',lat:18.1627,lon:-66.7228},{name:'Aguada',lat:18.3805,lon:-67.1875},
+{name:'Aguadilla',lat:18.4274,lon:-67.1541},{name:'Aguas Buenas',lat:18.2569,lon:-66.1020},
+{name:'Aibonito',lat:18.1399,lon:-66.2661},{name:'Añasco',lat:18.2833,lon:-67.1394},
+{name:'Arecibo',lat:18.4726,lon:-66.7157},{name:'Arroyo',lat:17.9663,lon:-66.0614},
+{name:'Barceloneta',lat:18.4505,lon:-66.5385},{name:'Barranquitas',lat:18.1866,lon:-66.3063},
+{name:'Bayamón',lat:18.3994,lon:-66.1554},{name:'Cabo Rojo',lat:18.0866,lon:-67.1457},
+{name:'Caguas',lat:18.2341,lon:-66.0485},{name:'Camuy',lat:18.4840,lon:-66.8449},
+{name:'Canóvanas',lat:18.3790,lon:-65.9016},{name:'Carolina',lat:18.3808,lon:-65.9574},
+{name:'Cataño',lat:18.4413,lon:-66.1174},{name:'Cayey',lat:18.1119,lon:-66.1648},
+{name:'Ceiba',lat:18.2642,lon:-65.6487},{name:'Ciales',lat:18.3361,lon:-66.4689},
+{name:'Cidra',lat:18.1758,lon:-66.1614},{name:'Coamo',lat:18.0799,lon:-66.3579},
+{name:'Comerío',lat:18.2193,lon:-66.2257},{name:'Corozal',lat:18.3419,lon:-66.3168},
+{name:'Culebra',lat:18.3109,lon:-65.3028},{name:'Dorado',lat:18.4589,lon:-66.2677},
+{name:'Fajardo',lat:18.3258,lon:-65.6524},{name:'Florida',lat:18.3623,lon:-66.5719},
+{name:'Guánica',lat:17.9714,lon:-66.9080},{name:'Guayama',lat:17.9842,lon:-66.1117},
+{name:'Guayanilla',lat:18.0192,lon:-66.7919},{name:'Guaynabo',lat:18.3571,lon:-66.1108},
+{name:'Gurabo',lat:18.2544,lon:-65.9724},{name:'Hatillo',lat:18.4867,lon:-66.8254},
+{name:'Hormigueros',lat:18.1399,lon:-67.1270},{name:'Humacao',lat:18.1498,lon:-65.8277},
+{name:'Isabela',lat:18.5002,lon:-67.0247},{name:'Jayuya',lat:18.2186,lon:-66.5916},
+{name:'Juana Díaz',lat:18.0536,lon:-66.5067},{name:'Juncos',lat:18.2275,lon:-65.9213},
+{name:'Lajas',lat:18.0492,lon:-67.0593},{name:'Lares',lat:18.2949,lon:-66.8781},
+{name:'Las Marías',lat:18.2539,lon:-66.9899},{name:'Las Piedras',lat:18.1830,lon:-65.8717},
+{name:'Loíza',lat:18.4313,lon:-65.8800},{name:'Luquillo',lat:18.3727,lon:-65.7166},
+{name:'Manatí',lat:18.4293,lon:-66.4862},{name:'Maricao',lat:18.1808,lon:-66.9799},
+{name:'Maunabo',lat:18.0072,lon:-65.9013},{name:'Mayagüez',lat:18.2011,lon:-67.1396},
+{name:'Moca',lat:18.3946,lon:-67.1130},{name:'Morovis',lat:18.3264,lon:-66.4065},
+{name:'Naguabo',lat:18.2116,lon:-65.7347},{name:'Naranjito',lat:18.3009,lon:-66.2448},
+{name:'Orocovis',lat:18.2269,lon:-66.3914},{name:'Patillas',lat:18.0037,lon:-66.0136},
+{name:'Peñuelas',lat:18.0563,lon:-66.7260},{name:'Ponce',lat:18.0108,lon:-66.6141},
+{name:'Quebradillas',lat:18.4737,lon:-66.9387},{name:'Rincón',lat:18.3403,lon:-67.2508},
+{name:'Río Grande',lat:18.3803,lon:-65.8314},{name:'Sabana Grande',lat:18.0769,lon:-66.9606},
+{name:'Salinas',lat:17.9772,lon:-66.2978},{name:'San Germán',lat:18.0831,lon:-67.0359},
+{name:'San Juan',lat:18.4655,lon:-66.1057},{name:'San Lorenzo',lat:18.1893,lon:-65.9615},
+{name:'San Sebastián',lat:18.3371,lon:-66.9901},{name:'Santa Isabel',lat:17.9663,lon:-66.4049},
+{name:'Toa Alta',lat:18.3880,lon:-66.2478},{name:'Toa Baja',lat:18.4441,lon:-66.2542},
+{name:'Trujillo Alto',lat:18.3548,lon:-66.0074},{name:'Utuado',lat:18.2665,lon:-66.7008},
+{name:'Vega Alta',lat:18.4123,lon:-66.3313},{name:'Vega Baja',lat:18.4441,lon:-66.3871},
+{name:'Vieques',lat:18.1263,lon:-65.4401},{name:'Villalba',lat:18.1279,lon:-66.4922},
+{name:'Yabucoa',lat:18.0505,lon:-65.8793},{name:'Yauco',lat:18.0349,lon:-66.8496}
+];
+var savedLoc=JSON.parse(localStorage.getItem('kwint_location')||'null');
+var PR=savedLoc||{lat:18.2208,lon:-66.5901,name:'Centro PR'};
 var ZONES=[
   {name:"Norte",lat:18.4505,lon:-66.5385,ref:"Barceloneta"},
   {name:"Oeste",lat:18.2011,lon:-67.1396,ref:"Mayaguez"},
@@ -564,7 +620,7 @@ var unitC=localStorage.getItem('kwint_unit')!=='F';
 var langES=localStorage.getItem('kwint_lang')!=='EN';
 var LANG={
 labels:{en:{Temp:'Temp',FeelsLike:'Feels Like',HeatIndex:'Heat Index',Wind:'Wind',Gusts:'Gusts',Rain:'Rain',Humidity:'Humidity',Pressure:'Pressure',UVIndex:'UV Index',DewPoint:'Dew Point',Visibility:'Visibility',RainProb:'Rain Prob.',CloudCover:'Cloud Cover',CAPE:'CAPE',PressTrend:'Press. Trend',Condition:'Condition'},
-es:{Temp:'Temperatura',FeelsLike:'Sensación',HeatIndex:'Índice Calor',Wind:'Viento',Gusts:'Ráfagas',Rain:'Lluvia',Humidity:'Humedad',Pressure:'Presión',UVIndex:'Índice UV',DewPoint:'Punto Rocío',Visibility:'Visibilidad',RainProb:'Prob. Lluvia',CloudCover:'Nubosidad',CAPE:'CAPE',PressTrend:'Tend. Presión',Condition:'Condición'}},
+es:{Temp:'Temperatura',FeelsLike:'Sensación',HeatIndex:'Índice Calor',Wind:'Viento',Gusts:'Ráfagas',Rain:'Lluvia',Humidity:'Humedad',Pressure:'Presión',UVIndex:'Índice UV',DewPoint:'Punto Rocío',Visibility:'Visibilidad',RainProb:'Prob. Lluvia',CloudCover:'Nubosidad',CAPE:'Energía Conv.',PressTrend:'Tend. Presión',Condition:'Condición'}},
 uv:{en:{EXTREME:'EXTREME',VERYHIGH:'VERY HIGH',HIGH:'HIGH',MODERATE:'MODERATE',LOW:'LOW'},es:{EXTREME:'EXTREMO',VERYHIGH:'MUY ALTO',HIGH:'ALTO',MODERATE:'MODERADO',LOW:'BAJO'}},
 dew:{en:{opr:'Oppressive',vhum:'Very Humid',hum:'Humid',comf:'Comfortable',dry:'Dry'},es:{opr:'Opresivo',vhum:'Muy Húmedo',hum:'Húmedo',comf:'Confortable',dry:'Seco'}},
 vis:{en:{vp:'Very Poor',p:'Poor',m:'Moderate',g:'Good'},es:{vp:'Muy Pobre',p:'Pobre',m:'Moderada',g:'Buena'}},
@@ -573,7 +629,7 @@ cape:{en:{ext:'Extreme',sev:'Severe Storms',storm:'Storms',mod:'Moderate Convect
 risk:{en:{NORMAL:'NORMAL',LOW:'LOW / WATCH',MODERATE:'MODERATE',HIGH:'HIGH',EXTREME:'EXTREME'},es:{NORMAL:'NORMAL',LOW:'BAJO / VIGILANCIA',MODERATE:'MODERADO',HIGH:'ALTO',EXTREME:'EXTREMO'}},
 riskAction:{en:{ext:'Dangerous conditions. Stay alert to official bulletins.',high:'High risk. Avoid unnecessary exposure and monitor changes.',mod:'Moderate risk. Stay alert.',low:'Conditions under observation.',norm:'No strong signals of immediate risk.'},es:{ext:'Condiciones peligrosas. Manténgase pendiente a boletines oficiales.',high:'Riesgo alto. Evite exposición innecesaria y monitoree cambios.',mod:'Riesgo moderado. Manténgase alerta.',low:'Condiciones bajo observación.',norm:'Condiciones sin señales fuertes de riesgo inmediato.'}},
 codes:{en:{0:"Clear",1:"Mostly Clear",2:"Partly Cloudy",3:"Overcast",45:"Fog",48:"Fog",51:"Light Drizzle",53:"Drizzle",55:"Heavy Drizzle",61:"Light Rain",63:"Rain",65:"Heavy Rain",80:"Showers",81:"Mod Showers",82:"Heavy Showers",95:"Thunderstorm",96:"T-Storm+Hail",99:"Severe T-Storm"},es:{0:"Despejado",1:"Mayormente Despejado",2:"Parcialmente Nublado",3:"Nublado",45:"Neblina",48:"Neblina",51:"Llovizna Leve",53:"Llovizna",55:"Llovizna Fuerte",61:"Lluvia Leve",63:"Lluvia",65:"Lluvia Fuerte",80:"Aguaceros",81:"Aguaceros Mod.",82:"Aguaceros Fuertes",95:"Tormenta Eléctrica",96:"Tormenta+Granizo",99:"Tormenta Severa"}},
-headers:{en:{riskH:'Risk Score & Current Conditions',forecast:'Forecast Widget',alertas:'Alerts Detected',factors:'Risk Score Factors — Centro PR',hourly:'Forecast 1-6 Hours — Centro PR',season:'Hurricane Season'},es:{riskH:'Puntuación de Riesgo & Condiciones Actuales',forecast:'Widget de Pronóstico',alertas:'Alertas Detectadas',factors:'Factores del Risk Score — Centro PR',hourly:'Pronóstico 1-6 Horas — Centro PR',season:'Temporada de Huracanes'}},
+headers:{en:{riskH:'Risk Score & Current Conditions',forecast:'Forecast Widget',alertas:'Alerts Detected',factors:'Risk Score Factors',hourly:'Forecast 1-6 Hours',season:'Hurricane Season'},es:{riskH:'Puntuación de Riesgo & Condiciones Actuales',forecast:'Widget de Pronóstico',alertas:'Alertas Detectadas',factors:'Factores del Risk Score',hourly:'Pronóstico 1-6 Horas',season:'Temporada de Huracanes'}},
 detail:{en:{actual:'Actual',sensation:'Sensation',noaa:'NOAA formula',vs:'vs previous'},es:{actual:'Actual',sensation:'Sensación',noaa:'Fórmula NOAA',vs:'vs anterior'}}
 };
 function L(cat,key){var lang=langES?'es':'en';return LANG[cat]&&LANG[cat][lang]&&LANG[cat][lang][key]||key}
@@ -608,12 +664,68 @@ document.getElementById('lblES').className=langES?'active':'';
 cardLabelMap.forEach(function(pair){var el=document.getElementById(pair[0]);if(el){var nameEl=el.parentElement.querySelector('.zone-name');if(nameEl)nameEl.textContent=L('labels',pair[1])}});
 var legs=langES?['0-19 NORMAL','20-39 BAJO','40-64 MODERADO','65-84 ALTO','85-100 EXTREMO']:['0-19 NORMAL','20-39 LOW','40-64 MODERATE','65-84 HIGH','85-100 EXTREME'];
 document.querySelectorAll('[data-lang-key]').forEach(function(el,i){if(i<legs.length)el.textContent=legs[i]});
-var rex=document.getElementById('riskExplain');if(rex)rex.innerHTML=langES?'Índice compuesto basado en: calor, viento, ráfagas, lluvia, presión, humedad, UV, CAPE y visibilidad.<br>Los valores se actualizan cada 5 min desde Open-Meteo API para Centro PR.':'Composite index based on: heat, wind, gusts, rain, pressure, humidity, UV, CAPE and visibility.<br>Values update every 5 min from Open-Meteo API for Centro PR.';
+var locName=PR.name||'Centro PR';
+var rex=document.getElementById('riskExplain');if(rex)rex.innerHTML=langES?'Índice compuesto basado en: calor, viento, ráfagas, lluvia, presión, humedad, UV, CAPE y visibilidad.<br>Los valores se actualizan cada 5 min desde Open-Meteo API para '+locName+'.':'Composite index based on: heat, wind, gusts, rain, pressure, humidity, UV, CAPE and visibility.<br>Values update every 5 min from Open-Meteo API for '+locName+'.';
+updateLocIndicator();
 fetchWeather()};
 (function(){var cb=document.getElementById('langToggle');if(cb){cb.checked=langES;
 document.getElementById('lblEN').className=langES?'':'active';
 document.getElementById('lblES').className=langES?'active':'';
 if(langES){cardLabelMap.forEach(function(pair){var el=document.getElementById(pair[0]);if(el){var nameEl=el.parentElement.querySelector('.zone-name');if(nameEl)nameEl.textContent=L('labels',pair[1])}})}}})();
+
+// Location system
+function populateLocSelect(){
+var sel=document.getElementById('locSelect');if(!sel)return;
+sel.innerHTML='<option value="centro">Centro PR (General)</option>';
+MUNICIPIOS.forEach(function(m,i){
+var opt=document.createElement('option');opt.value=i;opt.textContent=m.name;
+sel.appendChild(opt)});
+if(PR.name&&PR.name!=='Centro PR'){
+for(var i=0;i<MUNICIPIOS.length;i++){if(MUNICIPIOS[i].name===PR.name){sel.value=i;break}}}
+if(PR.name&&PR.gps)sel.value='centro';
+updateLocIndicator()}
+function updateLocIndicator(){
+var el=document.getElementById('locIndicator');if(!el)return;
+var n=PR.name||'Centro PR';
+var txt=PR.gps?(langES?'📍 Ubicación GPS: ':'📍 GPS Location: ')+PR.lat.toFixed(4)+'°N, '+Math.abs(PR.lon).toFixed(4)+'°W':(langES?'📍 Datos para: ':'📍 Data for: ')+n;
+el.textContent=txt;
+var hf=document.getElementById('hFactors');if(hf)hf.textContent=langES?'📊 Factores del Risk Score — '+n:'📊 Risk Score Factors — '+n;
+var hh=document.getElementById('hHourly');if(hh)hh.textContent=langES?'🔮 Pronóstico 1-6 Horas — '+n:'🔮 Forecast 1-6 Hours — '+n}
+window.changeLocation=function(){
+var sel=document.getElementById('locSelect');if(!sel)return;
+var v=sel.value;
+if(v==='centro'){PR.lat=18.2208;PR.lon=-66.5901;PR.name='Centro PR';delete PR.gps}
+else{var m=MUNICIPIOS[parseInt(v)];if(m){PR.lat=m.lat;PR.lon=m.lon;PR.name=m.name;delete PR.gps}}
+localStorage.setItem('kwint_location',JSON.stringify(PR));
+updateLocIndicator();prevWeather=null;fetchWeather();fetchForecast();fetchDust()};
+window.useGPS=function(){
+var btn=document.getElementById('locGpsBtn');
+if(!navigator.geolocation){btn.textContent='❌ No disponible';return}
+btn.textContent='⏳...';
+navigator.geolocation.getCurrentPosition(function(pos){
+var lat=pos.coords.latitude,lon=pos.coords.longitude;
+if(lat<17.5||lat>18.7||lon<-67.5||lon>-65.0){
+btn.textContent='📡 GPS';alert(langES?'Ubicación fuera de Puerto Rico. Seleccione un municipio manualmente.':'Location outside Puerto Rico. Please select a municipality manually.');return}
+var closest=null,minD=Infinity;
+MUNICIPIOS.forEach(function(m){var d=haversine(lat,m.lat,lon,m.lon);if(d<minD){minD=d;closest=m}});
+PR.lat=lat;PR.lon=lon;PR.name=(closest?closest.name:'GPS')+' (GPS)';PR.gps=true;
+localStorage.setItem('kwint_location',JSON.stringify(PR));
+document.getElementById('locSelect').value='centro';
+updateLocIndicator();prevWeather=null;fetchWeather();fetchForecast();fetchDust();
+btn.textContent='📡 GPS'},function(){
+btn.textContent='📡 GPS';alert(langES?'No se pudo obtener ubicación. Verifique permisos del navegador.':'Could not get location. Check browser permissions.')},
+{enableHighAccuracy:false,timeout:10000})};
+populateLocSelect();
+(function(){var locName=PR.name||'Centro PR';var rex=document.getElementById('riskExplain');if(rex)rex.innerHTML=langES?'Índice compuesto basado en: calor, viento, ráfagas, lluvia, presión, humedad, UV, CAPE y visibilidad.<br>Los valores se actualizan cada 5 min desde Open-Meteo API para '+locName+'.':'Composite index based on: heat, wind, gusts, rain, pressure, humidity, UV, CAPE and visibility.<br>Values update every 5 min from Open-Meteo API for '+locName+'.'})();
+if(!savedLoc&&navigator.geolocation){
+navigator.geolocation.getCurrentPosition(function(pos){
+var lat=pos.coords.latitude,lon=pos.coords.longitude;
+if(lat>=17.5&&lat<=18.7&&lon>=-67.5&&lon<=-65.0){
+var closest=null,minD=Infinity;
+MUNICIPIOS.forEach(function(m){var d=haversine(lat,m.lat,lon,m.lon);if(d<minD){minD=d;closest=m}});
+PR.lat=lat;PR.lon=lon;PR.name=(closest?closest.name:'GPS')+' (GPS)';PR.gps=true;
+localStorage.setItem('kwint_location',JSON.stringify(PR));
+updateLocIndicator();prevWeather=null;fetchWeather();fetchForecast();fetchDust()}},function(){},{enableHighAccuracy:false,timeout:8000})}
 
 var prevWeather=null;
 
@@ -718,10 +830,11 @@ document.getElementById('riskLevel').textContent=risk.level;document.getElementB
 document.getElementById('riskAction').textContent=risk.action;
 var fill=document.getElementById('riskFill');fill.style.width=risk.score+'%';fill.style.background=risk.color;
 if(hic>=38){document.getElementById('dHeat').style.color='var(--red)'}else if(hic>=32){document.getElementById('dHeat').style.color='var(--orange)'}
+var locN=PR.name||'Centro PR';var rexEl=document.getElementById('riskExplain');if(rexEl)rexEl.innerHTML=langES?'Índice compuesto basado en: calor, viento, ráfagas, lluvia, presión, humedad, UV, CAPE y visibilidad.<br>Los valores se actualizan cada 5 min desde Open-Meteo API para '+locN+'.':'Composite index based on: heat, wind, gusts, rain, pressure, humidity, UV, CAPE and visibility.<br>Values update every 5 min from Open-Meteo API for '+locN+'.';
 
 // Risk Factors
 var rfEl=document.getElementById('riskReasons');
-var rfHtml='<div style="font-size:.85rem;font-weight:700;margin-bottom:4px">📊 FACTORES DE LA PUNTUACIÓN DE RIESGO</div><div style="font-size:.72rem;color:var(--text-dim);margin-bottom:8px">📍 Estación: Centro PR (18.22°N, 66.59°W)</div>';
+var rfHtml='<div style="font-size:.85rem;font-weight:700;margin-bottom:4px">📊 FACTORES DE LA PUNTUACIÓN DE RIESGO</div><div style="font-size:.72rem;color:var(--text-dim);margin-bottom:8px">📍 Estación: '+(PR.name||'Centro PR')+' ('+PR.lat.toFixed(2)+'°N, '+Math.abs(PR.lon).toFixed(2)+'°W)</div>';
 if(risk.reasons.length){risk.reasons.forEach(function(r){rfHtml+='<div style="font-size:.82rem;padding:3px 0">'+r+'</div>'})}
 else{rfHtml+='<div style="font-size:.82rem;color:var(--accent)">✅ Sin factores de riesgo elevados</div>'}
 
