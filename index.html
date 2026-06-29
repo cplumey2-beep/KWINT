@@ -1183,13 +1183,16 @@ var w=alertasData.weather;
 var nws=alertasData.nwsAlerts||[];
 var storms=alertasData.storms||[];
 
-// Factor 1: Risk Score
+// Factor 1: Risk Score (solo escala alto si hay amenaza severa real, no por calor/humedad)
 var scoreEl=document.getElementById('riskScore');
 var score=scoreEl?parseInt(scoreEl.textContent):0;
-if(score>=85){level=Math.max(level,4);reasons.push('Risk Score EXTREMO ('+score+')')}
-else if(score>=65){level=Math.max(level,3);reasons.push('Risk Score ALTO ('+score+')')}
-else if(score>=40){level=Math.max(level,2);reasons.push('Risk Score MODERADO ('+score+')')}
-else if(score>=20){level=Math.max(level,1);reasons.push('Risk Score BAJO ('+score+')')}
+var hasSevereWeather=w&&(w.code>=95||(w.wind_kmh&&w.wind_kmh>=63)||(w.gust_kmh&&w.gust_kmh>=90)||(w.pressure_msl&&w.pressure_msl<=1000));
+if(score>=85&&hasSevereWeather){level=Math.max(level,4);reasons.push('Risk Score EXTREMO ('+score+')')}
+else if(score>=85){level=Math.max(level,2);reasons.push('Risk Score EXTREMO ('+score+') — monitoreo activo')}
+else if(score>=65&&hasSevereWeather){level=Math.max(level,3);reasons.push('Risk Score ALTO ('+score+')')}
+else if(score>=65){level=Math.max(level,1);reasons.push('Risk Score ALTO ('+score+') — sin amenaza severa')}
+else if(score>=40){level=Math.max(level,1);reasons.push('Risk Score MODERADO ('+score+')')}
+else if(score>=20){reasons.push('Risk Score BAJO ('+score+')')}
 
 // Factor 2: NWS Alerts
 var hasWarning=false,hasWatch=false;
