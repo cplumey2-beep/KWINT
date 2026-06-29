@@ -298,10 +298,17 @@
 <!-- Risk Score + Current Conditions -->
 <section class="card no-anim" id="dashboard">
   <h2><span class="live-dot"></span>Risk Score &amp; Current Conditions</h2>
-  <div class="unit-toggle">
-    <label id="lblC" class="active">°C | hPa</label>
-    <label class="toggle-switch"><input type="checkbox" id="unitToggle" onchange="toggleUnit()"><span class="toggle-slider"></span></label>
-    <label id="lblF">°F | inHg</label>
+  <div class="unit-toggle" style="gap:18px;flex-wrap:wrap;justify-content:center">
+    <div style="display:flex;align-items:center;gap:6px">
+      <label id="lblC" class="active">°C | hPa</label>
+      <label class="toggle-switch"><input type="checkbox" id="unitToggle" onchange="toggleUnit()"><span class="toggle-slider"></span></label>
+      <label id="lblF">°F | inHg</label>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <label id="lblEN">EN</label>
+      <label class="toggle-switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="toggle-slider"></span></label>
+      <label id="lblES" class="active">ES</label>
+    </div>
   </div>
   <div class="risk-meter">
     <div class="risk-score" id="riskScore">--</div>
@@ -309,13 +316,13 @@
     <div class="risk-bar"><div class="risk-fill" id="riskFill" style="width:0%;background:var(--accent)"></div></div>
     <div class="risk-action" id="riskAction">Calculating risk based on live weather data...</div>
     <div style="display:flex;justify-content:space-between;font-size:.6rem;font-weight:700;letter-spacing:.5px;margin-top:6px;padding:0 2px">
-      <span style="color:var(--accent)">0-19 NORMAL</span>
-      <span style="color:var(--yellow)">20-39 LOW</span>
-      <span style="color:var(--orange)">40-64 MODERATE</span>
-      <span style="color:var(--red)">65-84 HIGH</span>
-      <span style="color:#ff0040">85-100 EXTREME</span>
+      <span style="color:var(--accent)" data-lang-key="riskLeg0">0-19 NORMAL</span>
+      <span style="color:var(--yellow)" data-lang-key="riskLeg1">20-39 BAJO</span>
+      <span style="color:var(--orange)" data-lang-key="riskLeg2">40-64 MODERADO</span>
+      <span style="color:var(--red)" data-lang-key="riskLeg3">65-84 ALTO</span>
+      <span style="color:#ff0040" data-lang-key="riskLeg4">85-100 EXTREMO</span>
     </div>
-    <div style="font-size:.68rem;color:var(--text-dim);text-align:center;margin-top:6px;line-height:1.5">Índice compuesto basado en: calor, viento, ráfagas, lluvia, presión, humedad, UV, CAPE y visibilidad.<br>Los valores se actualizan cada 5 min desde Open-Meteo API para Centro PR.</div>
+    <div style="font-size:.68rem;color:var(--text-dim);text-align:center;margin-top:6px;line-height:1.5" id="riskExplain">Índice compuesto basado en: calor, viento, ráfagas, lluvia, presión, humedad, UV, CAPE y visibilidad.<br>Los valores se actualizan cada 5 min desde Open-Meteo API para Centro PR.</div>
   </div>
   <div class="zone-grid" id="currentData" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
     <div class="zone-card"><div class="zone-name">Temp</div><div class="zone-temp" id="dTemp">--</div><div class="zone-detail">Actual</div></div>
@@ -542,18 +549,34 @@ var ZONES=[
   {name:"Este",lat:18.3258,lon:-65.6524,ref:"Fajardo"},
   {name:"Sur",lat:17.9716,lon:-66.606,ref:"Ponce"}
 ];
-var CODES={0:"Clear",1:"Mostly Clear",2:"Partly Cloudy",3:"Overcast",45:"Fog",48:"Fog",51:"Light Drizzle",53:"Drizzle",55:"Heavy Drizzle",61:"Light Rain",63:"Rain",65:"Heavy Rain",80:"Showers",81:"Mod Showers",82:"Heavy Showers",95:"Thunderstorm",96:"T-Storm+Hail",99:"Severe T-Storm"};
+function getCode(c){var lang=langES?'es':'en';return LANG.codes[lang][c]||'Unknown'}
 var CICONS={0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",51:"🌦️",53:"🌦️",55:"🌦️",61:"🌧️",63:"🌧️",65:"🌧️",80:"🌧️",81:"🌧️",82:"🌧️",95:"⛈️",96:"⛈️",99:"⛈️"};
 function pad(n){return String(n).padStart(2,'0')}
 function getAST(){var d=new Date();return new Date(d.getTime()+(d.getTimezoneOffset()-240)*60000)}
 function cToF(c){return c==null?null:Math.round((c*9/5+32)*10)/10}
 function fToC(f){return f==null?null:Math.round((f-32)*5/9*10)/10}
 function heatIndex(tf,rh){if(tf==null||rh==null||tf<80)return tf;var t=tf,r=rh;var hi=-42.379+2.04901523*t+10.14333127*r-.22475541*t*r-.00683783*t*t-.05481717*r*r+.00122874*t*t*r+.00085282*t*r*r-.00000199*t*t*r*r;if(r<13&&t>=80&&t<=112)hi-=((13-r)/4)*Math.sqrt((17-Math.abs(t-95))/17);if(r>85&&t>=80&&t<=87)hi+=((r-85)/10)*((87-t)/5);return Math.round(hi)}
-function uvLabel(uv){if(uv==null)return{txt:'N/A',cl:'var(--text-dim)'};if(uv>=11)return{txt:'EXTREME',cl:'#9c27b0'};if(uv>=8)return{txt:'VERY HIGH',cl:'var(--red)'};if(uv>=6)return{txt:'HIGH',cl:'var(--orange)'};if(uv>=3)return{txt:'MODERATE',cl:'var(--yellow)'};return{txt:'LOW',cl:'var(--accent)'}}
+function uvLabel(uv){if(uv==null)return{txt:'N/A',cl:'var(--text-dim)'};if(uv>=11)return{txt:L('uv','EXTREME'),cl:'#9c27b0'};if(uv>=8)return{txt:L('uv','VERYHIGH'),cl:'var(--red)'};if(uv>=6)return{txt:L('uv','HIGH'),cl:'var(--orange)'};if(uv>=3)return{txt:L('uv','MODERATE'),cl:'var(--yellow)'};return{txt:L('uv','LOW'),cl:'var(--accent)'}}
 function degToDir(d){if(d==null)return"--";var dirs=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];return dirs[Math.round(d/22.5)%16]}
 function haversine(a,b,c,d){var R=6371,r=Math.PI/180;var dl=(c-a)*r,dn=(d-b)*r;var x=Math.sin(dl/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dn/2)**2;return R*2*Math.asin(Math.sqrt(x))}
 
 var unitC=localStorage.getItem('kwint_unit')!=='F';
+var langES=localStorage.getItem('kwint_lang')!=='EN';
+var LANG={
+labels:{en:{Temp:'Temp',FeelsLike:'Feels Like',HeatIndex:'Heat Index',Wind:'Wind',Gusts:'Gusts',Rain:'Rain',Humidity:'Humidity',Pressure:'Pressure',UVIndex:'UV Index',DewPoint:'Dew Point',Visibility:'Visibility',RainProb:'Rain Prob.',CloudCover:'Cloud Cover',CAPE:'CAPE',PressTrend:'Press. Trend',Condition:'Condition'},
+es:{Temp:'Temperatura',FeelsLike:'Sensación',HeatIndex:'Índice Calor',Wind:'Viento',Gusts:'Ráfagas',Rain:'Lluvia',Humidity:'Humedad',Pressure:'Presión',UVIndex:'Índice UV',DewPoint:'Punto Rocío',Visibility:'Visibilidad',RainProb:'Prob. Lluvia',CloudCover:'Nubosidad',CAPE:'CAPE',PressTrend:'Tend. Presión',Condition:'Condición'}},
+uv:{en:{EXTREME:'EXTREME',VERYHIGH:'VERY HIGH',HIGH:'HIGH',MODERATE:'MODERATE',LOW:'LOW'},es:{EXTREME:'EXTREMO',VERYHIGH:'MUY ALTO',HIGH:'ALTO',MODERATE:'MODERADO',LOW:'BAJO'}},
+dew:{en:{opr:'Oppressive',vhum:'Very Humid',hum:'Humid',comf:'Comfortable',dry:'Dry'},es:{opr:'Opresivo',vhum:'Muy Húmedo',hum:'Húmedo',comf:'Confortable',dry:'Seco'}},
+vis:{en:{vp:'Very Poor',p:'Poor',m:'Moderate',g:'Good'},es:{vp:'Muy Pobre',p:'Pobre',m:'Moderada',g:'Buena'}},
+cloud:{en:{ov:'Overcast',part:'Partial',few:'Few Clouds',clr:'Clear'},es:{ov:'Nublado',part:'Parcial',few:'Poco Nublado',clr:'Despejado'}},
+cape:{en:{ext:'Extreme',sev:'Severe Storms',storm:'Storms',mod:'Moderate Convection',stb:'Stable'},es:{ext:'Extremo',sev:'Tormentas Severas',storm:'Tormentas',mod:'Convección Moderada',stb:'Estable'}},
+risk:{en:{NORMAL:'NORMAL',LOW:'LOW / WATCH',MODERATE:'MODERATE',HIGH:'HIGH',EXTREME:'EXTREME'},es:{NORMAL:'NORMAL',LOW:'BAJO / VIGILANCIA',MODERATE:'MODERADO',HIGH:'ALTO',EXTREME:'EXTREMO'}},
+riskAction:{en:{ext:'Dangerous conditions. Stay alert to official bulletins.',high:'High risk. Avoid unnecessary exposure and monitor changes.',mod:'Moderate risk. Stay alert.',low:'Conditions under observation.',norm:'No strong signals of immediate risk.'},es:{ext:'Condiciones peligrosas. Manténgase pendiente a boletines oficiales.',high:'Riesgo alto. Evite exposición innecesaria y monitoree cambios.',mod:'Riesgo moderado. Manténgase alerta.',low:'Condiciones bajo observación.',norm:'Condiciones sin señales fuertes de riesgo inmediato.'}},
+codes:{en:{0:"Clear",1:"Mostly Clear",2:"Partly Cloudy",3:"Overcast",45:"Fog",48:"Fog",51:"Light Drizzle",53:"Drizzle",55:"Heavy Drizzle",61:"Light Rain",63:"Rain",65:"Heavy Rain",80:"Showers",81:"Mod Showers",82:"Heavy Showers",95:"Thunderstorm",96:"T-Storm+Hail",99:"Severe T-Storm"},es:{0:"Despejado",1:"Mayormente Despejado",2:"Parcialmente Nublado",3:"Nublado",45:"Neblina",48:"Neblina",51:"Llovizna Leve",53:"Llovizna",55:"Llovizna Fuerte",61:"Lluvia Leve",63:"Lluvia",65:"Lluvia Fuerte",80:"Aguaceros",81:"Aguaceros Mod.",82:"Aguaceros Fuertes",95:"Tormenta Eléctrica",96:"Tormenta+Granizo",99:"Tormenta Severa"}},
+headers:{en:{riskH:'Risk Score & Current Conditions',forecast:'Forecast Widget',alertas:'Alerts Detected',factors:'Risk Score Factors — Centro PR',hourly:'Forecast 1-6 Hours — Centro PR',season:'Hurricane Season'},es:{riskH:'Puntuación de Riesgo & Condiciones Actuales',forecast:'Widget de Pronóstico',alertas:'Alertas Detectadas',factors:'Factores del Risk Score — Centro PR',hourly:'Pronóstico 1-6 Horas — Centro PR',season:'Temporada de Huracanes'}},
+detail:{en:{actual:'Actual',sensation:'Sensation',noaa:'NOAA formula',vs:'vs previous'},es:{actual:'Actual',sensation:'Sensación',noaa:'Fórmula NOAA',vs:'vs anterior'}}
+};
+function L(cat,key){var lang=langES?'es':'en';return LANG[cat]&&LANG[cat][lang]&&LANG[cat][lang][key]||key}
 function tempStr(c){if(c==null)return'--';return unitC?Math.round(c*10)/10+'°C':cToF(c)+'°F'}
 function pressStr(hpa){if(hpa==null)return'--';return unitC?Math.round(hpa*10)/10:Math.round(hpa*0.02953*100)/100}
 function pressUnit(){return unitC?'hPa (MSL)':'inHg'}
@@ -577,6 +600,21 @@ if(wd){var dir=wd.textContent.split('|')[0].trim();wd.textContent=dir+' | '+wind
 document.getElementById('lblC').className=unitC?'active':'';
 document.getElementById('lblF').className=unitC?'':'active'}})();
 
+var cardLabelMap=[['dTemp','Temp'],['dFeels','FeelsLike'],['dHeat','HeatIndex'],['dWind','Wind'],['dGust','Gusts'],['dRain','Rain'],['dHumid','Humidity'],['dPress','Pressure'],['dUV','UVIndex'],['dDew','DewPoint'],['dVis','Visibility'],['dRainProb','RainProb'],['dCloud','CloudCover'],['dCape','CAPE'],['dPressTrend','PressTrend'],['dCondIcon','Condition']];
+window.toggleLang=function(){var cb=document.getElementById('langToggle');langES=cb.checked;
+localStorage.setItem('kwint_lang',langES?'ES':'EN');
+document.getElementById('lblEN').className=langES?'':'active';
+document.getElementById('lblES').className=langES?'active':'';
+cardLabelMap.forEach(function(pair){var el=document.getElementById(pair[0]);if(el){var nameEl=el.parentElement.querySelector('.zone-name');if(nameEl)nameEl.textContent=L('labels',pair[1])}});
+var legs=langES?['0-19 NORMAL','20-39 BAJO','40-64 MODERADO','65-84 ALTO','85-100 EXTREMO']:['0-19 NORMAL','20-39 LOW','40-64 MODERATE','65-84 HIGH','85-100 EXTREME'];
+document.querySelectorAll('[data-lang-key]').forEach(function(el,i){if(i<legs.length)el.textContent=legs[i]});
+var rex=document.getElementById('riskExplain');if(rex)rex.innerHTML=langES?'Índice compuesto basado en: calor, viento, ráfagas, lluvia, presión, humedad, UV, CAPE y visibilidad.<br>Los valores se actualizan cada 5 min desde Open-Meteo API para Centro PR.':'Composite index based on: heat, wind, gusts, rain, pressure, humidity, UV, CAPE and visibility.<br>Values update every 5 min from Open-Meteo API for Centro PR.';
+fetchWeather()};
+(function(){var cb=document.getElementById('langToggle');if(cb){cb.checked=langES;
+document.getElementById('lblEN').className=langES?'':'active';
+document.getElementById('lblES').className=langES?'active':'';
+if(langES){cardLabelMap.forEach(function(pair){var el=document.getElementById(pair[0]);if(el){var nameEl=el.parentElement.querySelector('.zone-name');if(nameEl)nameEl.textContent=L('labels',pair[1])}})}}})();
+
 var prevWeather=null;
 
 function calcRisk(w){var s=0,reasons=[];var wind=w.wind_kmh||0,gust=w.gust_kmh||0,rain=w.precipitation||0,press=w.pressure_msl||1013,humid=w.humidity||0,hi=w.heat_index_f||0,code=w.code||0,uv=w.uv_index,cape=w.cape||0,vis=w.visibility;
@@ -587,16 +625,16 @@ if(wind>=119){s+=40;reasons.push('💨 Viento fuerza huracán: +40')}else if(win
 if(gust>=120){s+=35;reasons.push('🌬️ Ráfagas destructivas: +35')}else if(gust>=90){s+=25;reasons.push('🌬️ Ráfagas muy fuertes: +25')}else if(gust>=60){s+=15;reasons.push('🌬️ Ráfagas fuertes: +15')}else if(gust>=45){s+=8;reasons.push('🌬️ Ráfagas elevadas: +8')}
 if(rain>=20){s+=25;reasons.push('🌧️ Lluvia muy intensa: +25')}else if(rain>=10){s+=18;reasons.push('🌧️ Lluvia intensa: +18')}else if(rain>=5){s+=12;reasons.push('🌧️ Lluvia significativa: +12')}else if(rain>0){s+=5;reasons.push('🌧️ Lluvia detectada: +5')}
 if(press<=990){s+=35;reasons.push('📉 Presión muy baja: +35')}else if(press<=1000){s+=25;reasons.push('📉 Presión baja: +25')}else if(press<=1006){s+=12;reasons.push('📉 Presión bajando: +12')}
-if(code>=95){s+=25;var st=CODES[code]||'Tormenta';reasons.push('⛈️ '+st+' detectada: +25')}else if(code>=61){s+=10;reasons.push('🌧️ Condiciones de lluvia: +10')}
+if(code>=95){s+=25;var st=getCode(code)||'Tormenta';reasons.push('⛈️ '+st+' detectada: +25')}else if(code>=61){s+=10;reasons.push('🌧️ Condiciones de lluvia: +10')}
 if(cape>=2500){s+=15;reasons.push('⚡ CAPE extremo ('+cape+' J/kg): +15')}else if(cape>=1500){s+=10;reasons.push('⚡ CAPE severo ('+cape+' J/kg): +10')}else if(cape>=1000){s+=5;reasons.push('⚡ CAPE elevado ('+cape+' J/kg): +5')}
 if(vis!=null&&vis<1){s+=10;reasons.push('🌫️ Visibilidad muy pobre (<1 km): +10')}else if(vis!=null&&vis<4){s+=5;reasons.push('🌫️ Visibilidad reducida ('+vis.toFixed(1)+' km): +5')}
 s=Math.min(s,100);
 var lv,cl,ac;
-if(s>=85){lv="EXTREME";cl="var(--red)";ac="Condiciones peligrosas. Manténgase pendiente a boletines oficiales."}
-else if(s>=65){lv="HIGH";cl="var(--red)";ac="Riesgo alto. Evite exposición innecesaria y monitoree cambios."}
-else if(s>=40){lv="MODERATE";cl="var(--orange)";ac="Riesgo moderado. Manténgase alerta."}
-else if(s>=20){lv="LOW / WATCH";cl="var(--yellow)";ac="Condiciones bajo observación."}
-else{lv="NORMAL";cl="var(--accent)";ac="Condiciones sin señales fuertes de riesgo inmediato."}
+if(s>=85){lv=L('risk','EXTREME');cl="var(--red)";ac=L('riskAction','ext')}
+else if(s>=65){lv=L('risk','HIGH');cl="var(--red)";ac=L('riskAction','high')}
+else if(s>=40){lv=L('risk','MODERATE');cl="var(--orange)";ac=L('riskAction','mod')}
+else if(s>=20){lv=L('risk','LOW');cl="var(--yellow)";ac=L('riskAction','low')}
+else{lv=L('risk','NORMAL');cl="var(--accent)";ac=L('riskAction','norm')}
 return{score:s,level:lv,color:cl,action:ac,reasons:reasons}}
 
 // Clock
@@ -648,15 +686,15 @@ if(fc>=40)eFl.style.color='var(--red)';else if(fc>=35)eFl.style.color='var(--ora
 var eHi=document.getElementById('dHeat');eHi.textContent=tempStr(hic);eHi.setAttribute('data-tc',hic);
 var uvInfo=uvLabel(uv);document.getElementById('dUV').textContent=uv!=null?uv:'--';document.getElementById('dUV').style.color=uvInfo.cl;document.getElementById('dUVLabel').textContent=uvInfo.txt;
 var dew=c.dew_point_2m!=null?Math.round(c.dew_point_2m*10)/10:null;
-var eDew=document.getElementById('dDew');if(dew!=null){eDew.textContent=tempStr(dew);eDew.setAttribute('data-tc',dew);var dewLbl=dew>=26?'Opresivo':dew>=24?'Muy húmedo':dew>=21?'Húmedo':dew>=16?'Confortable':'Seco';document.getElementById('dDewLabel').textContent=dewLbl;if(dew>=26)eDew.style.color='var(--red)';else if(dew>=24)eDew.style.color='var(--orange)'}
+var eDew=document.getElementById('dDew');if(dew!=null){eDew.textContent=tempStr(dew);eDew.setAttribute('data-tc',dew);var dewLbl=dew>=26?L('dew','opr'):dew>=24?L('dew','vhum'):dew>=21?L('dew','hum'):dew>=16?L('dew','comf'):L('dew','dry');document.getElementById('dDewLabel').textContent=dewLbl;if(dew>=26)eDew.style.color='var(--red)';else if(dew>=24)eDew.style.color='var(--orange)'}
 var vis=c.visibility!=null?Math.round(c.visibility/1000*10)/10:null;
-if(vis!=null){document.getElementById('dVis').textContent=vis;var visLbl=vis<1?'Muy pobre':vis<4?'Pobre':vis<10?'Moderada':'Buena';document.getElementById('dVisLabel').textContent=visLbl+' (km)';if(vis<1)document.getElementById('dVis').style.color='var(--red)';else if(vis<4)document.getElementById('dVis').style.color='var(--orange)'}
+if(vis!=null){document.getElementById('dVis').textContent=vis;var visLbl=vis<1?L('vis','vp'):vis<4?L('vis','p'):vis<10?L('vis','m'):L('vis','g');document.getElementById('dVisLabel').textContent=visLbl+' (km)';if(vis<1)document.getElementById('dVis').style.color='var(--red)';else if(vis<4)document.getElementById('dVis').style.color='var(--orange)'}
 var rProb=c.precipitation_probability!=null?c.precipitation_probability:null;
 if(rProb!=null){document.getElementById('dRainProb').textContent=rProb;if(rProb>=70)document.getElementById('dRainProb').style.color='var(--blue)';else if(rProb>=40)document.getElementById('dRainProb').style.color='var(--orange)'}
 var cloud=c.cloud_cover!=null?c.cloud_cover:null;
-if(cloud!=null){document.getElementById('dCloud').textContent=cloud;var clLbl=cloud>=80?'Nublado':cloud>=50?'Parcial':cloud>=20?'Poco nublado':'Despejado';document.getElementById('dCloudLabel').textContent=clLbl+' (%)'}
+if(cloud!=null){document.getElementById('dCloud').textContent=cloud;var clLbl=cloud>=80?L('cloud','ov'):cloud>=50?L('cloud','part'):cloud>=20?L('cloud','few'):L('cloud','clr');document.getElementById('dCloudLabel').textContent=clLbl+' (%)'}
 var cape=c.cape!=null?Math.round(c.cape):null;
-if(cape!=null){document.getElementById('dCape').textContent=cape;var capeLbl=cape>=2500?'Extremo':cape>=1500?'Tormentas severas':cape>=1000?'Tormentas':cape>=500?'Convección moderada':'Estable';document.getElementById('dCapeLabel').textContent=capeLbl;if(cape>=2500)document.getElementById('dCape').style.color='var(--red)';else if(cape>=1500)document.getElementById('dCape').style.color='var(--orange)';else if(cape>=1000)document.getElementById('dCape').style.color='var(--yellow)'}
+if(cape!=null){document.getElementById('dCape').textContent=cape;var capeLbl=cape>=2500?L('cape','ext'):cape>=1500?L('cape','sev'):cape>=1000?L('cape','storm'):cape>=500?L('cape','mod'):L('cape','stb');document.getElementById('dCapeLabel').textContent=capeLbl;if(cape>=2500)document.getElementById('dCape').style.color='var(--red)';else if(cape>=1500)document.getElementById('dCape').style.color='var(--orange)';else if(cape>=1000)document.getElementById('dCape').style.color='var(--yellow)'}
 if(prevWeather&&prevWeather.pressure_msl){var pDiff=Math.round((c.pressure_msl-prevWeather.pressure_msl)*10)/10;var pArrow=pDiff>0.5?'↑ +'+pDiff:pDiff<-0.5?'↓ '+pDiff:'→ '+pDiff;document.getElementById('dPressTrend').textContent=pArrow;document.getElementById('dPressTrendLabel').textContent='hPa vs anterior';if(pDiff<-2)document.getElementById('dPressTrend').style.color='var(--red)';else if(pDiff<-0.5)document.getElementById('dPressTrend').style.color='var(--orange)';else if(pDiff>0.5)document.getElementById('dPressTrend').style.color='var(--accent)'}
 var eWn=document.getElementById('dWind');eWn.textContent=windStr(c.wind_speed_10m);eWn.setAttribute('data-kmh',c.wind_speed_10m);
 if(c.wind_speed_10m>=119)eWn.style.color='var(--red)';else if(c.wind_speed_10m>=63)eWn.style.color='var(--red)';else if(c.wind_speed_10m>=45)eWn.style.color='var(--orange)';else if(c.wind_speed_10m>=30)eWn.style.color='var(--yellow)';
@@ -672,7 +710,7 @@ var ePr=document.getElementById('dPress');ePr.textContent=pressStr(c.pressure_ms
 if(c.pressure_msl<=990)ePr.style.color='var(--red)';else if(c.pressure_msl<=1000)ePr.style.color='var(--orange)';else if(c.pressure_msl<=1006)ePr.style.color='var(--yellow)';
 document.getElementById('dPressUnit').textContent=pressUnit();
 document.getElementById('dCondIcon').textContent=CICONS[c.weather_code]||'🌡️';
-var eCond=document.getElementById('dCondText');eCond.textContent=CODES[c.weather_code]||'Unknown';
+var eCond=document.getElementById('dCondText');eCond.textContent=getCode(c.weather_code);
 if(c.weather_code>=95)eCond.style.color='var(--red)';else if(c.weather_code>=80)eCond.style.color='var(--orange)';else if(c.weather_code>=61)eCond.style.color='var(--yellow)';
 var risk=calcRisk(w);
 document.getElementById('riskScore').textContent=risk.score;document.getElementById('riskScore').style.color=risk.color;
@@ -766,7 +804,7 @@ if(w.humidity&&w.humidity>=90)alerts.push('💧 Humedad alta (posible lluvia / a
 if(w.wind_kmh&&w.wind_kmh>=30)alerts.push('💨 Vientos fuertes detectados (<span data-kmh="'+w.wind_kmh+'">'+windStr(w.wind_kmh)+'</span> '+windUnit()+')');
 if(w.gust_kmh&&w.gust_kmh>=45)alerts.push('🌬️ Ráfagas fuertes detectadas (<span data-kmh="'+w.gust_kmh+'">'+windStr(w.gust_kmh)+'</span> '+windUnit()+')');
 if(w.precipitation&&w.precipitation>0)alerts.push('🌧️ Precipitación detectada: '+w.precipitation+' mm');
-if(w.code&&w.code>=95)alerts.push('⛈️ '+(CODES[w.code]||'Tormenta')+' detectada');
+if(w.code&&w.code>=95)alerts.push('⛈️ '+(getCode(w.code)||'Tormenta')+' detectada');
 else if(w.code&&w.code>=61)alerts.push('🌧️ Condiciones de lluvia detectadas');
 var hic_alert=fToC(w.heat_index_f);
 if(w.heat_index_f&&w.heat_index_f>=100)alerts.push('🔥 Calor peligroso — Índice de calor: <span data-tc="'+hic_alert+'">'+tempStr(hic_alert)+'</span>');
@@ -972,7 +1010,7 @@ var watchTag=isWatched?' <span style="font-size:.65rem;color:var(--blue)">👁�
 if(z.tc===null){card.innerHTML='<div class="zone-name">'+z.name+'</div><div class="zone-temp">--</div><div class="zone-detail">Unavailable</div>';grid.appendChild(card);return}
 card.innerHTML='<div class="zone-name">'+z.name+watchTag+'</div>'+
 '<div class="zone-temp" data-tc="'+z.tc+'">'+tempStr(z.tc)+'</div>'+
-'<div class="zone-detail">'+(CICONS[z.code]||'')+' '+(CODES[z.code]||'--')+'</div>'+
+'<div class="zone-detail">'+(CICONS[z.code]||'')+' '+(getCode(z.code)||'--')+'</div>'+
 '<div class="zone-detail">🌡️ HI: <span data-tc="'+z.hic+'">'+tempStr(z.hic)+'</span> | 💨 <span data-kmh="'+z.wind+'">'+windStr(z.wind)+'</span> <span data-wunit="1">'+windUnit()+'</span> ('+toKt(z.wind)+' kt)</div>'+
 '<div class="zone-detail">🌧️ '+z.rain+' mm | <span data-hpa="'+z.press+'">'+pressStr(z.press)+'</span> '+pressUnit()+'</div>'+
 '<div class="zone-risk" style="background:'+z.color+'22;color:'+z.color+'">'+z.level+' '+z.score+'/100</div>';
