@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KWINT — Kriz Iron Weather Intelligence | Puerto Rico</title>
+  <style>
+    :root {
+      --gold:#ffd700;--gold-dim:rgba(255,215,0,.12);--text:#e8e8e8;--text-dim:rgba(255,255,255,.5);
+      --bg:#06081a;--card:rgba(14,18,45,.88);--card-hover:rgba(22,28,62,.94);
+      --border:rgba(255,215,0,.1);--border-hover:rgba(255,215,0,.3);
+      --accent:#06d121;--blue:#4fc3f7;--red:#ff4444;--orange:#ff9800;--yellow:#ffeb3b;
+      --nav-bg:rgba(6,8,22,.96);--radius:14px;--shadow:0 4px 24px rgba(0,0,0,.5);
+      --tr:.3s cubic-bezier(.4,0,.2,1);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;scroll-padding-top:60px}
+    body{color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);line-height:1.6;overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;background:url("https://pbs.twimg.com/media/A4Z1bJ7CQAEKEF3.jpg:large") center/cover no-repeat;opacity:.1;z-index:-1}
+
+    nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+    .nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:4px;padding:0 16px;height:50px;overflow-x:auto;scrollbar-width:none}
+    .nav-inner::-webkit-scrollbar{display:none}
+    .nav-brand{color:var(--gold);font-weight:800;font-size:.95rem;white-space:nowrap;margin-right:8px}
+    .nav-link{color:var(--text);text-decoration:none;font-size:.76rem;font-weight:500;padding:5px 10px;border-radius:20px;white-space:nowrap;transition:var(--tr);opacity:.6}
+    .nav-link:hover,.nav-link.active{background:var(--gold-dim);color:var(--gold);opacity:1}
+    .nav-clock{margin-left:auto;font-size:.78rem;color:var(--gold);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+    .alert-banner{background:linear-gradient(90deg,rgba(255,68,68,.15),rgba(255,152,0,.1));border-bottom:1px solid rgba(255,68,68,.3);overflow:hidden;max-height:0;transition:max-height .5s ease}
+    .alert-banner.show{max-height:500px}
+    .alert-banner-inner{max-width:1400px;margin:0 auto;padding:10px 16px}
+    .alert-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:700;font-size:.85rem}
+    .alert-pulse{width:10px;height:10px;background:var(--red);border-radius:50%;animation:ap 1.5s infinite}
+    @keyframes ap{0%,100%{box-shadow:0 0 0 0 rgba(255,68,68,.6)}50%{box-shadow:0 0 0 8px rgba(255,68,68,0)}}
+    .alert-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+    .alert-card{flex-shrink:0;min-width:280px;max-width:380px;padding:10px 14px;border-radius:10px;font-size:.82rem;line-height:1.4;border-left:3px solid}
+    .alert-card.warning{background:rgba(255,68,68,.12);border-color:var(--red)}
+    .alert-card.watch{background:rgba(255,152,0,.12);border-color:var(--orange)}
+    .alert-card.advisory{background:rgba(255,235,59,.1);border-color:var(--yellow)}
+    .alert-card.other{background:rgba(79,195,247,.1);border-color:var(--blue)}
+    .alert-card strong{display:block;margin-bottom:4px}
+    .alert-ok{text-align:center;padding:8px;font-size:.85rem;color:var(--accent);font-weight:600}
+
+    .wrap{max-width:1400px;margin:0 auto;padding:16px 16px 40px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}.span-2{grid-column:1/-1}}
+
+    .tier-header{grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:16px 0 2px;padding:0 4px}
+    .tier-label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;white-space:nowrap}
+    .t1{color:var(--red)}.t2{color:var(--orange)}.t3{color:var(--blue)}.t4{color:var(--text-dim)}
+    .tier-line{flex:1;height:1px;background:var(--border)}
+    .tier-title{font-size:.85rem;font-weight:600;color:var(--text);opacity:.8}
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;backdrop-filter:blur(10px);box-shadow:var(--shadow);transition:var(--tr);opacity:0;transform:translateY(20px)}
+    .card.visible{animation:fu .4s ease forwards}
+    .card:hover{background:var(--card-hover);border-color:var(--border-hover)}
+    .card.no-anim{opacity:1;transform:none;animation:none}
+    @keyframes fu{to{opacity:1;transform:translateY(0)}}
+
+    h1{font-size:clamp(1.3rem,4vw,1.9rem);color:var(--gold);text-align:center;margin-bottom:6px;line-height:1.3}
+    h2{font-size:1.1rem;color:var(--gold);text-align:center;margin-bottom:14px;position:relative;padding-bottom:10px}
+    h2::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:32px;height:2px;background:var(--gold);border-radius:2px}
+    h3{font-size:.95rem;color:var(--gold);text-align:center;margin:8px 0 6px}
+    .subtitle{text-align:center;opacity:.8;font-size:.9rem}
+    .author{text-align:center;font-weight:600;font-size:.85rem;color:var(--blue)}
+
+    .status-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:14px}
+    .status-item{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
+    .status-item .label{font-size:.63rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);margin-bottom:3px}
+    .status-item .value{font-size:1.05rem;font-weight:700;color:var(--gold)}
+    .status-item .sub{font-size:.66rem;color:var(--text-dim);margin-top:2px}
+    @media(max-width:700px){.status-bar{grid-template-columns:repeat(3,1fr)}}
+
+    .risk-meter{text-align:center;margin:12px 0}
+    .risk-score{font-size:2.8rem;font-weight:900;line-height:1}
+    .risk-label{font-size:1rem;font-weight:700;margin-top:4px}
+    .risk-action{font-size:.8rem;color:var(--text-dim);margin-top:6px;max-width:500px;margin-left:auto;margin-right:auto}
+    .risk-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.08);margin:12px auto;max-width:400px;overflow:hidden}
+    .risk-fill{height:100%;border-radius:4px;transition:width .8s ease}
+
+    .zone-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
+    .zone-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;transition:var(--tr)}
+    .zone-card:hover{border-color:var(--border-hover)}
+    .zone-name{font-size:.75rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .zone-temp{font-size:1.4rem;font-weight:800}
+    .zone-detail{font-size:.72rem;color:var(--text-dim);margin-top:2px}
+    .zone-risk{display:inline-block;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:8px;margin-top:6px}
+
+    .dust-meter{display:flex;align-items:center;gap:16px;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;margin-top:10px}
+    .dust-icon{font-size:2rem}
+    .dust-info{flex:1}
+    .dust-level{font-weight:700;font-size:.95rem}
+    .dust-msg{font-size:.78rem;color:var(--text-dim);margin-top:2px}
+    .dust-val{font-size:.7rem;color:var(--text-dim);margin-top:2px}
+
+    .storm-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;margin-top:8px}
+    .storm-icon{font-size:1.6rem}
+    .storm-info{flex:1}
+    .storm-name{font-weight:700;font-size:.9rem}
+    .storm-detail{font-size:.75rem;color:var(--text-dim)}
+    .storm-dist{font-size:.8rem;font-weight:700;color:var(--orange);text-align:right;white-space:nowrap}
+
+    .img-fluid{max-width:100%;width:100%;height:auto;display:block;margin:6px auto;border-radius:8px;cursor:pointer;transition:var(--tr)}
+    .img-fluid:hover{transform:scale(1.008);box-shadow:0 4px 20px rgba(255,215,0,.12)}
+    .img-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+    @media(max-width:700px){.img-grid-2{grid-template-columns:1fr}}
+    figure{margin:6px 0}
+    figcaption{font-size:.73rem;color:var(--text-dim);text-align:center;margin-top:4px}
+
+    .tabs{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;justify-content:center;flex-wrap:wrap}
+    .tab-btn{background:transparent;color:var(--text-dim);border:1px solid var(--border);padding:5px 12px;border-radius:20px;font-size:.74rem;font-weight:600;cursor:pointer;transition:var(--tr);white-space:nowrap}
+    .tab-btn:hover{border-color:var(--gold);color:var(--text)}
+    .tab-btn.active{background:var(--gold);color:#000;border-color:var(--gold)}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+
+    .qa-categories{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:14px}
+    .qa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:5px}
+    .qa-link{display:flex;align-items:center;gap:7px;color:var(--text);text-decoration:none;padding:8px 10px;border-radius:8px;font-size:.8rem;background:rgba(255,255,255,.03);border:1px solid transparent;transition:var(--tr)}
+    .qa-link:hover{background:var(--gold-dim);border-color:var(--border-hover);color:var(--gold)}
+    .qa-link .qa-icon{font-size:.95rem;flex-shrink:0}
+    .qa-link.hidden{display:none}
+
+    .widget-wrap{border-radius:var(--radius);overflow:hidden;min-height:100px}
+    iframe{border-radius:8px}
+
+    .lightbox{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.93);backdrop-filter:blur(10px);justify-content:center;align-items:center;cursor:zoom-out;padding:20px}
+    .lightbox.open{display:flex}
+    .lightbox img{max-width:95vw;max-height:92vh;border-radius:8px;box-shadow:0 0 40px rgba(255,215,0,.15)}
+    .lightbox-close{position:absolute;top:14px;right:20px;color:#fff;font-size:2rem;cursor:pointer;background:none;border:none}
+
+    .btn{display:inline-block;padding:12px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold),#f0c800);color:#000;font-weight:700;font-size:.95rem;cursor:pointer;transition:var(--tr);box-shadow:0 4px 16px rgba(255,215,0,.2)}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,215,0,.35)}
+
+    .center{text-align:center}
+    .badge{display:inline-block;background:var(--gold-dim);color:var(--gold);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px}
+    .refresh-info{text-align:center;font-size:.7rem;color:var(--text-dim);margin-top:8px}
+    .live-dot{display:inline-block;width:7px;height:7px;background:var(--accent);border-radius:50%;margin-right:5px;animation:p 2s infinite}
+    @keyframes p{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(6,209,33,.5)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(6,209,33,0)}}
+
+    .season-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);border-radius:10px;margin-top:10px;font-size:.82rem}
+
+    .emb-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;transition:var(--tr)}
+    .emb-card:hover{border-color:var(--border-hover)}
+    .emb-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+    .emb-name{font-weight:700;font-size:.88rem;flex:1}
+    .emb-entity{font-size:.65rem;color:var(--text-dim);background:rgba(255,255,255,.06);padding:1px 6px;border-radius:6px}
+    .emb-bar-wrap{height:10px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden;margin:6px 0}
+    .emb-bar-fill{height:100%;border-radius:5px;transition:width .8s ease}
+    .emb-stats{display:flex;gap:12px;flex-wrap:wrap;font-size:.78rem;color:var(--text-dim)}
+    .emb-level-tag{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px;display:inline-block}
+    .emb-sec-title{font-size:.9rem;font-weight:700;color:var(--gold);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    .emb-summary{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px}
+    .emb-summary-title{font-weight:700;font-size:.9rem;color:var(--gold);margin-bottom:8px}
+    .emb-rec{font-size:.82rem;line-height:1.5;margin-top:8px}
+    .emb-alert-list{margin-top:10px;font-size:.82rem}
+
+    .fire-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.15);border-radius:10px;margin-top:8px}
+    .fire-item.high{background:rgba(255,68,68,.12);border-color:rgba(255,68,68,.3)}
+    .fire-item.mod{background:rgba(255,152,0,.1);border-color:rgba(255,152,0,.25)}
+    .fire-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+    .fire-info{flex:1}
+    .fire-muni{font-weight:700;font-size:.88rem}
+    .fire-detail{font-size:.75rem;color:var(--text-dim);margin-top:2px}
+    .fire-link{font-size:.72rem;color:var(--blue);text-decoration:none}
+    .fire-link:hover{text-decoration:underline}
+    .fire-summary{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+    .fire-stat{text-align:center}
+    .fire-stat .val{font-size:1.3rem;font-weight:800}
+    .fire-stat .lbl{font-size:.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px}
+    footer{text-align:center;padding:20px}
+    footer p{margin:4px 0;font-size:.82rem}
+    .callsigns{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+    .callsign{background:var(--gold-dim);color:var(--gold);padding:4px 14px;border-radius:20px;font-weight:700;font-size:.8rem;letter-spacing:1px}
+
+    .unit-toggle{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 10px}
+    .unit-toggle label{font-size:.82rem;font-weight:700;cursor:pointer;transition:var(--tr);color:var(--text-dim)}
+    .unit-toggle label.active{color:var(--gold)}
+    .toggle-switch{position:relative;display:inline-block;width:40px;height:20px}
+    .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+    .toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:20px;transition:var(--tr);border:1px solid var(--border);cursor:pointer}
+    .toggle-slider::before{content:"";position:absolute;width:16px;height:16px;left:2px;bottom:1px;background:var(--gold);border-radius:50%;transition:var(--tr)}
+    .toggle-switch input:checked+.toggle-slider::before{transform:translateX(18px)}
+    .toggle-switch input:checked+.toggle-slider{background:rgba(255,215,0,.15);border-color:var(--border-hover)}
+
+    @media(max-width:640px){.nav-brand{font-size:.85rem}.card{padding:12px}.qa-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<nav><div class="nav-inner">
+  <span class="nav-brand">KWINT</span>
+  <a class="nav-link" href="#dashboard">Dashboard</a>
+  <a class="nav-link" href="#zones">Zones</a>
+  <a class="nav-link" href="#alerts">Alerts</a>
+  <a class="nav-link" href="#storms">Storms</a>
+  <a class="nav-link" href="#embalses">Embalses</a>
+  <a class="nav-link" href="#fires">Fires</a>
+  <a class="nav-link" href="#radar">Radar</a>
+  <a class="nav-link" href="#links">Links</a>
+  <a class="nav-link" style="color:var(--blue)" href="index2.html">Radar & Sat</a>
+  <a class="nav-link" style="color:var(--blue)" href="index3.html">Forecast</a>
+  <span class="nav-clock" id="navClock">--:--:-- AST</span>
+</div></nav>
+
+<div class="alert-banner" id="alertBanner"><div class="alert-banner-inner">
+  <div class="alert-header"><div class="alert-pulse"></div><span style="color:var(--red)">ACTIVE NWS ALERTS &mdash; PUERTO RICO</span></div>
+  <div class="alert-scroll" id="alertScroll"><div class="alert-ok">Loading alerts...</div></div>
+</div></div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<div class="wrap">
+
+<header class="card span-2 no-anim">
+  <h1>KWINT &mdash; Kriz Iron Weather Intelligence</h1>
+  <p class="subtitle"><strong>Puerto Rico Weather &amp; Space Monitoring System</strong></p>
+  <p class="author">Engineered by Eng. Christian Plumey &mdash; KP4PSS</p>
+  <div class="status-bar">
+    <div class="status-item"><div class="label">Local Time</div><div class="value" id="sClock">--:--</div><div class="sub" id="sClockSub">AST (UTC-4)</div></div>
+    <div class="status-item"><div class="label">Sunrise</div><div class="value" id="sunrise">--:--</div><div class="sub" id="sunriseSub">AM</div></div>
+    <div class="status-item"><div class="label">Sunset</div><div class="value" id="sunset">--:--</div><div class="sub" id="sunsetSub">PM</div></div>
+    <div class="status-item"><div class="label">Moon</div><div class="value" id="moonIcon">--</div><div class="sub" id="moonName">...</div></div>
+    <div class="status-item"><div class="label">Dust</div><div class="value" id="dustBadge">--</div><div class="sub" id="dustSub">...</div></div>
+    <div class="status-item"><div class="label">NWS Alerts</div><div class="value" id="alertCount">--</div><div class="sub" id="alertLabel">...</div></div>
+  </div>
+</header>
+
+<main class="grid">
+
+<!-- Quick Access — top for immediate navigation -->
+<section class="card span-2 no-anim" id="links">
+  <h2>Quick Access</h2>
+  <div class="qa-categories">
+    <button class="tab-btn active" onclick="filterQA('all',this)">All</button>
+    <button class="tab-btn" onclick="filterQA('weather',this)">Weather</button>
+    <button class="tab-btn" onclick="filterQA('hurricane',this)">Hurricanes</button>
+    <button class="tab-btn" onclick="filterQA('radio',this)">Radio</button>
+    <button class="tab-btn" onclick="filterQA('emergency',this)">Emergency</button>
+    <button class="tab-btn" onclick="filterQA('infrastructure',this)">Infrastructure</button>
+    <button class="tab-btn" onclick="filterQA('aviation',this)">Aviation</button>
+    <button class="tab-btn" onclick="filterQA('osint',this)">OSINT</button>
+    <button class="tab-btn" onclick="filterQA('science',this)">Science</button>
+  </div>
+  <div class="qa-grid">
+    <a class="qa-link" data-cat="weather" href="https://www.noaa.gov/" target="_blank"><span class="qa-icon">&#127758;</span> NOAA</a>
+    <a class="qa-link" data-cat="hurricane" href="https://www.nhc.noaa.gov/" target="_blank"><span class="qa-icon">&#127744;</span> NHC Hurricane Center</a>
+    <a class="qa-link" data-cat="weather" href="https://www.weather.gov/ncep/" target="_blank"><span class="qa-icon">&#9729;</span> NOAA Predicciones</a>
+    <a class="qa-link" data-cat="hurricane" href="https://www.weathernerds.org/tc_guidance/" target="_blank"><span class="qa-icon">&#127744;</span> Trayectorias</a>
+    <a class="qa-link" data-cat="weather" href="https://www.weathernerds.org/" target="_blank"><span class="qa-icon">&#128202;</span> Weather Nerds</a>
+    <a class="qa-link" data-cat="weather" href="https://www.windy.com/-Radar-lightning-radar?radar,18.398,-66.087,7" target="_blank"><span class="qa-icon">&#127752;</span> Windy Radar PR</a>
+    <a class="qa-link" data-cat="weather" href="https://www.windy.com" target="_blank"><span class="qa-icon">&#128168;</span> Windy</a>
+    <a class="qa-link" data-cat="weather" href="https://www.tropicaltidbits.com/analysis/" target="_blank"><span class="qa-icon">&#128200;</span> T.Tidbits Analysis</a>
+    <a class="qa-link" data-cat="weather" href="https://www.tropicaltidbits.com" target="_blank"><span class="qa-icon">&#127758;</span> Tropical Tidbits</a>
+    <a class="qa-link" data-cat="weather" href="https://www.seatemperature.org/" target="_blank"><span class="qa-icon">&#127754;</span> Ocean Temp</a>
+    <a class="qa-link" data-cat="weather" href="https://zoom.earth/" target="_blank"><span class="qa-icon">&#127760;</span> Zoom Earth</a>
+    <a class="qa-link" data-cat="weather" href="https://www.ndbc.noaa.gov/maps/Puerto_Rico.shtml" target="_blank"><span class="qa-icon">&#127754;</span> NDBC Buoys PR</a>
+    <a class="qa-link" data-cat="weather" href="https://www.surf-forecast.com/breaks/Rincon_Puerto-Rico" target="_blank"><span class="qa-icon">&#127940;</span> Surf Forecast PR</a>
+    <a class="qa-link" data-cat="weather" href="https://magicseaweed.com/Puerto-Rico-Surf-Forecast/3560/" target="_blank"><span class="qa-icon">&#127754;</span> MagicSeaweed PR</a>
+    <a class="qa-link" data-cat="weather" href="https://earth.nullschool.net/#current/ocean/surface/currents/orthographic=-66.50,18.20,2000" target="_blank"><span class="qa-icon">&#127758;</span> Earth Nullschool Waves</a>
+    <a class="qa-link" data-cat="weather" href="https://www.ventusky.com/?p=18.2;-66.5;7&l=waves" target="_blank"><span class="qa-icon">&#127754;</span> Ventusky Waves</a>
+    <a class="qa-link" data-cat="weather" href="https://www.windy.com/-Waves-waves?waves,18.220,-66.590,8" target="_blank"><span class="qa-icon">&#127754;</span> Windy Waves PR</a>
+    <a class="qa-link" data-cat="emergency" href="https://www.servir.net/servir_alertas/index-new.php" target="_blank"><span class="qa-icon">&#9888;</span> Monitor Alertas</a>
+    <a class="qa-link" data-cat="emergency" href="https://rsoe-edis.org/eventMap" target="_blank"><span class="qa-icon">&#127755;</span> Disaster Map</a>
+    <a class="qa-link" data-cat="emergency" href="https://redsismica.uprm.edu/Spanish/" target="_blank"><span class="qa-icon">&#128200;</span> Red Sismica PR</a>
+    <a class="qa-link" data-cat="emergency" href="https://www.marinevesseltraffic.com/war-map" target="_blank"><span class="qa-icon">&#9875;</span> War &amp; Conflict Map</a>
+    <a class="qa-link" data-cat="emergency" href="https://www.marinevesseltraffic.com/2013/04/marine-traffic.html" target="_blank"><span class="qa-icon">&#128674;</span> Marine Traffic</a>
+    <a class="qa-link" data-cat="emergency" href="https://firms.modaps.eosdis.nasa.gov/map/#d:2026-06-23;@-66.30,18.24,10.20z" target="_blank"><span class="qa-icon">&#128293;</span> NASA FIRMS Map</a>
+    <a class="qa-link" data-cat="emergency" href="https://nmead.pr.gov/" target="_blank"><span class="qa-icon">&#127987;</span> PREMA / NMEAD PR</a>
+    <a class="qa-link" data-cat="emergency" href="https://tsunami.gov/" target="_blank"><span class="qa-icon">&#127754;</span> PTWC Tsunami Alerts</a>
+    <a class="qa-link" data-cat="emergency" href="https://www.gdacs.org/" target="_blank"><span class="qa-icon">&#127760;</span> GDACS Global Disasters</a>
+    <a class="qa-link" data-cat="emergency" href="https://emergency.copernicus.eu/" target="_blank"><span class="qa-icon">&#128752;</span> Copernicus Emergency</a>
+    <a class="qa-link" data-cat="emergency" href="https://reliefweb.int/disasters" target="_blank"><span class="qa-icon">&#127988;</span> ReliefWeb Disasters</a>
+    <a class="qa-link" data-cat="infrastructure" href="https://miluma.lumapr.com/outages/outageMap" target="_blank"><span class="qa-icon">&#9889;</span> LUMA Outage Map</a>
+    <a class="qa-link" data-cat="aviation" href="https://globe.adsbexchange.com/?lat=18.24&lon=-66.30&zoom=8" target="_blank"><span class="qa-icon">&#9992;</span> ADS-B Exchange PR</a>
+    <a class="qa-link" data-cat="aviation" href="https://www.flightradar24.com/18.24,-66.30/8" target="_blank"><span class="qa-icon">&#128747;</span> FlightRadar24 PR</a>
+    <a class="qa-link" data-cat="aviation" href="https://www.flightaware.com/live/airport/TJSJ" target="_blank"><span class="qa-icon">&#9992;</span> FlightAware SJU</a>
+    <a class="qa-link" data-cat="osint" href="https://liveuamap.com/" target="_blank"><span class="qa-icon">&#127758;</span> LiveUA Map</a>
+    <a class="qa-link" data-cat="radio" href="http://www.weatherhamradio.com/" target="_blank"><span class="qa-icon">&#128251;</span> Weather Ham</a>
+    <a class="qa-link" data-cat="radio" href="https://solarham.net" target="_blank"><span class="qa-icon">&#9728;</span> SolarHam</a>
+    <a class="qa-link" data-cat="radio" href="https://prvi-vfc.org/web/" target="_blank"><span class="qa-icon">&#128225;</span> PRVI Frequencies</a>
+    <a class="qa-link" data-cat="radio" href="https://mygmrs.com/" target="_blank"><span class="qa-icon">&#128225;</span> GMRS</a>
+    <a class="qa-link" data-cat="science" href="https://www.volcanodiscovery.com/campi-flegrei.html" target="_blank"><span class="qa-icon">&#127755;</span> Campi Flegrei</a>
+    <a class="qa-link" data-cat="science" href="https://www.volcanodiscovery.com/yellowstone.html" target="_blank"><span class="qa-icon">&#127755;</span> Yellowstone</a>
+    <a class="qa-link" data-cat="science" href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank"><span class="qa-icon">&#127758;</span> USGS Earthquakes</a>
+    <a class="qa-link" data-cat="science" href="https://isstracker.spaceflight.esa.int/" target="_blank"><span class="qa-icon">&#128752;</span> ISS Tracker</a>
+    <a class="qa-link" data-cat="science" href="https://www.spaceweatherlive.com/" target="_blank"><span class="qa-icon">&#9728;</span> Space Weather Live</a>
+    <a class="qa-link" data-cat="science" href="https://www.swpc.noaa.gov/" target="_blank"><span class="qa-icon">&#9889;</span> NOAA Space Weather</a>
+    <a class="qa-link" data-cat="science" href="https://redsismica.uprm.edu/Spanish/" target="_blank"><span class="qa-icon">&#128200;</span> Red Sísmica PR</a>
+  </div>
+</section>
+
+<!-- ===== TIER 1: LIVE DASHBOARD ===== -->
+<div class="tier-header"><span class="tier-label t1">LIVE</span><span class="tier-line"></span><span class="tier-title">Real-Time Dashboard</span><span class="tier-line"></span></div>
+
+<!-- Risk Score + Current Conditions -->
+<section class="card no-anim" id="dashboard">
+  <h2><span class="live-dot"></span>Risk Score &amp; Current Conditions</h2>
+  <div class="unit-toggle">
+    <label id="lblC" class="active">°C | hPa</label>
+    <label class="toggle-switch"><input type="checkbox" id="unitToggle" onchange="toggleUnit()"><span class="toggle-slider"></span></label>
+    <label id="lblF">°F | inHg</label>
+  </div>
+  <div class="risk-meter">
+    <div class="risk-score" id="riskScore">--</div>
+    <div class="risk-label" id="riskLevel">Loading...</div>
+    <div class="risk-bar"><div class="risk-fill" id="riskFill" style="width:0%;background:var(--accent)"></div></div>
+    <div class="risk-action" id="riskAction">Calculating risk based on live weather data...</div>
+  </div>
+  <div class="zone-grid" id="currentData" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
+    <div class="zone-card"><div class="zone-name">Temp</div><div class="zone-temp" id="dTemp">--</div><div class="zone-detail">Actual</div></div>
+    <div class="zone-card"><div class="zone-name">Feels Like</div><div class="zone-temp" id="dFeels">--</div><div class="zone-detail">Sensacion</div></div>
+    <div class="zone-card"><div class="zone-name">Heat Index</div><div class="zone-temp" id="dHeat">--</div><div class="zone-detail">NOAA formula</div></div>
+    <div class="zone-card"><div class="zone-name">Wind</div><div class="zone-temp" id="dWind">--</div><div class="zone-detail" id="dWindDir">--</div></div>
+    <div class="zone-card"><div class="zone-name">Gusts</div><div class="zone-temp" id="dGust">--</div><div class="zone-detail" id="dGustUnit">km/h</div></div>
+    <div class="zone-card"><div class="zone-name">Rain</div><div class="zone-temp" id="dRain">--</div><div class="zone-detail">mm</div></div>
+    <div class="zone-card"><div class="zone-name">Humidity</div><div class="zone-temp" id="dHumid">--</div><div class="zone-detail">%</div></div>
+    <div class="zone-card"><div class="zone-name">Pressure</div><div class="zone-temp" id="dPress">--</div><div class="zone-detail" id="dPressUnit">hPa (MSL)</div></div>
+    <div class="zone-card"><div class="zone-name">UV Index</div><div class="zone-temp" id="dUV">--</div><div class="zone-detail" id="dUVLabel">--</div></div>
+    <div class="zone-card"><div class="zone-name">Condition</div><div class="zone-temp" id="dCondIcon">--</div><div class="zone-detail" id="dCondText">--</div></div>
+  </div>
+  <p class="refresh-info"><span class="live-dot"></span>Open-Meteo API &mdash; auto-refresh every 5 min</p>
+</section>
+
+<!-- Live Weather Widget -->
+<section class="card no-anim">
+  <h2><span class="live-dot"></span>Forecast Widget</h2>
+  <div class="widget-wrap" id="forecastWidgetWrap">
+    <div id="ww_2b36e76aa8005" v='1.3' loc='auto' a='{"t":"horizontal","lang":"en","sl_lpl":1,"ids":["wl392"],"font":"Arial","sl_ics":"one_a","sl_sot":"celsius","cl_bkg":"image","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722"}'><a href="https://weatherwidget.org/" id="ww_2b36e76aa8005_u" target="_blank">Weather Widget</a></div>
+    <script>(function(){var el=document.getElementById('ww_2b36e76aa8005');if(el){var u=localStorage.getItem('kwint_unit')==='F'?'fahrenheit':'celsius';el.setAttribute('a',el.getAttribute('a').replace(/"sl_sot":"[^"]*"/,'"sl_sot":"'+u+'"'))}})()</script>
+    <script async src="https://app3.weatherwidget.org/js/?id=ww_2b36e76aa8005"></script>
+  </div>
+  <p class="badge center" style="margin-top:8px">📍 Auto-detect — Tu ubicación</p>
+  <h3 style="margin-top:16px"><span class="live-dot"></span>Mini Radar — PR</h3>
+  <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3;margin-top:8px">
+    <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=8&overlay=radar&product=radar&level=surface&lat=18.22&lon=-66.5&detailLat=18.22&detailLon=-66.5&marker=true&message=true" width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen></iframe>
+  </div>
+  <p class="refresh-info"><span class="live-dot"></span>Windy.com — Radar en vivo</p>
+</section>
+
+<!-- Alertas Detectadas -->
+<section class="card span-2 no-anim" id="alertasDetectadas">
+  <h2>🚨 Alertas Detectadas</h2>
+  <div id="alertasContent"><p class="center" style="color:var(--text-dim);font-size:.82rem">Scanning...</p></div>
+</section>
+
+<!-- Risk Factors + Trend Intelligence -->
+<section class="card" id="riskFactors">
+  <h2>📊 Factores del Risk Score — Centro PR</h2>
+  <div id="riskReasons"><p class="center" style="color:var(--text-dim);font-size:.82rem">Calculating...</p></div>
+</section>
+
+<!-- Forecast 1-6 hours -->
+<section class="card" id="forecastHourly">
+  <h2>🔮 Pronóstico 1-6 Horas — Centro PR</h2>
+  <div id="forecastContent"><p class="center" style="color:var(--text-dim);font-size:.82rem">Loading forecast...</p></div>
+</section>
+
+<!-- Hurricane Season Detail -->
+<section class="card span-2" id="seasonDetail">
+  <h2>🌀 Temporada de Huracanes</h2>
+  <div id="seasonContent"></div>
+  <details style="margin-top:14px;cursor:pointer">
+    <summary style="font-size:.88rem;font-weight:700;color:var(--gold);padding:8px 0">🎒 LISTA DE PREPARACIÓN — Click para expandir</summary>
+    <div style="font-size:.82rem;line-height:1.8;margin-top:10px;padding:14px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px">
+      <strong>💧 AGUA</strong><br>
+      ▸ Mínimo 1 galón por persona por día — para 7 días<br>
+      ▸ Agua adicional para cocinar e higiene<br><br>
+      <strong>🥫 ALIMENTOS</strong><br>
+      ▸ Comida no perecedera para 7-14 días<br>
+      ▸ Abridor manual o latas de abre fácil<br>
+      ▸ Comida para mascotas si aplica<br><br>
+      <strong>⚡ ENERGÍA</strong><br>
+      ▸ Generador: verificar aceite, combustible y arranque<br>
+      ▸ Combustible en recipientes certificados<br>
+      ▸ Baterías recargables y cargadores solares<br>
+      ▸ Power bank — cargado al 100%<br>
+      ▸ Linternas, velas y fósforos<br><br>
+      <strong>🏠 HOGAR</strong><br>
+      ▸ Persianas de huracán o tabla de madera lista<br>
+      ▸ Revisar techo, canaletas y tuberías ANTES del peak<br>
+      ▸ Saber dónde está la llave de agua y panel eléctrico<br>
+      ▸ Poda de árboles y ramas cerca del hogar<br><br>
+      <strong>📋 DOCUMENTOS</strong><br>
+      ▸ Pasaportes, licencias, seguro médico en funda impermeable<br>
+      ▸ Efectivo en billetes pequeños — ATMs fallan en emergencias<br><br>
+      <strong>🏥 SALUD</strong><br>
+      ▸ Medicamentos para 30 días — adelantar recetas AHORA<br>
+      ▸ Botiquín completo y actualizado<br>
+      ▸ Historial médico de la familia por escrito<br><br>
+      <strong>📡 COMUNICACIONES</strong><br>
+      ▸ Radio de baterías o manivela — recibe NWS sin internet<br>
+      ▸ Lista de contactos de emergencia impresa<br>
+      ▸ Plan familiar: dónde reunirse si hay separación<br><br>
+      <strong>🚗 VEHÍCULO</strong><br>
+      ▸ Tanque LLENO al iniciar el peak (15 agosto)<br>
+      ▸ Kit de emergencias en el carro
+    </div>
+  </details>
+</section>
+
+<!-- Zone Comparison -->
+<section class="card span-2" id="zones">
+  <h2>PR Zone Comparison</h2>
+  <div class="zone-grid" id="zoneGrid">
+    <div class="zone-card"><div class="zone-name">Norte</div><div class="zone-temp">...</div><div class="zone-detail">Loading</div></div>
+    <div class="zone-card"><div class="zone-name">Oeste</div><div class="zone-temp">...</div><div class="zone-detail">Loading</div></div>
+    <div class="zone-card"><div class="zone-name">Central</div><div class="zone-temp">...</div><div class="zone-detail">Loading</div></div>
+    <div class="zone-card"><div class="zone-name">Este</div><div class="zone-temp">...</div><div class="zone-detail">Loading</div></div>
+    <div class="zone-card"><div class="zone-name">Sur</div><div class="zone-temp">...</div><div class="zone-detail">Loading</div></div>
+  </div>
+</section>
+
+<!-- ===== TIER 2: ALERTS & INTELLIGENCE ===== -->
+<div class="tier-header"><span class="tier-label t2">INTEL</span><span class="tier-line"></span><span class="tier-title">Alerts &amp; Intelligence</span><span class="tier-line"></span></div>
+
+<!-- Saharan Dust -->
+<section class="card" id="alerts">
+  <h2>Saharan Dust Monitor</h2>
+  <div class="dust-meter" id="dustMeter">
+    <div class="dust-icon" id="dustIcon">...</div>
+    <div class="dust-info">
+      <div class="dust-level" id="dustLevel">Loading...</div>
+      <div class="dust-msg" id="dustMsg">Fetching air quality data...</div>
+      <div class="dust-val" id="dustVal"></div>
+    </div>
+  </div>
+</section>
+
+<!-- NHC Storm Tracker -->
+<section class="card span-2" id="storms">
+  <h2>🌀 NHC Storm Tracker</h2>
+  <div id="stormList"><p class="center" style="color:var(--text-dim);font-size:.85rem">Loading NHC data...</p></div>
+  <div class="season-bar" id="seasonBar" style="display:none">
+    <span style="font-size:1.2rem">&#127744;</span>
+    <span id="seasonText">Hurricane Season</span>
+  </div>
+</section>
+
+<!-- Embalses de Puerto Rico -->
+<section class="card span-2" id="embalses">
+  <h2>🌊 Embalses de Puerto Rico</h2>
+  <div id="embalsesContent"><p class="center" style="color:var(--text-dim)">Loading USGS data...</p></div>
+</section>
+
+<!-- NASA FIRMS Fire Monitor -->
+<section class="card span-2" id="fires">
+  <h2>🔥 Fire Hotspot Monitor &mdash; Puerto Rico</h2>
+  <div id="fireContent">
+    <div id="fireResults">
+      <div class="fire-summary" id="fireSummary"></div>
+      <div id="fireList"><p class="center" style="color:var(--text-dim)">Scanning satellites...</p></div>
+      <p class="refresh-info" style="margin-top:12px"><span class="live-dot"></span>NASA FIRMS (VIIRS + MODIS) &mdash; Satellites pass ~2x/day</p>
+    </div>
+  </div>
+</section>
+
+<!-- Tropical Outlook -->
+<section class="card span-2">
+  <h2>Tropical Outlook</h2>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('tropical','2day',this)">2-Day</button>
+    <button class="tab-btn" onclick="switchTab('tropical','7day',this)">7-Day</button>
+    <button class="tab-btn" onclick="switchTab('tropical','precip',this)">Precipitation</button>
+  </div>
+  <div id="tropical-2day" class="tab-panel active"><img class="img-fluid auto-refresh" src="https://www.nhc.noaa.gov/xgtwo/two_atl_2d0.png" alt="NHC 2-Day" loading="lazy" style="max-width:900px;margin:0 auto" /></div>
+  <div id="tropical-7day" class="tab-panel"><img class="img-fluid auto-refresh" src="https://www.nhc.noaa.gov/xgtwo/two_atl_7d0.png" alt="NHC 7-Day" loading="lazy" style="max-width:900px;margin:0 auto" /></div>
+  <div id="tropical-precip" class="tab-panel"><img class="img-fluid auto-refresh" src="https://www.cpc.ncep.noaa.gov/products/precip/CWlink/ghaz/gth_full_TConly_ATL.png" alt="CPC Precip" loading="lazy" style="max-width:900px;margin:0 auto" /></div>
+</section>
+
+<!-- ===== TIER 3: IMAGERY ===== -->
+<div class="tier-header"><span class="tier-label t3">IMAGERY</span><span class="tier-line"></span><span class="tier-title">Radar &amp; Satellite</span><span class="tier-line"></span></div>
+
+<section class="card" id="radar">
+  <h2><span class="live-dot"></span>Live Radar — PR</h2>
+  <img class="img-fluid auto-refresh" src="https://www.weatherpr.com/GR3/tjua_br1_0.jpg" alt="WeatherPR Radar" loading="lazy" />
+  <figcaption>WeatherPR &mdash; Radar de reflectividad TJUA</figcaption>
+  <p class="refresh-info"><span class="live-dot"></span>Auto-refresh every 5 min</p>
+</section>
+
+<section class="card">
+  <h2><span class="live-dot"></span>Lightning &amp; Thunderstorms</h2>
+  <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3">
+    <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=7&overlay=thunder&product=ecmwf&level=surface&lat=18.22&lon=-66.5&message=true" width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen></iframe>
+  </div>
+  <figcaption>Windy.com &mdash; Actividad eléctrica y tormentas en tiempo real</figcaption>
+</section>
+
+<section class="card">
+  <h2><span class="live-dot"></span>Doppler Radar</h2>
+  <img class="img-fluid auto-refresh" src="https://sirocco.accuweather.com/nxssa_r1_640x480d/r1/inxr1TJUAa.gif" alt="AccuWeather Doppler" loading="lazy" />
+  <figcaption>AccuWeather &mdash; Doppler Base Reflectivity TJUA</figcaption>
+  <p class="refresh-info"><span class="live-dot"></span>Auto-refresh every 5 min</p>
+</section>
+
+<section class="card">
+  <h2><span class="live-dot"></span>Wind Map</h2>
+  <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3">
+    <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=7&overlay=wind&product=ecmwf&level=surface&lat=18.22&lon=-66.5&message=true" width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen></iframe>
+  </div>
+  <figcaption>Windy.com &mdash; Patrón de vientos, dirección e intensidad</figcaption>
+</section>
+
+
+<section class="card center">
+  <img class="img-fluid" src="https://www.fg-a.com/flags/2021-Puerto-Rico-flag-wavy.jpg" alt="PR" loading="lazy" style="max-width:340px;border-radius:12px;margin:0 auto" />
+  <div style="margin-top:12px"><span class="badge">Visits</span><br /><a href="https://www.hitwebcounter.com" target="_blank"><img src="https://hitwebcounter.com/counter/counter.php?page=21394163&style=0036&nbdigits=9&type=page&initCount=386877" alt="Visits" style="margin-top:6px" /></a></div>
+</section>
+
+</main>
+
+<footer class="card span-2">
+  <p style="color:var(--gold);font-weight:700">Communications &mdash; FCC Licensed</p>
+  <div class="callsigns"><span class="callsign">KP4PSS</span><span class="callsign">GMRS: WRCH686</span></div>
+  <p style="margin-top:10px;color:var(--text-dim);font-size:.75rem">Launched Jan 2017 &mdash; Last update Jun 2026</p>
+</footer>
+</div>
+
+<script>
+(function(){
+var PR={lat:18.2208,lon:-66.5901};
+var ZONES=[
+  {name:"Norte",lat:18.4505,lon:-66.5385,ref:"Barceloneta"},
+  {name:"Oeste",lat:18.2011,lon:-67.1396,ref:"Mayaguez"},
+  {name:"Central",lat:18.2208,lon:-66.5901,ref:"Centro PR"},
+  {name:"Este",lat:18.3258,lon:-65.6524,ref:"Fajardo"},
+  {name:"Sur",lat:17.9716,lon:-66.606,ref:"Ponce"}
+];
+var CODES={0:"Clear",1:"Mostly Clear",2:"Partly Cloudy",3:"Overcast",45:"Fog",48:"Fog",51:"Light Drizzle",53:"Drizzle",55:"Heavy Drizzle",61:"Light Rain",63:"Rain",65:"Heavy Rain",80:"Showers",81:"Mod Showers",82:"Heavy Showers",95:"Thunderstorm",96:"T-Storm+Hail",99:"Severe T-Storm"};
+var CICONS={0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",51:"🌦️",53:"🌦️",55:"🌦️",61:"🌧️",63:"🌧️",65:"🌧️",80:"🌧️",81:"🌧️",82:"🌧️",95:"⛈️",96:"⛈️",99:"⛈️"};
+function pad(n){return String(n).padStart(2,'0')}
+function getAST(){var d=new Date();return new Date(d.getTime()+(d.getTimezoneOffset()-240)*60000)}
+function cToF(c){return c==null?null:Math.round((c*9/5+32)*10)/10}
+function fToC(f){return f==null?null:Math.round((f-32)*5/9*10)/10}
+function heatIndex(tf,rh){if(tf==null||rh==null||tf<80)return tf;var t=tf,r=rh;var hi=-42.379+2.04901523*t+10.14333127*r-.22475541*t*r-.00683783*t*t-.05481717*r*r+.00122874*t*t*r+.00085282*t*r*r-.00000199*t*t*r*r;if(r<13&&t>=80&&t<=112)hi-=((13-r)/4)*Math.sqrt((17-Math.abs(t-95))/17);if(r>85&&t>=80&&t<=87)hi+=((r-85)/10)*((87-t)/5);return Math.round(hi)}
+function uvLabel(uv){if(uv==null)return{txt:'N/A',cl:'var(--text-dim)'};if(uv>=11)return{txt:'EXTREME',cl:'#9c27b0'};if(uv>=8)return{txt:'VERY HIGH',cl:'var(--red)'};if(uv>=6)return{txt:'HIGH',cl:'var(--orange)'};if(uv>=3)return{txt:'MODERATE',cl:'var(--yellow)'};return{txt:'LOW',cl:'var(--accent)'}}
+function degToDir(d){if(d==null)return"--";var dirs=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];return dirs[Math.round(d/22.5)%16]}
+function haversine(a,b,c,d){var R=6371,r=Math.PI/180;var dl=(c-a)*r,dn=(d-b)*r;var x=Math.sin(dl/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dn/2)**2;return R*2*Math.asin(Math.sqrt(x))}
+
+var unitC=localStorage.getItem('kwint_unit')!=='F';
+function tempStr(c){if(c==null)return'--';return unitC?Math.round(c*10)/10+'°C':cToF(c)+'°F'}
+function pressStr(hpa){if(hpa==null)return'--';return unitC?Math.round(hpa*10)/10:Math.round(hpa*0.02953*100)/100}
+function pressUnit(){return unitC?'hPa (MSL)':'inHg'}
+function windStr(kmh){if(kmh==null)return'--';return unitC?Math.round(kmh*10)/10:Math.round(kmh*0.621371*10)/10}
+function windUnit(){return unitC?'km/h':'mph'}
+function toKt(kmh){return kmh==null?'--':Math.round(kmh*0.539957*10)/10}
+window.toggleUnit=function(){var cb=document.getElementById('unitToggle');unitC=!cb.checked;
+localStorage.setItem('kwint_unit',unitC?'C':'F');
+document.getElementById('lblC').className=unitC?'active':'';
+document.getElementById('lblF').className=unitC?'':'active';
+document.querySelectorAll('[data-tc]').forEach(function(el){var c=parseFloat(el.getAttribute('data-tc'));if(!isNaN(c))el.textContent=tempStr(c)});
+document.querySelectorAll('[data-hpa]').forEach(function(el){var h=parseFloat(el.getAttribute('data-hpa'));if(!isNaN(h))el.textContent=pressStr(h)});
+document.querySelectorAll('[data-kmh]').forEach(function(el){var k=parseFloat(el.getAttribute('data-kmh'));if(!isNaN(k))el.textContent=windStr(k)});
+document.querySelectorAll('[data-wunit]').forEach(function(el){el.textContent=windUnit()});
+var pu=document.getElementById('dPressUnit');if(pu)pu.textContent=pressUnit();
+var guEl=document.getElementById('dGust');var guKmh=guEl?parseFloat(guEl.getAttribute('data-kmh')):null;
+var gu=document.getElementById('dGustUnit');if(gu)gu.textContent=windUnit()+(guKmh?' ('+toKt(guKmh)+' kt)':'');
+var wd=document.getElementById('dWindDir');var wnEl=document.getElementById('dWind');var wnKmh=wnEl?parseFloat(wnEl.getAttribute('data-kmh')):null;
+if(wd){var dir=wd.textContent.split('|')[0].trim();wd.textContent=dir+' | '+windUnit()+(wnKmh?' ('+toKt(wnKmh)+' kt)':'')}};
+(function(){var cb=document.getElementById('unitToggle');if(cb){cb.checked=!unitC;
+document.getElementById('lblC').className=unitC?'active':'';
+document.getElementById('lblF').className=unitC?'':'active'}})();
+
+var prevWeather=null;
+
+function calcRisk(w){var s=0,reasons=[];var wind=w.wind_kmh||0,gust=w.gust_kmh||0,rain=w.precipitation||0,press=w.pressure_msl||1013,humid=w.humidity||0,hi=w.heat_index_f||0,code=w.code||0,uv=w.uv_index;
+if(hi>=110){s+=30;reasons.push('🔴 Índice de calor extremo: +30')}else if(hi>=105){s+=25;reasons.push('🔴 Calor crítico: +25')}else if(hi>=100){s+=20;reasons.push('🔴 Calor peligroso: +20')}else if(hi>=95){s+=12;reasons.push('🟠 Calor fuerte: +12')}else if(hi>=90){s+=6;reasons.push('🟡 Calor moderado: +6')}
+if(uv!=null&&uv>=11){s+=8;reasons.push('☀️ UV extremo ('+uv+'): +8')}else if(uv!=null&&uv>=8){s+=5;reasons.push('☀️ UV muy alto ('+uv+'): +5')}else if(uv!=null&&uv>=6){s+=3;reasons.push('☀️ UV alto ('+uv+'): +3')}
+if(humid>=95){s+=10;reasons.push('💧 Humedad extrema: +10')}else if(humid>=90){s+=6;reasons.push('💧 Humedad alta: +6')}
+if(wind>=119){s+=40;reasons.push('💨 Viento fuerza huracán: +40')}else if(wind>=63){s+=30;reasons.push('💨 Viento tropical fuerte: +30')}else if(wind>=45){s+=20;reasons.push('💨 Viento fuerte: +20')}else if(wind>=30){s+=10;reasons.push('💨 Viento moderado/fuerte: +10')}
+if(gust>=120){s+=35;reasons.push('🌬️ Ráfagas destructivas: +35')}else if(gust>=90){s+=25;reasons.push('🌬️ Ráfagas muy fuertes: +25')}else if(gust>=60){s+=15;reasons.push('🌬️ Ráfagas fuertes: +15')}else if(gust>=45){s+=8;reasons.push('🌬️ Ráfagas elevadas: +8')}
+if(rain>=20){s+=25;reasons.push('🌧️ Lluvia muy intensa: +25')}else if(rain>=10){s+=18;reasons.push('🌧️ Lluvia intensa: +18')}else if(rain>=5){s+=12;reasons.push('🌧️ Lluvia significativa: +12')}else if(rain>0){s+=5;reasons.push('🌧️ Lluvia detectada: +5')}
+if(press<=990){s+=35;reasons.push('📉 Presión muy baja: +35')}else if(press<=1000){s+=25;reasons.push('📉 Presión baja: +25')}else if(press<=1006){s+=12;reasons.push('📉 Presión bajando: +12')}
+if(code>=95){s+=25;var st=CODES[code]||'Tormenta';reasons.push('⛈️ '+st+' detectada: +25')}else if(code>=61){s+=10;reasons.push('🌧️ Condiciones de lluvia: +10')}
+s=Math.min(s,100);
+var lv,cl,ac;
+if(s>=85){lv="EXTREME";cl="var(--red)";ac="Condiciones peligrosas. Manténgase pendiente a boletines oficiales."}
+else if(s>=65){lv="HIGH";cl="var(--red)";ac="Riesgo alto. Evite exposición innecesaria y monitoree cambios."}
+else if(s>=40){lv="MODERATE";cl="var(--orange)";ac="Riesgo moderado. Manténgase alerta."}
+else if(s>=20){lv="LOW / WATCH";cl="var(--yellow)";ac="Condiciones bajo observación."}
+else{lv="NORMAL";cl="var(--accent)";ac="Condiciones sin señales fuertes de riesgo inmediato."}
+return{score:s,level:lv,color:cl,action:ac,reasons:reasons}}
+
+// Clock
+setInterval(function(){var a=getAST();var h24=a.getHours(),mn=a.getMinutes(),sc=a.getSeconds();
+var ap=h24>=12?'PM':'AM',h12=h24%12||12;
+document.getElementById('navClock').textContent=h12+':'+pad(mn)+':'+pad(sc)+' '+ap+' AST';
+document.getElementById('sClock').textContent=h12+':'+pad(mn)+' '+ap;
+document.getElementById('sClockSub').textContent='('+pad(h24)+':'+pad(mn)+') AST'},1000);
+
+// Sun
+function fmt12(dec){var h=Math.floor(dec),m=Math.round((dec-h)*60);if(m===60){h++;m=0}var ap=h>=12?'PM':'AM';var h12=h%12||12;return{t12:h12+':'+pad(m),t24:pad(h)+':'+pad(m),ap:ap}}
+(function(){var a=getAST(),doy=Math.floor((a-new Date(a.getFullYear(),0,0))/864e5),lat=18.2;
+var dec=23.45*Math.sin(2*Math.PI/365*(doy-81)),dr=dec*Math.PI/180,lr=lat*Math.PI/180;
+var ha=Math.acos(-Math.tan(lr)*Math.tan(dr))*180/Math.PI;
+var noon=12+66.5/15-4,rise=noon-ha/15,set=noon+ha/15;
+var r=fmt12(rise),s=fmt12(set);
+document.getElementById('sunrise').textContent=r.t12;document.getElementById('sunriseSub').textContent=r.ap+' ('+r.t24+')';
+document.getElementById('sunset').textContent=s.t12;document.getElementById('sunsetSub').textContent=s.ap+' ('+s.t24+')'})();
+
+// Moon
+(function(){var a=getAST(),y=a.getFullYear(),m=a.getMonth()+1,d=a.getDate();
+if(m<=2){y--;m+=12}var A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+var JD=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5;
+var ph=((JD-2451550.1)/29.530588853)%1;if(ph<0)ph+=1;
+var ps=[{m:.0625,i:"🌑",n:"Luna Nueva"},{m:.1875,i:"🌒",n:"Creciente"},{m:.3125,i:"🌓",n:"Cuarto Creciente"},{m:.4375,i:"🌔",n:"Gibosa Creciente"},{m:.5625,i:"🌕",n:"Luna Llena"},{m:.6875,i:"🌖",n:"Gibosa Menguante"},{m:.8125,i:"🌗",n:"Cuarto Menguante"},{m:.9375,i:"🌘",n:"Menguante"},{m:1.01,i:"🌑",n:"Luna Nueva"}];
+for(var x=0;x<ps.length;x++)if(ph<ps[x].m){document.getElementById('moonIcon').textContent=ps[x].i;document.getElementById('moonName').textContent=ps[x].n;break}})();
+
+// Hurricane Season
+(function(){var m=getAST().getMonth()+1;
+var bar=document.getElementById('seasonBar'),txt=document.getElementById('seasonText');
+if(m>=6&&m<=11){bar.style.display='flex';
+if(m>=8&&m<=10){txt.innerHTML='<strong style="color:var(--red)">PEAK Hurricane Season</strong> (Aug 15 - Oct 15)'}
+else{txt.innerHTML='<strong style="color:var(--orange)">Hurricane Season Active</strong> (Jun 1 - Nov 30)'}}
+else{bar.style.display='flex';txt.innerHTML='<span style="color:var(--accent)">Off-Season</span> &mdash; Next: June 1'}})();
+
+// Fetch central weather + risk
+function fetchWeather(){
+fetch('https://api.open-meteo.com/v1/forecast?latitude='+PR.lat+'&longitude='+PR.lon+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,pressure_msl,uv_index&timezone=America/Puerto_Rico')
+.then(function(r){return r.json()}).then(function(d){
+var c=d.current||{};
+var tc=Math.round(c.temperature_2m*10)/10,fc=Math.round(c.apparent_temperature*10)/10;
+var tf=cToF(c.temperature_2m),hi=heatIndex(tf,c.relative_humidity_2m),hic=fToC(hi);
+var uv=c.uv_index!=null?Math.round(c.uv_index*10)/10:null;
+var w={temp_f:tf,feels_f:cToF(fc),heat_index_f:hi,humidity:c.relative_humidity_2m,wind_kmh:c.wind_speed_10m,gust_kmh:c.wind_gusts_10m,precipitation:c.precipitation,pressure_msl:c.pressure_msl,code:c.weather_code,uv_index:uv};
+var eTmp=document.getElementById('dTemp');eTmp.textContent=tempStr(tc);eTmp.setAttribute('data-tc',tc);
+var eFl=document.getElementById('dFeels');eFl.textContent=tempStr(fc);eFl.setAttribute('data-tc',fc);
+var eHi=document.getElementById('dHeat');eHi.textContent=tempStr(hic);eHi.setAttribute('data-tc',hic);
+var uvInfo=uvLabel(uv);document.getElementById('dUV').textContent=uv!=null?uv:'--';document.getElementById('dUV').style.color=uvInfo.cl;document.getElementById('dUVLabel').textContent=uvInfo.txt;
+var eWn=document.getElementById('dWind');eWn.textContent=windStr(c.wind_speed_10m);eWn.setAttribute('data-kmh',c.wind_speed_10m);
+document.getElementById('dWindDir').textContent=degToDir(c.wind_direction_10m)+' | '+windUnit()+' ('+toKt(c.wind_speed_10m)+' kt)';
+var eGu=document.getElementById('dGust');eGu.textContent=windStr(c.wind_gusts_10m);eGu.setAttribute('data-kmh',c.wind_gusts_10m);
+document.getElementById('dGustUnit').textContent=windUnit()+' ('+toKt(c.wind_gusts_10m)+' kt)';
+document.getElementById('dRain').textContent=c.precipitation;
+document.getElementById('dHumid').textContent=c.relative_humidity_2m;
+var ePr=document.getElementById('dPress');ePr.textContent=pressStr(c.pressure_msl);ePr.setAttribute('data-hpa',c.pressure_msl);
+document.getElementById('dPressUnit').textContent=pressUnit();
+document.getElementById('dCondIcon').textContent=CICONS[c.weather_code]||'🌡️';
+document.getElementById('dCondText').textContent=CODES[c.weather_code]||'Unknown';
+var risk=calcRisk(w);
+document.getElementById('riskScore').textContent=risk.score;document.getElementById('riskScore').style.color=risk.color;
+document.getElementById('riskLevel').textContent=risk.level;document.getElementById('riskLevel').style.color=risk.color;
+document.getElementById('riskAction').textContent=risk.action;
+var fill=document.getElementById('riskFill');fill.style.width=risk.score+'%';fill.style.background=risk.color;
+if(hic>=38){document.getElementById('dHeat').style.color='var(--red)'}else if(hic>=32){document.getElementById('dHeat').style.color='var(--orange)'}
+
+// Risk Factors
+var rfEl=document.getElementById('riskReasons');
+var rfHtml='<div style="font-size:.85rem;font-weight:700;margin-bottom:4px">📊 FACTORES DE LA PUNTUACIÓN DE RIESGO</div><div style="font-size:.72rem;color:var(--text-dim);margin-bottom:8px">📍 Estación: Centro PR (18.22°N, 66.59°W)</div>';
+if(risk.reasons.length){risk.reasons.forEach(function(r){rfHtml+='<div style="font-size:.82rem;padding:3px 0">'+r+'</div>'})}
+else{rfHtml+='<div style="font-size:.82rem;color:var(--accent)">✅ Sin factores de riesgo elevados</div>'}
+
+// Trend Intelligence
+rfHtml+='<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">';
+rfHtml+='<div style="font-size:.85rem;font-weight:700;margin-bottom:6px">🧠 INTELIGENCIA DEL SISTEMA</div>';
+if(prevWeather){
+var trends=[];
+var pDrop=(prevWeather.pressure_msl||0)-(w.pressure_msl||0);
+if(pDrop>=4)trends.push('📉 Presión cayendo agresivamente: posible intensificación');
+else if(pDrop>=2)trends.push('📉 Presión bajando rápido: ambiente más inestable');
+var wInc=(w.wind_kmh||0)-(prevWeather.wind_kmh||0);
+if(wInc>=20)trends.push('💨 Viento aumentando agresivamente');
+else if(wInc>=10)trends.push('💨 Viento en aumento');
+var gInc=(w.gust_kmh||0)-(prevWeather.gust_kmh||0);
+if(gInc>=25)trends.push('🌬️ Ráfagas subiendo peligrosamente');
+else if(gInc>=12)trends.push('🌬️ Ráfagas en aumento');
+var rInc=(w.precipitation||0)-(prevWeather.precipitation||0);
+if(rInc>=5)trends.push('🌧️ Precipitación aumentando fuerte');
+else if(rInc>=2)trends.push('🌧️ Lluvia aumentando');
+var hInc=(w.humidity||0)-(prevWeather.humidity||0);
+if(hInc>=10)trends.push('💧 Humedad subiendo: ambiente más saturado');
+var hiInc=(hi||0)-(prevWeather.heat_index_f||0);
+if(hiInc>=8)trends.push('🔥 Índice de calor subiendo rápido');
+else if(hiInc>=4)trends.push('🔥 Índice de calor en aumento');
+if(trends.length){trends.forEach(function(t){rfHtml+='<div style="font-size:.82rem;padding:3px 0">'+t+'</div>'})}
+else{rfHtml+='<div style="font-size:.82rem;color:var(--text-dim)">Sin cambios bruscos comparado con la lectura anterior.</div>'}
+}else{rfHtml+='<div style="font-size:.82rem;color:var(--text-dim)">Primera lectura registrada. Tendencias se activarán desde la próxima corrida.</div>'}
+rfHtml+='</div>';
+
+// Predictions
+rfHtml+='<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">';
+rfHtml+='<div style="font-size:.85rem;font-weight:700;margin-bottom:6px">🧭 PREDICCIÓN</div>';
+var preds=[];
+if(w.pressure_msl&&w.pressure_msl<=1000)preds.push('📉 Presión baja: ambiente puede mantenerse inestable');
+if(w.wind_kmh&&w.wind_kmh>=45)preds.push('💨 Viento fuerte: posibles ráfagas adicionales');
+if(w.gust_kmh&&w.gust_kmh>=60)preds.push('🌬️ Ráfagas peligrosas: asegure objetos sueltos');
+if(w.precipitation&&w.precipitation>=5)preds.push('🌧️ Lluvia significativa: riesgo de acumulación');
+if(w.humidity&&w.humidity>=90&&(!w.precipitation||w.precipitation===0))preds.push('💧 Humedad muy alta: posible desarrollo de lluvia');
+if(hi&&hi>=100)preds.push('🔥 Calor peligroso: riesgo de fatiga por calor');
+if(!preds.length)preds.push('✅ Condiciones relativamente estables, sin señal fuerte de deterioro inmediato');
+preds.forEach(function(p){rfHtml+='<div style="font-size:.82rem;padding:3px 0">'+p+'</div>'});
+rfHtml+='</div>';
+
+rfEl.innerHTML=rfHtml;
+prevWeather={pressure_msl:w.pressure_msl,wind_kmh:w.wind_kmh,gust_kmh:w.gust_kmh,precipitation:w.precipitation,humidity:w.humidity,heat_index_f:hi};
+alertasData.weather=w;renderAlertas();
+
+}).catch(function(){document.getElementById('riskLevel').textContent='API Error'})}
+fetchWeather();setInterval(fetchWeather,300000);
+
+// Alertas Detectadas — consolidated from all sources
+var alertasData={dust:null,zones:[],weather:null,storms:[],fires:null,nwsAlerts:[]};
+
+function renderAlertas(){
+var el=document.getElementById('alertasContent');
+var alerts=[];
+var w=alertasData.weather;
+
+// Dust
+if(alertasData.dust){var d=alertasData.dust;
+alerts.push(d.icon+' POLVO SAHARIANO — '+d.level+(d.val?' ('+d.val+' µg/m³)':'')+'\n   '+d.msg)}
+
+// Zone activity summary
+var zoneNormals=[],zoneAlerts=[];
+alertasData.zones.forEach(function(z){
+if(z.score>=20)zoneAlerts.push(z);
+else zoneNormals.push(z)});
+
+if(zoneNormals.length){
+var names=zoneNormals.map(function(z){return z.name}).join(', ');
+alerts.push('✅ Zonas '+names+' — Sin riesgo elevado\n   📍 Lectura individual por zona geográfica')}
+if(zoneAlerts.length){zoneAlerts.forEach(function(z){
+var ctx=z.reasons&&z.reasons.length?z.reasons.slice(0,3).map(function(r){return r.replace(/:\s*\+\d+$/,'')}).join(' | '):'';
+alerts.push('⚠️ '+z.name+' — '+z.level+'\n   '+ctx+'\n   <a href="#zones" style="color:var(--blue);font-size:.78rem;text-decoration:none">Ver zona en detalle →</a>')})}
+
+// Weather conditions
+if(w){
+if(w.humidity&&w.humidity>=90)alerts.push('💧 Humedad alta (posible lluvia / ambiente saturado)');
+if(w.wind_kmh&&w.wind_kmh>=30)alerts.push('💨 Vientos fuertes detectados (<span data-kmh="'+w.wind_kmh+'">'+windStr(w.wind_kmh)+'</span> '+windUnit()+')');
+if(w.gust_kmh&&w.gust_kmh>=45)alerts.push('🌬️ Ráfagas fuertes detectadas (<span data-kmh="'+w.gust_kmh+'">'+windStr(w.gust_kmh)+'</span> '+windUnit()+')');
+if(w.precipitation&&w.precipitation>0)alerts.push('🌧️ Precipitación detectada: '+w.precipitation+' mm');
+if(w.code&&w.code>=95)alerts.push('⛈️ '+(CODES[w.code]||'Tormenta')+' detectada');
+else if(w.code&&w.code>=61)alerts.push('🌧️ Condiciones de lluvia detectadas');
+var hic_alert=fToC(w.heat_index_f);
+if(w.heat_index_f&&w.heat_index_f>=100)alerts.push('🔥 Calor peligroso — Índice de calor: <span data-tc="'+hic_alert+'">'+tempStr(hic_alert)+'</span>');
+else if(w.heat_index_f&&w.heat_index_f>=95)alerts.push('🟠 Calor fuerte — Índice de calor: <span data-tc="'+hic_alert+'">'+tempStr(hic_alert)+'</span>');
+if(w.pressure_msl&&w.pressure_msl<=1006)alerts.push('📉 Presión atmosférica baja: <span data-hpa="'+w.pressure_msl+'">'+pressStr(w.pressure_msl)+'</span> '+pressUnit())}
+
+// Storms
+if(alertasData.storms&&alertasData.storms.length){
+alertasData.storms.forEach(function(st){
+var icon=st.dist<1000?'🚨':st.dist<1500?'🔴':st.dist<3000?'🟠':'🔵';
+alerts.push(icon+' 🌀 '+st.type+': '+st.name+' — '+st.threat+'\n   📏 '+st.dist+' km '+st.dir+' de PR | 💨 <span data-kmh="'+st.wind+'">'+windStr(st.wind)+'</span> '+windUnit()+'\n   <a href="#storms" style="color:var(--blue);font-size:.78rem;text-decoration:none">Ver detalles en Storm Tracker →</a>')})}
+
+// Fires
+if(alertasData.fires&&alertasData.fires.count>0){var f=alertasData.fires;
+var fIcon=f.severity==='ALTA'?'🔴':f.severity==='MODERADA'?'🟠':'🟡';
+alerts.push(fIcon+' 🔥 INCENDIO FORESTAL — Severidad: '+f.severity+'\n   '+f.count+' incendio'+(f.count>1?'s':'')+' en '+f.munis+' municipio'+(f.munis>1?'s':'')+' | FRP máx: '+f.maxFrp+' MW\n   <a href="#fires" style="color:var(--blue);font-size:.78rem;text-decoration:none">Ver detalles en Fire Monitor →</a>')}
+
+// NWS Alerts — floods, thunderstorms, tropical, marine, heat, wind
+if(alertasData.nwsAlerts&&alertasData.nwsAlerts.length){
+var icons={flood:'🌊',tstorm:'⛈️',tropical:'🌀',marine:'🌊',heat:'🔥',wind:'💨'};
+var labels={flood:'INUNDACIÓN',tstorm:'TORMENTA ELÉCTRICA',tropical:'TROPICAL',marine:'MARÍTIMA',heat:'CALOR',wind:'VIENTO'};
+alertasData.nwsAlerts.forEach(function(a){
+var ic=icons[a.cat]||'⚠️';var lb=labels[a.cat]||'ALERTA';
+var sevIcon=a.severity==='warning'?'🔴':a.severity==='watch'?'🟡':'🟠';
+alerts.push(sevIcon+' '+ic+' '+lb+' — '+a.event+'\n   📍 '+a.area+'\n   <a href="#alerts" style="color:var(--blue);font-size:.78rem;text-decoration:none">Ver en NWS Alerts →</a>')})}
+
+if(!alerts.length){
+el.innerHTML='<div style="text-align:center;color:var(--accent);font-size:.9rem">✅ Sin alertas significativas — Condiciones normales</div>';return}
+
+var html='';
+alerts.forEach(function(a){
+var lines=a.split('\n');
+var bg='rgba(255,255,255,.04)';var bc='var(--border)';
+if(a.indexOf('🚨')>=0||a.indexOf('🔴')>=0||a.indexOf('⚠️')>=0||a.indexOf('🔥')>=0){bg='rgba(255,68,68,.08)';bc='rgba(255,68,68,.2)'}
+else if(a.indexOf('🟠')>=0||a.indexOf('💨')>=0||a.indexOf('🌬️')>=0){bg='rgba(255,152,0,.08)';bc='rgba(255,152,0,.2)'}
+else if(a.indexOf('🔵')>=0){bg='rgba(79,195,247,.08)';bc='rgba(79,195,247,.2)'}
+else if(a.indexOf('💧')>=0||a.indexOf('🌧️')>=0||a.indexOf('📉')>=0){bg='rgba(79,195,247,.08)';bc='rgba(79,195,247,.2)'}
+else if(a.indexOf('✅')>=0){bg='rgba(6,209,33,.06)';bc='rgba(6,209,33,.15)'}
+html+='<div style="padding:8px 12px;margin-bottom:6px;border-radius:8px;font-size:.84rem;background:'+bg+';border:1px solid '+bc+';line-height:1.5">';
+lines.forEach(function(l){html+=l+'<br>'});
+html+='</div>'});
+el.innerHTML=html}
+
+// Hourly Forecast 1-6h
+function fetchForecast(){
+fetch('https://api.open-meteo.com/v1/forecast?latitude='+PR.lat+'&longitude='+PR.lon+'&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m,pressure_msl&forecast_days=1&timezone=America/Puerto_Rico')
+.then(function(r){return r.json()}).then(function(d){
+var hr=d.hourly||{};var times=hr.time||[];
+var ast=getAST();var nowStr=ast.getFullYear()+'-'+pad(ast.getMonth()+1)+'-'+pad(ast.getDate())+'T'+pad(ast.getHours())+':00';
+var startIdx=0;
+for(var i=0;i<times.length;i++){if(times[i]>=nowStr){startIdx=i;break}}
+var forecast=[];
+for(var i=startIdx;i<Math.min(startIdx+6,times.length);i++){
+var tc=hr.temperature_2m[i],fc=hr.apparent_temperature[i],rh=hr.relative_humidity_2m[i];
+var tf=cToF(tc),ff=cToF(fc),hi=heatIndex(tf,rh);
+forecast.push({time:times[i],temp_c:Math.round(tc*10)/10,feels_c:Math.round(fc*10)/10,heat_index_c:fToC(hi),heat_index_f:hi,humidity:rh,
+rain:hr.precipitation[i],rain_prob:hr.precipitation_probability[i],
+wind:hr.wind_speed_10m[i],gust:hr.wind_gusts_10m[i],press:hr.pressure_msl[i],code:hr.weather_code[i]})}
+
+if(!forecast.length){document.getElementById('forecastContent').innerHTML='<p style="color:var(--text-dim)">No forecast data</p>';return}
+
+var el=document.getElementById('forecastContent');
+var temps=forecast.map(function(f){return f.temp_c}).filter(function(v){return v!=null});
+var heats=forecast.map(function(f){return f.heat_index_c}).filter(function(v){return v!=null});
+var heatsF=forecast.map(function(f){return f.heat_index_f}).filter(Boolean);
+var rains=forecast.map(function(f){return f.rain||0});
+var rainProbs=forecast.map(function(f){return f.rain_prob||0});
+var winds=forecast.map(function(f){return f.wind||0});
+var gusts=forecast.map(function(f){return f.gust||0});
+var presses=forecast.map(function(f){return f.press}).filter(Boolean);
+var totalRain=rains.reduce(function(a,b){return a+b},0);
+
+var html='<div style="font-size:.85rem;font-weight:700;margin-bottom:8px">🔮 PRONÓSTICO / PROYECCIÓN 1-6 HORAS</div>';
+
+// Alerts from forecast
+var fAlerts=[];
+if(heatsF.length&&Math.max.apply(null,heatsF)>=100)fAlerts.push('🔥 Calor peligroso: riesgo de fatiga por calor si hay exposición prolongada');
+if(Math.max.apply(null,rains)>=5)fAlerts.push('🌧️ Lluvia significativa: riesgo de acumulación rápida');
+var maxHumid=Math.max.apply(null,forecast.map(function(f){return f.humidity||0}));
+if(maxHumid>=90&&totalRain===0)fAlerts.push('💧 Humedad muy alta: ambiente cargado; posible desarrollo de lluvia');
+if(Math.max.apply(null,winds)>=45)fAlerts.push('💨 Viento fuerte presente: posibles ráfagas adicionales');
+if(Math.max.apply(null,gusts)>=60)fAlerts.push('🌬️ Ráfagas peligrosas: asegure objetos sueltos');
+if(fAlerts.length){fAlerts.forEach(function(a){html+='<div style="font-size:.82rem;padding:2px 0;color:var(--orange)">'+a+'</div>'});html+='<br>'}
+
+var first=forecast[0].time.replace('T',' '),last=forecast[forecast.length-1].time.replace('T',' ');
+html+='<div style="font-size:.8rem;color:var(--text-dim);margin-bottom:8px">Pronóstico horario de Open-Meteo ('+first+' a '+last+')</div>';
+
+html+='<div style="font-size:.82rem;line-height:1.8">';
+if(temps.length){var tMin=Math.min.apply(null,temps),tMax=Math.max.apply(null,temps);html+='🌡️ Temperatura esperada: <strong><span data-tc="'+tMin+'">'+tempStr(tMin)+'</span> a <span data-tc="'+tMax+'">'+tempStr(tMax)+'</span></strong><br>'}
+if(heats.length){var hMax=Math.max.apply(null,heats);html+='🔥 Índice de calor máximo esperado: <strong><span data-tc="'+hMax+'">'+tempStr(hMax)+'</span></strong><br>'}
+html+='🌧️ Lluvia acumulada estimada: <strong>'+totalRain.toFixed(1)+' mm</strong><br>';
+if(rainProbs.length)html+='☔ Probabilidad de lluvia máxima: <strong>'+Math.max.apply(null,rainProbs)+'%</strong><br>';
+if(winds.length){var wMax=Math.max.apply(null,winds);html+='💨 Viento máximo esperado: <strong><span data-kmh="'+wMax+'">'+windStr(wMax)+'</span> '+windUnit()+'</strong><br>'}
+if(gusts.length){var gMax=Math.max.apply(null,gusts);html+='🌬️ Ráfaga máxima esperada: <strong><span data-kmh="'+gMax+'">'+windStr(gMax)+'</span> '+windUnit()+'</strong><br>'}
+if(presses.length>=2){var pChange=presses[presses.length-1]-presses[0];var pChangeDisp=unitC?Math.round(pChange*10)/10+' hPa':Math.round(pChange*0.02953*100)/100+' inHg';html+='📉 Cambio de presión proyectado: <strong><span data-hpa="'+Math.round(pChange*10)/10+'">'+pChangeDisp+'</span></strong><br>'}
+html+='</div>';
+
+html+='<div style="margin-top:10px;font-size:.72rem;color:var(--text-dim)">📡 Fuentes: Open-Meteo + NOAA/NWS<br>Sistema: KRIZ IRON - CLIMA | KWINT</div>';
+el.innerHTML=html;
+
+}).catch(function(){document.getElementById('forecastContent').innerHTML='<p style="color:var(--text-dim)">Forecast unavailable</p>'})}
+fetchForecast();setInterval(fetchForecast,300000);
+
+// Hurricane Season Detail
+(function(){
+var el=document.getElementById('seasonContent');
+var ast=getAST();var m=ast.getMonth()+1,d=ast.getDate();
+
+var seasonStart=new Date(ast.getFullYear(),5,1);
+var seasonEnd=new Date(ast.getFullYear(),10,30);
+var peakStart=new Date(ast.getFullYear(),7,15);
+var peakEnd=new Date(ast.getFullYear(),9,15);
+
+var inSeason=m>=6&&m<=11;
+var inPeak=ast>=peakStart&&ast<=peakEnd;
+var dayOfSeason=inSeason?Math.floor((ast-seasonStart)/864e5)+1:0;
+var totalDays=183;
+
+var html='';
+if(inSeason){
+var phase,phaseIcon,prepLevel,prepColor;
+if(inPeak){phase='PEAK DE TEMPORADA';phaseIcon='🔴';prepLevel='MÁXIMA';prepColor='var(--red)'}
+else if(ast<peakStart){phase='INICIO DE TEMPORADA';phaseIcon='🟡';var daysToPeak=Math.floor((peakStart-ast)/864e5);prepLevel='ACTIVA';prepColor='var(--orange)'}
+else{phase='FINAL DE TEMPORADA';phaseIcon='🟢';prepLevel='VIGILANCIA';prepColor='var(--yellow)'}
+
+var phaseBg=inPeak?'rgba(255,68,68,.12)':ast<peakStart?'rgba(255,152,0,.1)':'rgba(255,235,59,.08)';
+var phaseBorder=inPeak?'rgba(255,68,68,.3)':ast<peakStart?'rgba(255,152,0,.25)':'rgba(255,235,59,.2)';
+html+='<div class="dust-meter" style="background:'+phaseBg+';border-color:'+phaseBorder+'">';
+html+='<div class="dust-icon">'+phaseIcon+'</div>';
+html+='<div class="dust-info">';
+html+='<div class="dust-level" style="color:'+prepColor+'">'+phase+'</div>';
+var countdownMsg='';
+if(ast<peakStart){var dtp=Math.floor((peakStart-ast)/864e5);countdownMsg='Día '+dayOfSeason+' de '+totalDays+' — Peak en <strong>'+dtp+' días</strong> (Ago 15)'}
+else if(inPeak){var daysLeft=Math.floor((peakEnd-ast)/864e5);countdownMsg='Día '+dayOfSeason+' de '+totalDays+' — Peak restante: <strong>'+daysLeft+' días</strong> (hasta Oct 15)'}
+else{var daysLeft2=Math.floor((seasonEnd-ast)/864e5);countdownMsg='Día '+dayOfSeason+' de '+totalDays+' — Fin de temporada en <strong>'+daysLeft2+' días</strong> (Nov 30)'}
+html+='<div class="dust-msg">'+countdownMsg+'</div>';
+html+='<div class="dust-val">Nivel de preparación: <strong style="color:'+prepColor+'">'+prepLevel+'</strong></div>';
+html+='</div></div>';
+
+var progressPct=Math.round(dayOfSeason/totalDays*100);
+html+='<div class="risk-bar" style="margin:10px 0;max-width:100%"><div class="risk-fill" style="width:'+progressPct+'%;background:'+prepColor+'"></div></div>';
+
+html+='<div class="zone-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-top:12px">';
+html+='<div class="zone-card"><div class="zone-name">Día de Temporada</div><div class="zone-temp">'+dayOfSeason+'</div><div class="zone-detail">de '+totalDays+' días</div></div>';
+if(ast<peakStart){var dtp2=Math.floor((peakStart-ast)/864e5);
+html+='<div class="zone-card"><div class="zone-name">Peak en</div><div class="zone-temp" style="color:var(--orange)">'+dtp2+'</div><div class="zone-detail">días (Ago 15)</div></div>'}
+else if(inPeak){var daysLeft3=Math.floor((peakEnd-ast)/864e5);
+html+='<div class="zone-card"><div class="zone-name">Peak restante</div><div class="zone-temp" style="color:var(--red)">'+daysLeft3+'</div><div class="zone-detail">días (hasta Oct 15)</div></div>'}
+else{var daysLeft4=Math.floor((seasonEnd-ast)/864e5);
+html+='<div class="zone-card"><div class="zone-name">Fin temporada</div><div class="zone-temp">'+daysLeft4+'</div><div class="zone-detail">días (Nov 30)</div></div>'}
+html+='<div class="zone-card"><div class="zone-name">Preparación</div><div style="font-size:.9rem;font-weight:700;color:'+prepColor+'">'+prepLevel+'</div></div>';
+html+='<div class="zone-card"><div class="zone-name">Progreso</div><div class="zone-temp" style="color:var(--gold)">'+progressPct+'%</div><div class="zone-detail">de la temporada</div></div>';
+html+='</div>';
+
+html+='<div style="margin-top:12px;padding:10px 14px;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.15);border-radius:10px;font-size:.82rem;line-height:1.5">';
+html+='<strong>Juzgue usted, llegue a sus conclusiones.</strong><br>';
+html+='<em>No todo lo que te cuentan es verdad y no todo lo que es verdad te lo cuentan.</em><br>';
+html+='— Kriz Iron</div>';
+}else{
+var nextSeason=new Date(ast.getFullYear()+(m>11?1:0),5,1);
+var daysUntil=Math.floor((nextSeason-ast)/864e5);
+html+='<div class="dust-meter" style="background:rgba(6,209,33,.08);border-color:rgba(6,209,33,.2)">';
+html+='<div class="dust-icon">🟢</div>';
+html+='<div class="dust-info">';
+html+='<div class="dust-level" style="color:var(--accent)">FUERA DE TEMPORADA</div>';
+html+='<div class="dust-msg">Próxima temporada en <strong>'+daysUntil+' días</strong> (Jun 1)</div>';
+html+='</div></div>'}
+
+el.innerHTML=html;
+})();
+
+// Fetch zones
+function fetchZones(){
+var grid=document.getElementById('zoneGrid');grid.innerHTML='';
+var zoneResults=[];var zoneDone=0;
+ZONES.forEach(function(z,zi){
+fetch('https://api.open-meteo.com/v1/forecast?latitude='+z.lat+'&longitude='+z.lon+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,precipitation,pressure_msl&timezone=America/Puerto_Rico')
+.then(function(r){return r.json()}).then(function(d){
+var c=d.current||{};var tf=cToF(c.temperature_2m),hi=heatIndex(tf,c.relative_humidity_2m);
+var tc=Math.round(c.temperature_2m*10)/10,hic=fToC(hi);
+var w={temp_f:tf,heat_index_f:hi,humidity:c.relative_humidity_2m,wind_kmh:c.wind_speed_10m,gust_kmh:c.wind_gusts_10m,precipitation:c.precipitation,pressure_msl:c.pressure_msl,code:c.weather_code};
+var risk=calcRisk(w);
+zoneResults.push({name:z.name,score:risk.score,level:risk.level,color:risk.color,reasons:risk.reasons,tc:tc,hic:hic,code:c.weather_code,wind:c.wind_speed_10m,rain:c.precipitation,press:c.pressure_msl,idx:zi});
+zoneDone++;if(zoneDone>=ZONES.length)renderZones(zoneResults);
+}).catch(function(){zoneResults.push({name:z.name,score:0,level:'--',color:'var(--text-dim)',tc:null,idx:zi});zoneDone++;if(zoneDone>=ZONES.length)renderZones(zoneResults)})})}
+
+function renderZones(zones){
+zones.sort(function(a,b){return a.idx-b.idx});
+var grid=document.getElementById('zoneGrid');grid.innerHTML='';
+
+// Zona con mayor riesgo
+var top=zones.reduce(function(a,b){return(b.score>a.score)?b:a},zones[0]);
+if(top&&top.score>0){
+var topDiv=document.createElement('div');
+topDiv.style.cssText='grid-column:1/-1;text-align:center;padding:8px;background:'+top.color+'15;border:1px solid '+top.color+'33;border-radius:10px;margin-bottom:4px;font-size:.85rem';
+topDiv.innerHTML='🏆 Zona con mayor riesgo: <strong style="color:'+top.color+'">'+top.name+' — '+top.level+' / '+top.score+'/100</strong>';
+grid.appendChild(topDiv)}
+
+zones.forEach(function(z){
+var card=document.createElement('div');card.className='zone-card';
+var isWatched=z.name==='Norte';
+var watchTag=isWatched?' <span style="font-size:.65rem;color:var(--blue)">👁️ OBSERVADA</span>':'';
+if(z.tc===null){card.innerHTML='<div class="zone-name">'+z.name+'</div><div class="zone-temp">--</div><div class="zone-detail">Unavailable</div>';grid.appendChild(card);return}
+card.innerHTML='<div class="zone-name">'+z.name+watchTag+'</div>'+
+'<div class="zone-temp" data-tc="'+z.tc+'">'+tempStr(z.tc)+'</div>'+
+'<div class="zone-detail">'+(CICONS[z.code]||'')+' '+(CODES[z.code]||'--')+'</div>'+
+'<div class="zone-detail">🌡️ HI: <span data-tc="'+z.hic+'">'+tempStr(z.hic)+'</span> | 💨 <span data-kmh="'+z.wind+'">'+windStr(z.wind)+'</span> <span data-wunit="1">'+windUnit()+'</span> ('+toKt(z.wind)+' kt)</div>'+
+'<div class="zone-detail">🌧️ '+z.rain+' mm | <span data-hpa="'+z.press+'">'+pressStr(z.press)+'</span> '+pressUnit()+'</div>'+
+'<div class="zone-risk" style="background:'+z.color+'22;color:'+z.color+'">'+z.level+' '+z.score+'/100</div>';
+grid.appendChild(card)});
+
+// Update alertas
+alertasData.zones=zones.map(function(z){return{name:z.name,score:z.score,level:z.level,reasons:z.reasons||[]}});
+renderAlertas()}
+fetchZones();setInterval(fetchZones,300000);
+
+// Dust
+function fetchDust(){
+fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude='+PR.lat+'&longitude='+PR.lon+'&current=dust&timezone=America/Puerto_Rico')
+.then(function(r){return r.json()}).then(function(d){
+var dust=(d.current||{}).dust;var lv,ic,msg;
+if(dust==null){lv='N/A';ic='--';msg='Data unavailable'}
+else if(dust>300){lv='EXTREME';ic='🟣';msg='Extreme dust. Stay indoors.'}
+else if(dust>150){lv='UNHEALTHY';ic='🔴';msg='Unhealthy air. Stay indoors.'}
+else if(dust>50){lv='HIGH';ic='🟠';msg='High dust. Sensitive groups avoid exposure.'}
+else if(dust>=15){lv='MODERATE';ic='🟡';msg='Reduced air quality. Hazy skies possible.'}
+else{lv='NORMAL';ic='🟢';msg='No significant Saharan dust.'}
+document.getElementById('dustIcon').textContent=ic;document.getElementById('dustLevel').textContent=lv;
+document.getElementById('dustMsg').textContent=msg;document.getElementById('dustVal').textContent=dust!=null?dust+' µg/m³':'';
+document.getElementById('dustBadge').textContent=ic;document.getElementById('dustSub').textContent=lv;
+alertasData.dust={icon:ic,level:lv,msg:msg,val:dust};renderAlertas();
+}).catch(function(){})}
+fetchDust();setInterval(fetchDust,300000);
+
+// NWS Alerts
+function fetchAlerts(){
+fetch('https://api.weather.gov/alerts/active?area=PR',{headers:{'Accept':'application/geo+json','User-Agent':'PRWXCenter/1.0'}})
+.then(function(r){return r.json()}).then(function(d){
+var f=d.features||[];var banner=document.getElementById('alertBanner'),scroll=document.getElementById('alertScroll');
+var cEl=document.getElementById('alertCount'),lEl=document.getElementById('alertLabel');
+scroll.innerHTML='';
+if(!f.length){scroll.innerHTML='<div class="alert-ok">✅ No active alerts for Puerto Rico</div>';
+if(cEl){cEl.textContent='0';cEl.style.color='var(--accent)'}if(lEl)lEl.textContent='All clear';banner.classList.add('show');
+alertasData.nwsAlerts=[];renderAlertas();return}
+if(cEl){cEl.textContent=f.length;cEl.style.color='var(--red)'}if(lEl)lEl.textContent=f.length===1?'Alert':'Alerts';
+var nwsData=[];
+f.forEach(function(ft){var p=ft.properties;var card=document.createElement('div');card.className='alert-card';
+var ev=(p.event||'').toLowerCase();
+if(ev.indexOf('warning')!==-1)card.classList.add('warning');
+else if(ev.indexOf('watch')!==-1)card.classList.add('watch');
+else if(ev.indexOf('advisory')!==-1)card.classList.add('advisory');
+else card.classList.add('other');
+var area=p.areaDesc||'PR';if(area.length>120)area=area.substring(0,117)+'...';
+card.innerHTML='<strong>'+(p.event||'Alert')+'</strong><span style="font-size:.78rem;color:var(--text-dim)">'+area+'</span>';
+scroll.appendChild(card);
+var evUp=p.event||'';var evLow=evUp.toLowerCase();
+var cat=null;
+if(evLow.indexOf('flood')!==-1||evLow.indexOf('inundaci')!==-1)cat='flood';
+else if(evLow.indexOf('thunderstorm')!==-1||evLow.indexOf('tornado')!==-1||evLow.indexOf('lightning')!==-1)cat='tstorm';
+else if(evLow.indexOf('hurricane')!==-1||evLow.indexOf('tropical')!==-1)cat='tropical';
+else if(evLow.indexOf('rip current')!==-1||evLow.indexOf('surf')!==-1||evLow.indexOf('coastal')!==-1||evLow.indexOf('marine')!==-1)cat='marine';
+else if(evLow.indexOf('heat')!==-1||evLow.indexOf('excessive')!==-1)cat='heat';
+else if(evLow.indexOf('wind')!==-1)cat='wind';
+if(cat)nwsData.push({event:evUp,area:area,cat:cat,severity:evLow.indexOf('warning')!==-1?'warning':evLow.indexOf('watch')!==-1?'watch':'advisory'})});
+banner.classList.add('show');
+alertasData.nwsAlerts=nwsData;renderAlertas()}).catch(function(){})}
+fetchAlerts();setInterval(fetchAlerts,300000);
+
+// NHC Storms
+function parseNHCCoord(v){if(v==null)return null;if(typeof v==='number')return v;var s=String(v).trim().toUpperCase();
+try{if(s.endsWith('N'))return parseFloat(s);if(s.endsWith('S'))return -parseFloat(s);if(s.endsWith('W'))return -parseFloat(s);if(s.endsWith('E'))return parseFloat(s);return parseFloat(s)}catch(e){return null}}
+
+function cardinalFromPR(lat,lon){var dl=lat-PR.lat,dn=lon-PR.lon;var a=((Math.atan2(dn,dl)*180/Math.PI)%360+360)%360;
+var dirs=[[22.5,'al norte'],[67.5,'al noreste'],[112.5,'al este'],[157.5,'al sureste'],[202.5,'al sur'],[247.5,'al suroeste'],[292.5,'al oeste'],[337.5,'al noroeste'],[360,'al norte']];
+for(var i=0;i<dirs.length;i++)if(a<=dirs[i][0])return dirs[i][1];return'al norte'}
+
+function classifyStorm(windKmh,distKm){var cat,ce,threat,te;
+if(windKmh>=252){cat='Huracán Categoría 5';ce='🔴🔴🔴🔴🔴'}
+else if(windKmh>=209){cat='Huracán Categoría 4';ce='🔴🔴🔴🔴'}
+else if(windKmh>=178){cat='Huracán Categoría 3 (Mayor)';ce='🔴🔴🔴'}
+else if(windKmh>=154){cat='Huracán Categoría 2';ce='🔴🔴'}
+else if(windKmh>=119){cat='Huracán Categoría 1';ce='🔴'}
+else if(windKmh>=63){cat='Tormenta Tropical';ce='🟡'}
+else{cat='Depresión Tropical';ce='🟢'}
+if(distKm<300){threat='AMENAZA DIRECTA — INMINENTE';te='🚨'}
+else if(distKm<600){threat='AMENAZA ALTA';te='🔴'}
+else if(distKm<1000){threat='AMENAZA MODERADA';te='🟠'}
+else if(distKm<1500){threat='VIGILANCIA ACTIVA';te='🟡'}
+else if(distKm<3000){threat='MONITOREO';te='🟢'}
+else{threat='MONITOREO LEJANO';te='🔵'}
+return{cat:cat,ce:ce,threat:threat,te:te}}
+
+function getStormConeUrl(storm){var url=storm.trackImageLarge||storm.trackImageMedium;if(url)return url;
+var id=(storm.id||'').toUpperCase();if(id.length>=8){var pre=id.substring(0,2);var basin=pre==='AL'?'AT':pre==='EP'?'EP':'CP';var num=id.substring(2,4);
+return'https://www.nhc.noaa.gov/storm_graphics/'+basin+num+'/'+id+'_5day_cone_with_line_and_wind.png'}return null}
+
+function getPrepLines(threat){var lines={
+'AMENAZA DIRECTA — INMINENTE':'🚨 ACTIVA TU PLAN AHORA MISMO\n▸ Ejecuta plan familiar — no improvises\n▸ Protege ventanas y puertas\n▸ Llena tanques de agua y gasolina\n▸ Carga todos los dispositivos al 100%\n▸ Sigue instrucciones de autoridades locales',
+'AMENAZA ALTA':'🔴 PREPARACIÓN MÁXIMA AHORA\n▸ Suministros completos para 7+ días\n▸ Protección de ventanas lista\n▸ Tanque de gasolina LLENO\n▸ Documentos y efectivo listos\n▸ Monitorea NHC cada 6 horas',
+'AMENAZA MODERADA':'🟠 PREPARACIÓN ACTIVA\n▸ Verifica suministros de agua y alimentos\n▸ Revisa el generador y combustible\n▸ Mantén power bank cargado\n▸ Monitorea trayectoria cada 6 horas',
+'VIGILANCIA ACTIVA':'🟡 MANTENTE ATENTO\n▸ Revisa tu lista de preparación\n▸ Monitorea boletines del NHC\n▸ La trayectoria puede cambiar',
+'MONITOREO':'🟢 MONITOREO PREVENTIVO\n▸ Sistema activo en el Atlántico/Caribe\n▸ Se actualizará si hay cambios de trayectoria',
+'MONITOREO LEJANO':'🔵 MONITOREO LEJANO — ATLÁNTICO\n▸ Sistema detectado entre África y el Caribe\n▸ Aún lejos de Puerto Rico — puede cambiar\n▸ Monitorea evolución cada 12-24 horas\n▸ No requiere acción inmediata'
+};return lines[threat]||'▸ Monitorea los boletines oficiales del NHC.'}
+
+function fetchStorms(){
+fetch('https://www.nhc.noaa.gov/CurrentStorms.json')
+.then(function(r){return r.json()}).then(function(d){
+var el=document.getElementById('stormList');var storms=d.activeStorms||[];
+if(!storms.length){
+el.innerHTML='<div class="fire-item" style="background:rgba(6,209,33,.08);border-color:rgba(6,209,33,.2)">'+
+'<div class="fire-icon">✅</div><div class="fire-info">'+
+'<div class="fire-muni" style="color:var(--accent)">SIN SISTEMAS TROPICALES ACTIVOS</div>'+
+'<div class="fire-detail" style="color:var(--text);font-size:.85rem;margin-top:6px">'+
+'No se detectan ciclones tropicales, tormentas o depresiones activas entre África y el Caribe.<br><br>'+
+'🔗 Fuente: <a class="fire-link" href="https://www.nhc.noaa.gov/" target="_blank">National Hurricane Center (NHC)</a><br>'+
+'📡 Radio de monitoreo: 5,500 km (África → Caribe → Puerto Rico)'+
+'</div></div></div>';alertasData.storms=[];renderAlertas();return}
+
+el.innerHTML='';
+var stormAlerts=[];
+storms.forEach(function(s){
+var name=(s.name||'Sin nombre').toUpperCase();
+var lat=parseNHCCoord(s.latitude);var lon=parseNHCCoord(s.longitude);
+if(lat===null||lon===null)return;
+var dist=haversine(PR.lat,PR.lon,lat,lon);
+if(dist>5500)return;
+
+var windKt=parseInt(s.intensity)||0;
+var windKmh=Math.round(windKt*1.852);
+var windMph=Math.round(windKt*1.15078);
+var pressure=s.pressure||'N/D';
+var movement=s.movement||'N/D';
+var lastUpdate=s.lastUpdate||'N/D';
+var distMi=Math.round(dist*0.621371);
+var direction=cardinalFromPR(lat,lon);
+
+var cls=s.classification||'';
+var typeLabel={TD:'DEPRESIÓN TROPICAL',TS:'TORMENTA TROPICAL',HU:'HURACÁN',ST:'SUPERTIFÓN',TY:'TIFÓN'}[cls]||(cls||'SISTEMA TROPICAL');
+
+var pubAdv=s.publicAdvisory||{};var advNum=pubAdv.number||pubAdv.advNum||'—';
+
+var info=classifyStorm(windKmh,dist);
+stormAlerts.push({name:name,type:typeLabel,threat:info.threat,dist:Math.round(dist),dir:direction,wind:windKmh});
+var prepText=getPrepLines(info.threat).replace(/\n/g,'<br>');
+var coneUrl=getStormConeUrl(s);
+
+var threatBg='rgba(79,195,247,.06)';var threatBorder='rgba(79,195,247,.15)';
+if(dist<300){threatBg='rgba(255,68,68,.15)';threatBorder='rgba(255,68,68,.35)'}
+else if(dist<600){threatBg='rgba(255,68,68,.1)';threatBorder='rgba(255,68,68,.25)'}
+else if(dist<1000){threatBg='rgba(255,152,0,.1)';threatBorder='rgba(255,152,0,.25)'}
+else if(dist<1500){threatBg='rgba(255,235,59,.08)';threatBorder='rgba(255,235,59,.2)'}
+else if(dist<3000){threatBg='rgba(6,209,33,.06)';threatBorder='rgba(6,209,33,.15)'}
+
+var html='<div class="fire-item" style="background:'+threatBg+';border-color:'+threatBorder+';flex-direction:column;align-items:stretch">';
+html+='<div style="text-align:center;margin-bottom:12px">';
+html+='<div style="font-size:1.1rem;font-weight:800">'+info.ce+' '+typeLabel+': '+name+'</div>';
+html+='<div style="font-size:.8rem;color:var(--text-dim)">Advisory #'+advNum+'</div>';
+html+='</div>';
+
+html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+html+='<div class="zone-card" style="padding:10px"><div class="zone-name">Amenaza PR</div><div style="font-size:.9rem;font-weight:700">'+info.te+' '+info.threat+'</div></div>';
+html+='<div class="zone-card" style="padding:10px"><div class="zone-name">Posición</div><div style="font-size:.85rem">📍 '+direction+' de Puerto Rico<br>📏 '+Math.round(dist)+' km / '+distMi+' mi</div></div>';
+html+='<div class="zone-card" style="padding:10px"><div class="zone-name">Categoría</div><div style="font-size:.85rem">'+info.ce+' '+info.cat+'</div></div>';
+html+='<div class="zone-card" style="padding:10px"><div class="zone-name">Intensidad</div><div style="font-size:.85rem">💨 '+windKmh+' km/h / '+windMph+' mph<br>📉 '+pressure+' mb</div></div>';
+html+='<div class="zone-card" style="padding:10px"><div class="zone-name">Movimiento</div><div style="font-size:.85rem">🧭 '+movement+'</div></div>';
+html+='<div class="zone-card" style="padding:10px"><div class="zone-name">Última Act.</div><div style="font-size:.85rem">🕒 '+lastUpdate+'</div></div>';
+html+='</div>';
+
+if(coneUrl){
+html+='<div style="margin-bottom:12px"><div style="font-size:.8rem;font-weight:700;color:var(--gold);margin-bottom:6px;text-align:center">🗺️ CONO DE TRAYECTORIA (5 días)</div>';
+html+='<a href="'+coneUrl+'" target="_blank"><img class="img-fluid auto-refresh" src="'+coneUrl+'" alt="Cone '+name+'" loading="lazy" style="max-width:800px;margin:0 auto" /></a></div>'}
+
+html+='<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px">';
+html+='<div style="font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:6px">⚠️ RECOMENDACIÓN PARA PUERTO RICO</div>';
+html+='<div style="font-size:.82rem;line-height:1.5">'+prepText+'</div></div>';
+
+html+='<div style="text-align:center;font-size:.72rem;color:var(--text-dim)">'+
+'🔗 Fuente oficial: <a class="fire-link" href="https://www.nhc.noaa.gov/" target="_blank">nhc.noaa.gov</a> | 📡 KRIZ IRON - CLIMA | KWINT</div>';
+
+html+='</div>';
+
+var div=document.createElement('div');div.innerHTML=html;
+el.appendChild(div.firstChild)});
+
+alertasData.storms=stormAlerts;renderAlertas();
+
+if(!el.children.length){
+el.innerHTML='<div class="fire-item" style="background:rgba(6,209,33,.08);border-color:rgba(6,209,33,.2)">'+
+'<div class="fire-icon">✅</div><div class="fire-info">'+
+'<div class="fire-muni" style="color:var(--accent)">SIN SISTEMAS DENTRO DEL RADIO DE MONITOREO</div>'+
+'<div class="fire-detail" style="color:var(--text);font-size:.85rem;margin-top:6px">'+
+'Hay sistemas activos pero ninguno dentro de 5,500 km de Puerto Rico.<br>'+
+'🔗 <a class="fire-link" href="https://www.nhc.noaa.gov/" target="_blank">Ver todos en NHC →</a>'+
+'</div></div></div>'}
+
+}).catch(function(){document.getElementById('stormList').innerHTML='<p class="center" style="color:var(--text-dim)">NHC data unavailable</p>'})}
+fetchStorms();setInterval(fetchStorms,600000);
+
+// Embalses PR — USGS real-time + AAA thresholds
+var RESERVOIRS=[
+{n:"Carraízo",s:"50059000",g:"p",e:"AAA",u:{f:29.99,c:36.99,a:38.49,o:39.69,s:40.94}},
+{n:"La Plata",s:"50045000",g:"p",e:"AAA",u:{f:29.99,c:40.49,a:44.89,o:47.69,s:51.29}},
+{n:"Cidra",s:"50047550",g:"p",e:"AAA",u:{f:395.49,c:398.36,a:400.22,o:401.70,s:402.99}},
+{n:"Toa Vaca",s:"50111210",g:"p",e:"AAA",u:{f:122.99,c:132.59,a:139.59,o:146.99,s:163.99}},
+{n:"Río Blanco",s:"50076800",g:"p",e:"AAA",u:{f:19.99,c:22.49,a:24.24,o:26.49,s:28.74}},
+{n:"Fajardo",s:"50071225",g:"p",e:"AAA",u:{f:35.99,c:40.49,a:44.49,o:48.29,s:52.49}},
+{n:"Dos Bocas",s:"50027100",g:"p",e:"AEE",u:{f:82.90,c:84.42,a:86.25,o:88.08,s:89.91}},
+{n:"Caonillas",s:"50026140",g:"p",e:"AEE",u:{f:234.98,c:241.99,a:243.99,o:247.99,s:251.99}},
+{n:"Guajataca",s:"50010800",g:"p",e:"AEE",u:{f:183.99,c:185.99,a:189.99,o:193.99,s:196.49}},
+{n:"Cerrillos",s:"50113950",g:"p",e:"DRNA",u:{f:137.49,c:144.79,a:152.39,o:160.89,s:174.69}},
+{n:"Carite",s:"50039995",g:"s",e:"AEE",u:{f:532.15,c:536.15,a:538.15,o:541.15,s:542.93}},
+{n:"Patillas",s:"50093045",g:"s",e:"AEE",u:{f:53.32,c:56.99,a:58.81,o:62.17,s:65.99}},
+{n:"Guineo",s:"50032290",g:"s",e:"AEE",u:{f:893.97,c:895.49,a:897.32,o:899.15,s:902.20}},
+{n:"Matrullas",s:"50032590",g:"s",e:"AEE",u:{f:727.85,c:729.38,a:731.21,o:733.03,s:736.08}},
+{n:"Guayabal",s:"50111300",g:"s",e:"AEE",u:{f:98.44,c:99.96,a:101.79,o:102.71,s:103.93}},
+{n:"Garzas",s:"50020100",g:"s",e:"AEE",u:{f:727.85,c:729.38,a:731.21,o:733.03,s:736.08}},
+{n:"Guayo",s:"50141500",g:"s",e:"AEE",u:{f:436.77,c:438.29,a:440.12,o:441.95,s:445.00}},
+{n:"Luchetti",s:"50125780",g:"s",e:"AEE",u:{f:165.50,c:167.02,a:168.85,o:170.68,s:173.73}},
+{n:"Loco",s:"50128900",g:"s",e:"AEE",u:{f:67.05,c:68.57,a:68.87,o:69.48,s:70.09}}
+];
+
+var EMB_LEVELS=[
+{l:"FUERA DE SERVICIO",e:"⚫",bg:"rgba(80,80,80,.2)",cl:"#888"},
+{l:"CONTROL",e:"🔴",bg:"rgba(255,68,68,.15)",cl:"var(--red)"},
+{l:"AJUSTES",e:"🟠",bg:"rgba(255,152,0,.15)",cl:"var(--orange)"},
+{l:"OBSERVACIÓN",e:"🟡",bg:"rgba(255,235,59,.12)",cl:"var(--yellow)"},
+{l:"SEGURIDAD",e:"🟢",bg:"rgba(6,209,33,.12)",cl:"var(--accent)"},
+{l:"DESBORDE",e:"🔵",bg:"rgba(79,195,247,.15)",cl:"var(--blue)"}
+];
+
+var EMB_RECS=[
+"⚫ EMERGENCIA — Embalse fuera de capacidad operativa. Almacena agua de emergencia y prepárate para cortes prolongados.",
+"🔴 Posibles racionamientos por sectores. Almacena agua potable, prioriza consumo esencial.",
+"🟠 AAA podría iniciar ajustes de presión/horario. Llena cisternas y tinacos, reduce consumo no esencial.",
+"🟡 Niveles en observación. Sin restricciones, pero usa el agua responsablemente.",
+"🟢 Niveles saludables. Consumo normal sin restricciones.",
+"🔵 Niveles excelentes (posible vertido). Sin restricciones — buen momento para llenado de cisternas."
+];
+
+function classifyEmb(level,u){
+var idx;
+if(level<=u.f)idx=0;else if(level<=u.c)idx=1;else if(level<=u.a)idx=2;else if(level<=u.o)idx=3;else if(level<=u.s)idx=4;else idx=5;
+var rng=u.s-u.f;var pct=(level-u.f)/rng*100;
+return{idx:idx,pct:pct}}
+
+function embProgressBar(pct){var w=10;var filled=Math.round(Math.max(0,Math.min(100,pct))/100*w);
+return'█'.repeat(filled)+'░'.repeat(w-filled)}
+
+function fetchEmbalses(){
+var sites=RESERVOIRS.map(function(r){return r.s}).join(',');
+var url='https://waterservices.usgs.gov/nwis/iv/?format=json&sites='+sites+'&siteStatus=all&siteType=LK&parameterCd=72376';
+fetch(url).then(function(r){return r.json()}).then(function(data){
+var results={};
+var ts=(data.value||{}).timeSeries||[];
+ts.forEach(function(series){
+var vc=series.variable.variableCode[0].value;if(vc!=='72376')return;
+var sid=series.sourceInfo.siteCode[0].value;
+var vals=series.values[0].value;if(!vals.length)return;
+var latest=vals[vals.length-1];
+try{results[sid]={level:parseFloat(latest.value),dt:latest.dateTime}}catch(e){}});
+
+renderEmbalses(results);
+}).catch(function(){document.getElementById('embalsesContent').innerHTML='<p class="center" style="color:var(--text-dim)">⚠️ USGS data unavailable</p>'})}
+
+function renderEmbalses(levels){
+var el=document.getElementById('embalsesContent');
+var ast=getAST();
+var timeStr=pad(ast.getHours())+':'+pad(ast.getMinutes());
+var dayNames=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+var monthNames=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+var dateStr=dayNames[ast.getDay()]+' '+ast.getDate()+' de '+monthNames[ast.getMonth()]+' de '+ast.getFullYear();
+
+var html='<div style="text-align:center;font-size:.82rem;color:var(--text-dim);margin-bottom:12px">'+
+'📅 '+dateStr+' · 🕐 '+timeStr+' AST<br>'+
+'📡 Fuente: USGS (tiempo real) + umbrales oficiales AAA</div>';
+
+var principales=RESERVOIRS.filter(function(r){return r.g==='p'});
+var secundarios=RESERVOIRS.filter(function(r){return r.g==='s'});
+var worstIdx=5;var alertas=[];
+
+html+='<div class="emb-sec-title">🏞 EMBALSES PRINCIPALES</div>';
+principales.forEach(function(r){
+var d=levels[r.s];
+if(!d){html+='<div class="emb-card"><div class="emb-header"><span>⚪</span><span class="emb-name">'+r.n+'</span><span class="emb-entity">'+r.e+'</span></div><div style="font-size:.8rem;color:var(--text-dim)">Sin datos disponibles</div></div>';return}
+var cl=classifyEmb(d.level,r.u);var info=EMB_LEVELS[cl.idx];
+if(cl.idx<worstIdx)worstIdx=cl.idx;
+if(cl.idx!==4)alertas.push({name:r.n,info:info,pct:cl.pct});
+
+var barColor=info.cl;
+
+html+='<div class="emb-card"><div class="emb-header"><span>'+info.e+'</span><span class="emb-name">'+r.n+'</span><span class="emb-entity">'+r.e+'</span>'+
+'<span class="emb-level-tag" style="background:'+info.bg+';color:'+info.cl+'">'+info.l+'</span></div>'+
+'<div class="emb-bar-wrap"><div class="emb-bar-fill" style="width:'+Math.max(0,Math.min(100,cl.pct))+'%;background:'+barColor+'"></div></div>'+
+'<div class="emb-stats"><span>'+embProgressBar(cl.pct)+' '+cl.pct.toFixed(1)+'%</span><span>'+d.level.toFixed(2)+'m / '+r.u.s.toFixed(2)+'m</span></div></div>'});
+
+html+='<div class="emb-sec-title">🏞 EMBALSES SECUNDARIOS</div>';
+secundarios.forEach(function(r){
+var d=levels[r.s];
+if(!d){html+='<div class="emb-card" style="padding:8px 12px"><span>⚪ '+r.n+' — sin datos</span></div>';return}
+var cl=classifyEmb(d.level,r.u);var info=EMB_LEVELS[cl.idx];
+if(cl.idx!==4)alertas.push({name:r.n,info:info,pct:cl.pct});
+
+html+='<div class="emb-card" style="padding:8px 12px"><div class="emb-header" style="margin-bottom:0">'+
+'<span>'+info.e+'</span><span class="emb-name" style="font-size:.82rem">'+r.n+'</span>'+
+'<span class="emb-entity">'+r.e+'</span>'+
+'<span style="font-size:.78rem;color:var(--text-dim)">'+info.l+' ('+cl.pct.toFixed(1)+'%)</span></div>'+
+'<div class="emb-bar-wrap" style="height:6px;margin:6px 0 0"><div class="emb-bar-fill" style="width:'+Math.max(0,Math.min(100,cl.pct))+'%;background:'+info.cl+'"></div></div></div>'});
+
+// Summary
+var overall=EMB_LEVELS[worstIdx];
+html+='<div class="emb-summary"><div class="emb-summary-title">📋 RESUMEN Y RECOMENDACIÓN</div>'+
+'<div style="font-size:.88rem">Estado del sistema principal: '+overall.e+' <strong>'+overall.l+'</strong></div>'+
+'<div class="emb-rec">'+EMB_RECS[worstIdx]+'</div>';
+
+if(alertas.length){
+html+='<div class="emb-alert-list"><strong>⚠️ Embalses fuera de Seguridad:</strong><br>';
+alertas.forEach(function(a){html+='&nbsp;&nbsp;'+a.info.e+' '+a.name+' — '+a.info.l+' ('+a.pct.toFixed(1)+'%)<br>'});
+html+='</div>'}
+
+html+='<div style="margin-top:10px;font-size:.72rem;color:var(--text-dim)">'+
+'📡 KRIZ IRON — EMBALSES PR | Datos USGS tiempo real + umbrales AAA<br>'+
+'Creado, diseñado y codificado por KRIZ IRON</div></div>';
+
+el.innerHTML=html}
+
+fetchEmbalses();setInterval(fetchEmbalses,3600000);
+
+// NASA FIRMS Fire Monitor — 78 municipios, estilo Telegram, refresh 12h
+var FIRMS_BBOX="-67.27,17.88,-65.22,18.52";
+var FIRMS_SOURCES=["VIIRS_NOAA20_NRT","VIIRS_NOAA21_NRT","VIIRS_SNPP_NRT","MODIS_NRT"];
+var FIRMS_KEY='989b65a4765645802d73c69a782f2b74';
+var PR_MUNIS={
+"Adjuntas":[18.1627,-66.7224],"Aguada":[18.3824,-67.1887],"Aguadilla":[18.4274,-67.1541],
+"Aguas Buenas":[18.2569,-66.1028],"Aibonito":[18.14,-66.266],"Anasco":[18.2828,-67.1396],
+"Arecibo":[18.4725,-66.7156],"Arroyo":[17.966,-66.0614],"Barceloneta":[18.4505,-66.5385],
+"Barranquitas":[18.1866,-66.3063],"Bayamon":[18.3985,-66.1554],"Cabo Rojo":[18.0866,-67.1457],
+"Caguas":[18.2341,-66.0485],"Camuy":[18.4837,-66.8449],"Canovanas":[18.379,-65.9014],
+"Carolina":[18.3808,-65.9573],"Catano":[18.4413,-66.1174],"Cayey":[18.1119,-66.166],
+"Ceiba":[18.2636,-65.6486],"Ciales":[18.336,-66.4689],"Cidra":[18.176,-66.1614],
+"Coamo":[18.08,-66.358],"Comerio":[18.2192,-66.2256],"Corozal":[18.3414,-66.3168],
+"Culebra":[18.3108,-65.3028],"Dorado":[18.4589,-66.2677],"Fajardo":[18.3258,-65.6524],
+"Florida":[18.3632,-66.5617],"Guanica":[17.9714,-66.908],"Guayama":[17.9843,-66.1137],
+"Guayanilla":[18.0191,-66.7918],"Guaynabo":[18.3567,-66.1108],"Gurabo":[18.2544,-65.973],
+"Hatillo":[18.4867,-66.8254],"Hormigueros":[18.1397,-67.1275],"Humacao":[18.1498,-65.8197],
+"Isabela":[18.5006,-67.0243],"Jayuya":[18.2186,-66.5916],"Juana Diaz":[18.0535,-66.5066],
+"Juncos":[18.2275,-65.9211],"Lajas":[18.0498,-67.0591],"Lares":[18.2949,-66.8778],
+"Las Marias":[18.2508,-66.9904],"Las Piedras":[18.1831,-65.8722],"Loiza":[18.4313,-65.8783],
+"Luquillo":[18.3726,-65.7165],"Manati":[18.4314,-66.4837],"Maricao":[18.1808,-66.9796],
+"Maunabo":[18.0072,-65.8993],"Mayaguez":[18.2011,-67.1396],"Moca":[18.3946,-67.1131],
+"Morovis":[18.3257,-66.4079],"Naguabo":[18.2117,-65.7349],"Naranjito":[18.3009,-66.2449],
+"Orocovis":[18.2269,-66.391],"Patillas":[18.0038,-66.0136],"Penuelas":[18.0563,-66.726],
+"Ponce":[18.0111,-66.6141],"Quebradillas":[18.4735,-66.9388],"Rincon":[18.3403,-67.25],
+"Rio Grande":[18.3803,-65.8314],"Sabana Grande":[18.0777,-66.9607],"Salinas":[17.9772,-66.2987],
+"San German":[18.0826,-67.0353],"San Juan":[18.4655,-66.1057],"San Lorenzo":[18.1897,-65.9617],
+"San Sebastian":[18.3374,-66.9901],"Santa Isabel":[17.9663,-66.4049],"Toa Alta":[18.3885,-66.2482],
+"Toa Baja":[18.4441,-66.2541],"Trujillo Alto":[18.3548,-66.0075],"Utuado":[18.2653,-66.7008],
+"Vega Alta":[18.4122,-66.3312],"Vega Baja":[18.4442,-66.3879],"Vieques":[18.1263,-65.4401],
+"Villalba":[18.1275,-66.4922],"Yabucoa":[18.0505,-65.8794],"Yauco":[18.0348,-66.8499]
+};
+
+function nearestMuni(lat,lon){var best=null,bd=Infinity;for(var n in PR_MUNIS){var m=PR_MUNIS[n],d=haversine(lat,lon,m[0],m[1]);if(d<bd){bd=d;best=n}}return{name:best,dist:Math.round(bd*10)/10}}
+
+function fetchFires(){
+document.getElementById('fireList').innerHTML='<p class="center" style="color:var(--text-dim)">🛰️ Scanning satellites...</p>';
+var allHotspots=[];var done=0;
+FIRMS_SOURCES.forEach(function(src){
+var url='https://firms.modaps.eosdis.nasa.gov/api/area/csv/'+FIRMS_KEY+'/'+src+'/'+FIRMS_BBOX+'/2';
+fetch(url).then(function(r){return r.text()}).then(function(txt){
+var lines=txt.trim().split('\n');if(lines.length<=1){done++;if(done>=FIRMS_SOURCES.length)renderFires(allHotspots);return}
+var hdr=lines[0].split(',');
+for(var i=1;i<lines.length;i++){var fields=lines[i].split(',');if(fields.length<hdr.length)continue;
+var row={};hdr.forEach(function(h,j){row[h]=fields[j]});
+var lat=parseFloat(row.latitude),lon=parseFloat(row.longitude);if(isNaN(lat))continue;
+var rawConf=row.confidence||'l';var conf;try{var cn=parseInt(rawConf);conf=cn>=80?'h':cn>=30?'n':'l'}catch(e){conf=['h','n','l'].indexOf(rawConf)>=0?rawConf:'l'}
+var nearest=nearestMuni(lat,lon);
+allHotspots.push({lat:lat,lon:lon,confidence:conf,frp:parseFloat(row.frp)||0,
+acq_date:row.acq_date||'',acq_time:(row.acq_time||'').padStart(4,'0'),
+satellite:row.satellite||src,daynight:row.daynight||'',source:src,
+municipality:nearest.name,dist_km:nearest.dist})}
+done++;if(done>=FIRMS_SOURCES.length)renderFires(allHotspots)
+}).catch(function(){done++;if(done>=FIRMS_SOURCES.length)renderFires(allHotspots)})})}
+
+function clusterHotspots(spots){
+var rem=spots.slice(),clusters=[];
+while(rem.length){var seed=rem.shift(),cl=[seed],still=[];
+for(var i=0;i<rem.length;i++){if(haversine(seed.lat,seed.lon,rem[i].lat,rem[i].lon)<=1)cl.push(rem[i]);else still.push(rem[i])}
+rem=still;
+var bestConf=cl.some(function(p){return p.confidence==='h'})?'h':cl.some(function(p){return p.confidence==='n'})?'n':'l';
+var maxFrp=Math.max.apply(null,cl.map(function(p){return p.frp}));
+var latest=cl.sort(function(a,b){return(b.acq_date+b.acq_time).localeCompare(a.acq_date+a.acq_time)})[0];
+clusters.push({lat:seed.lat,lon:seed.lon,municipality:seed.municipality,dist_km:seed.dist_km,
+confidence:bestConf,frp:maxFrp,detections:cl.length,
+acq_date:latest.acq_date,acq_time:latest.acq_time,satellite:latest.satellite,daynight:latest.daynight})}
+return clusters}
+
+function renderFires(hotspots){
+// Filter last 12h
+var now=Date.now();
+var recent=hotspots.filter(function(h){
+try{var dt=new Date(h.acq_date+'T'+h.acq_time.substring(0,2)+':'+h.acq_time.substring(2,4)+':00Z');return(now-dt.getTime())<43200000}
+catch(e){return true}});
+
+var seen={},unique=[];
+recent.forEach(function(h){var k=Math.round(h.lat*1000)+','+Math.round(h.lon*1000);if(!seen[k]){seen[k]=1;unique.push(h)}});
+
+var list=document.getElementById('fireList');var summ=document.getElementById('fireSummary');
+var ast=getAST();var timeStr=pad(ast.getHours())+':'+pad(ast.getMinutes());
+
+if(!unique.length){
+alertasData.fires=null;renderAlertas();
+summ.innerHTML='<div class="fire-stat"><div class="val" style="color:var(--accent)">0</div><div class="lbl">Active Fires</div></div>'+
+'<div class="fire-stat"><div class="val" style="color:var(--accent)">✅</div><div class="lbl">Status</div></div>';
+list.innerHTML='<div class="fire-item" style="background:rgba(6,209,33,.08);border-color:rgba(6,209,33,.2)">'+
+'<div class="fire-icon">🟢</div><div class="fire-info">'+
+'<div class="fire-muni" style="color:var(--accent)">REPORTE DE INCENDIOS FORESTALES</div>'+
+'<div class="fire-detail" style="color:var(--text);font-size:.85rem;margin-top:6px">'+
+'🟢 No se registran fuegos forestales activos en Puerto Rico hasta el momento.<br><br>'+
+'🛰️ Fuente: NASA FIRMS (VIIRS + MODIS)<br>'+
+'🕒 Verificado: '+timeStr+' hora PR<br><br>'+
+'📡 Satélites: VIIRS NOAA-20, NOAA-21, Suomi NPP, MODIS Terra/Aqua<br>'+
+'⏱️ Datos de las últimas 12 horas<br>'+
+'📌 Cobertura: 78 municipios de PR'+
+'</div></div></div>';
+return}
+
+var clusters=clusterHotspots(unique);
+var byMuni={};clusters.forEach(function(c){if(!byMuni[c.municipality])byMuni[c.municipality]=[];byMuni[c.municipality].push(c)});
+
+var totalFires=clusters.length;
+var highConf=clusters.filter(function(c){return c.confidence==='h'}).length;
+var maxFrp=Math.max.apply(null,clusters.map(function(c){return c.frp}));
+var windEl=document.getElementById('dWind');var windKmh=parseFloat(windEl.getAttribute('data-kmh'))||parseFloat(windEl.textContent)||0;
+var windDir=document.getElementById('dWindDir').textContent.split('|')[0].trim();
+var highWind=windKmh>=30;
+
+var severity,sevColor,sevIcon;
+if(highConf>=2||maxFrp>=15||(highWind&&maxFrp>=10)){severity='ALTA';sevColor='var(--red)';sevIcon='🔴'}
+else if(highConf>=1||maxFrp>=5){severity='MODERADA';sevColor='var(--orange)';sevIcon='🟠'}
+else{severity='BAJA';sevColor='var(--yellow)';sevIcon='🟡'}
+
+alertasData.fires={count:totalFires,severity:severity,munis:Object.keys(byMuni).length,maxFrp:maxFrp.toFixed(1)};renderAlertas();
+
+summ.innerHTML='<div class="fire-stat"><div class="val" style="color:'+sevColor+'">'+totalFires+'</div><div class="lbl">Incendios</div></div>'+
+'<div class="fire-stat"><div class="val" style="color:'+sevColor+'">'+severity+'</div><div class="lbl">Severidad</div></div>'+
+'<div class="fire-stat"><div class="val">'+highConf+'</div><div class="lbl">Alta Confianza</div></div>'+
+'<div class="fire-stat"><div class="val">'+maxFrp.toFixed(1)+'</div><div class="lbl">FRP Max (MW)</div></div>'+
+'<div class="fire-stat"><div class="val">'+Object.keys(byMuni).length+'</div><div class="lbl">Municipios</div></div>';
+
+list.innerHTML='';
+
+// Header card
+var hdr=document.createElement('div');hdr.className='fire-item '+(severity==='ALTA'?'high':'mod');
+hdr.innerHTML='<div class="fire-icon">🚨</div><div class="fire-info">'+
+'<div class="fire-muni" style="font-size:1rem">🔥⚠️ INCENDIO FORESTAL DETECTADO</div>'+
+'<div class="fire-detail" style="color:var(--text);font-size:.85rem;margin-top:8px">'+
+sevIcon+' Severidad estimada: <strong>'+severity+'</strong><br>'+
+'🔥 Incendios activos: <strong>'+totalFires+'</strong><br>'+
+'🛰️ Fuente: NASA FIRMS (VIIRS + MODIS)<br>'+
+'⚡ FRP máximo: <strong>'+maxFrp.toFixed(1)+' MW</strong><br>'+
+'💨 Viento: '+windStr(windKmh)+' '+windUnit()+' del '+windDir+(highWind?' <span style="color:var(--red)">⚠️ RIESGO DE PROPAGACIÓN</span>':'')+
+'<br>🕒 Detectado: '+timeStr+' hora PR'+
+'</div></div>';
+list.appendChild(hdr);
+
+// Municipality cards
+var munis=Object.keys(byMuni).sort(function(a,b){return byMuni[b].length-byMuni[a].length});
+munis.forEach(function(m){
+var mc=byMuni[m];var fires=mc.length;
+var sevClass=mc.some(function(c){return c.confidence==='h'})?'high':'mod';
+var item=document.createElement('div');item.className='fire-item '+sevClass;
+
+var countStr=fires>1?fires+' incendios activos':'1 incendio activo';
+var detailHtml='';
+
+mc.sort(function(a,b){return b.frp-a.frp}).forEach(function(c,i){
+var gpsUrl='https://www.google.com/maps?q='+c.lat+','+c.lon;
+var confLabel={h:'🔴 Alta',n:'🟠 Nominal',l:'🟡 Baja'}[c.confidence]||'?';
+var timeLabel=c.acq_date+' '+c.acq_time.substring(0,2)+':'+c.acq_time.substring(2,4)+'Z';
+var satLabel=c.satellite.replace('_',' ');
+
+if(fires>1){detailHtml+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)"><strong>Incendio '+(i+1)+'</strong><br>'}
+else{detailHtml+='<div style="margin-top:4px">'}
+
+detailHtml+=
+'📍 Coordenadas: <strong>'+c.lat.toFixed(4)+'°N, '+Math.abs(c.lon).toFixed(4)+'°W</strong><br>'+
+'🗺️ <a class="fire-link" href="'+gpsUrl+'" target="_blank">Abrir en Google Maps →</a><br>'+
+'⚡ FRP: <strong>'+c.frp.toFixed(1)+' MW</strong> | Confianza: '+confLabel+'<br>'+
+'📡 Detecciones agrupadas: '+c.detections+' | Dist. al centro: '+c.dist_km+' km<br>'+
+'🛰️ Satélite: '+satLabel+' | '+(c.daynight==='D'?'☀️ Día':'🌙 Noche')+'<br>'+
+'🕒 Última detección: '+timeLabel+
+'</div>'});
+
+item.innerHTML='<div class="fire-icon">🔥</div><div class="fire-info">'+
+'<div class="fire-muni">📍 '+m+' — '+countStr+'</div>'+
+'<div class="fire-detail">'+detailHtml+'</div></div>';
+list.appendChild(item)});
+
+// Footer info card
+var footer=document.createElement('div');footer.className='fire-item';footer.style.background='rgba(255,255,255,.03)';footer.style.borderColor='var(--border)';
+footer.innerHTML='<div class="fire-icon">📡</div><div class="fire-info">'+
+'<div class="fire-muni" style="font-size:.85rem">SOBRE ESTE SISTEMA</div>'+
+'<div class="fire-detail" style="font-size:.78rem;margin-top:4px">'+
+'Este sistema utiliza datos de NASA FIRMS para detectar puntos de calor en Puerto Rico en tiempo casi-real.<br><br>'+
+'🛰️ Satélites utilizados:<br>'+
+'&nbsp;&nbsp;• VIIRS NOAA-20<br>&nbsp;&nbsp;• VIIRS NOAA-21<br>&nbsp;&nbsp;• VIIRS Suomi NPP<br>&nbsp;&nbsp;• MODIS Terra/Aqua<br><br>'+
+'⏱️ Los satélites pasan sobre PR ~2 veces al día (~2:00 AM y ~2:00 PM hora PR).<br>'+
+'📌 Cobertura: 78 municipios de PR<br>'+
+'🔍 Detecciones cercanas (&lt;1km) se agrupan como un solo incendio.<br><br>'+
+'🔴 ALTA — incendio intenso confirmado por satélite<br>'+
+'🟠 MODERADA — actividad de calor significativa<br>'+
+'🟡 BAJA — punto de calor menor detectado<br><br>'+
+'⚠️ Detección satelital de puntos de calor. Puede incluir quemas agrícolas. No confirma causa.<br><br>'+
+'<em>Creado, diseñado y codificado por KRIZ IRON</em>'+
+'</div></div>';
+list.appendChild(footer)}
+
+fetchFires();setInterval(fetchFires,43200000);
+
+// Auto-refresh images
+setInterval(function(){document.querySelectorAll('.auto-refresh').forEach(function(img){var s=img.getAttribute('src'),b=s.split(/[?&]_t=/)[0],sep=b.indexOf('?')!==-1?'&':'?';img.src=b+sep+'_t='+Date.now()})},300000);
+
+// Lightbox
+window.openLightbox=function(s){document.getElementById('lightbox-img').src=s;document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden'};
+window.closeLightbox=function(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow=''};
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox()});
+document.addEventListener('click',function(e){if(e.target.classList&&e.target.classList.contains('img-fluid')&&!e.target.closest('a')){e.preventDefault();openLightbox(e.target.src)}});
+
+// Tabs
+window.switchTab=function(g,t,b){document.querySelectorAll('[id^="'+g+'-"]').forEach(function(p){p.classList.remove('active')});var el=document.getElementById(g+'-'+t);if(el)el.classList.add('active');b.parentElement.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active')};
+window.filterQA=function(c,b){document.querySelectorAll('.qa-link').forEach(function(l){if(c==='all')l.classList.remove('hidden');else l.classList.toggle('hidden',l.getAttribute('data-cat')!==c)});b.parentElement.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active')};
+
+// Scroll animations
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:.05});
+document.querySelectorAll('.card:not(.no-anim)').forEach(function(c){obs.observe(c)});
+var secs=document.querySelectorAll('section[id]'),navs=document.querySelectorAll('.nav-link');
+window.addEventListener('scroll',function(){var p=window.scrollY+80;secs.forEach(function(s){if(s.offsetTop<=p&&s.offsetTop+s.offsetHeight>p)navs.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+s.id)})})},{passive:true});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KWINT — Radar & Satellite Center | Puerto Rico</title>
+  <style>
+    :root {
+      --gold:#ffd700;--gold-dim:rgba(255,215,0,.12);--text:#e8e8e8;--text-dim:rgba(255,255,255,.5);
+      --bg:#06081a;--card:rgba(14,18,45,.88);--card-hover:rgba(22,28,62,.94);
+      --border:rgba(255,215,0,.1);--border-hover:rgba(255,215,0,.3);
+      --accent:#06d121;--blue:#4fc3f7;--red:#ff4444;--orange:#ff9800;--yellow:#ffeb3b;
+      --nav-bg:rgba(6,8,22,.96);--radius:14px;--shadow:0 4px 24px rgba(0,0,0,.5);
+      --tr:.3s cubic-bezier(.4,0,.2,1);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;scroll-padding-top:60px}
+    body{color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);line-height:1.6;overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;background:url("https://pbs.twimg.com/media/A4Z1bJ7CQAEKEF3.jpg:large") center/cover no-repeat;opacity:.1;z-index:-1}
+
+    nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+    .nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:4px;padding:0 16px;height:50px;overflow-x:auto;scrollbar-width:none}
+    .nav-inner::-webkit-scrollbar{display:none}
+    .nav-brand{color:var(--gold);font-weight:800;font-size:.95rem;white-space:nowrap;margin-right:8px}
+    .nav-link{color:var(--text);text-decoration:none;font-size:.76rem;font-weight:500;padding:5px 10px;border-radius:20px;white-space:nowrap;transition:var(--tr);opacity:.6}
+    .nav-link:hover,.nav-link.active{background:var(--gold-dim);color:var(--gold);opacity:1}
+    .nav-clock{margin-left:auto;font-size:.78rem;color:var(--gold);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+    .wrap{max-width:1400px;margin:0 auto;padding:16px 16px 40px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}.span-2{grid-column:1/-1}}
+
+    .tier-header{grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:16px 0 2px;padding:0 4px}
+    .tier-label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;white-space:nowrap}
+    .t1{color:var(--red)}.t2{color:var(--orange)}.t3{color:var(--blue)}.t4{color:var(--text-dim)}
+    .tier-line{flex:1;height:1px;background:var(--border)}
+    .tier-title{font-size:.85rem;font-weight:600;color:var(--text);opacity:.8}
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;backdrop-filter:blur(10px);box-shadow:var(--shadow);transition:var(--tr);opacity:0;transform:translateY(20px)}
+    .card.visible{animation:fu .4s ease forwards}
+    .card:hover{background:var(--card-hover);border-color:var(--border-hover)}
+    .card.no-anim{opacity:1;transform:none;animation:none}
+    @keyframes fu{to{opacity:1;transform:translateY(0)}}
+
+    h1{font-size:clamp(1.3rem,4vw,1.9rem);color:var(--gold);text-align:center;margin-bottom:6px;line-height:1.3}
+    h2{font-size:1.1rem;color:var(--gold);text-align:center;margin-bottom:14px;position:relative;padding-bottom:10px}
+    h2::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:32px;height:2px;background:var(--gold);border-radius:2px}
+    h3{font-size:.95rem;color:var(--gold);text-align:center;margin:8px 0 6px}
+    .subtitle{text-align:center;opacity:.8;font-size:.9rem}
+    .author{text-align:center;font-weight:600;font-size:.85rem;color:var(--blue)}
+
+    .img-fluid{max-width:100%;width:100%;height:auto;display:block;margin:6px auto;border-radius:8px;cursor:pointer;transition:var(--tr)}
+    .img-fluid:hover{transform:scale(1.008);box-shadow:0 4px 20px rgba(255,215,0,.12)}
+    .img-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+    @media(max-width:700px){.img-grid-2{grid-template-columns:1fr}}
+    figure{margin:6px 0}
+    figcaption{font-size:.73rem;color:var(--text-dim);text-align:center;margin-top:4px}
+
+    .tabs{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;justify-content:center;flex-wrap:wrap}
+    .tab-btn{background:transparent;color:var(--text-dim);border:1px solid var(--border);padding:5px 12px;border-radius:20px;font-size:.74rem;font-weight:600;cursor:pointer;transition:var(--tr);white-space:nowrap}
+    .tab-btn:hover{border-color:var(--gold);color:var(--text)}
+    .tab-btn.active{background:var(--gold);color:#000;border-color:var(--gold)}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+
+    .lightbox{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.93);backdrop-filter:blur(10px);justify-content:center;align-items:center;cursor:zoom-out;padding:20px}
+    .lightbox.open{display:flex}
+    .lightbox img{max-width:95vw;max-height:92vh;border-radius:8px;box-shadow:0 0 40px rgba(255,215,0,.15)}
+    .lightbox-close{position:absolute;top:14px;right:20px;color:#fff;font-size:2rem;cursor:pointer;background:none;border:none}
+
+    .center{text-align:center}
+    .badge{display:inline-block;background:var(--gold-dim);color:var(--gold);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px}
+    .refresh-info{text-align:center;font-size:.7rem;color:var(--text-dim);margin-top:8px}
+    .live-dot{display:inline-block;width:7px;height:7px;background:var(--accent);border-radius:50%;margin-right:5px;animation:p 2s infinite}
+    @keyframes p{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(6,209,33,.5)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(6,209,33,0)}}
+
+    .widget-wrap{border-radius:var(--radius);overflow:hidden;min-height:100px}
+    iframe{border-radius:8px}
+
+    footer{text-align:center;padding:20px}
+    footer p{margin:4px 0;font-size:.82rem}
+    .callsigns{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+    .callsign{background:var(--gold-dim);color:var(--gold);padding:4px 14px;border-radius:20px;font-weight:700;font-size:.8rem;letter-spacing:1px}
+
+    @media(max-width:640px){.nav-brand{font-size:.85rem}.card{padding:12px}}
+  </style>
+</head>
+<body>
+
+<nav><div class="nav-inner">
+  <span class="nav-brand">KWINT</span>
+  <a class="nav-link" href="index.html">Dashboard</a>
+  <a class="nav-link active">Radar &amp; Satellite</a>
+  <a class="nav-link" href="index3.html">Forecast &amp; Resources</a>
+  <span class="nav-clock" id="navClock">--:--:-- AST</span>
+</div></nav>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<div class="wrap">
+
+<header class="card span-2 no-anim">
+  <h1>KWINT &mdash; Radar &amp; Satellite Center</h1>
+  <p class="subtitle"><strong>Puerto Rico Weather &amp; Space Monitoring System</strong></p>
+  <p class="author">Engineered by Eng. Christian Plumey &mdash; KP4PSS</p>
+</header>
+
+<main class="grid">
+
+<!-- ===== TIER: RADAR ===== -->
+<div class="tier-header"><span class="tier-label t1">RADAR</span><span class="tier-line"></span><span class="tier-title">Doppler &amp; Interactive</span><span class="tier-line"></span></div>
+
+<section class="card">
+  <h2><span class="live-dot"></span>Live Radar PR</h2>
+  <img class="img-fluid auto-refresh" src="https://www.weatherpr.com/GR3/tjua_br1_0.jpg" alt="WeatherPR Radar TJUA" loading="lazy" />
+  <figcaption>WeatherPR &mdash; Radar TJUA</figcaption>
+  <p class="refresh-info"><span class="live-dot"></span>Auto-refresh every 5 min</p>
+</section>
+
+<section class="card">
+  <h2><span class="live-dot"></span>Doppler Radar</h2>
+  <img class="img-fluid auto-refresh" src="https://sirocco.accuweather.com/nxssa_r1_640x480d/r1/inxr1TJUAa.gif" alt="AccuWeather Doppler TJUA" loading="lazy" />
+  <figcaption>AccuWeather &mdash; Doppler TJUA</figcaption>
+  <p class="refresh-info"><span class="live-dot"></span>Auto-refresh every 5 min</p>
+</section>
+
+<section class="card">
+  <h2>AccuWeather Regional Radar</h2>
+  <img class="img-fluid auto-refresh" src="https://api.accuweather.com/maps/v1/radar/static/globalSIR/tile?apikey=de13920f574d420984d3080b1fa6132b&zoom=3&lon=-66.500&lat=18.250&imgwidth=768&imgheight=432&language=en-us&base_data=radar" alt="AccuWeather Regional Radar PR" loading="lazy" />
+  <figcaption>AccuWeather &mdash; Radar Regional PR</figcaption>
+</section>
+
+<section class="card">
+  <h2><span class="live-dot"></span>Lightning &amp; Thunderstorms</h2>
+  <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3">
+    <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=7&overlay=thunder&product=ecmwf&level=surface&lat=18.22&lon=-66.5&message=true" width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen></iframe>
+  </div>
+  <figcaption>Windy.com &mdash; Lightning &amp; thunderstorm activity</figcaption>
+</section>
+
+<section class="card">
+  <h2><span class="live-dot"></span>Wind Map</h2>
+  <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3">
+    <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=7&overlay=wind&product=ecmwf&level=surface&lat=18.22&lon=-66.5&message=true" width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen></iframe>
+  </div>
+  <figcaption>Windy.com &mdash; Wind pattern, direction &amp; intensity</figcaption>
+</section>
+
+<section class="card span-2">
+  <h2><span class="live-dot"></span>Ventusky &mdash; Interactive Radar &amp; Weather Map</h2>
+  <div style="border-radius:10px;overflow:hidden;position:relative;aspect-ratio:16/9">
+    <iframe src="https://www.ventusky.com/?p=18.2;-66.5;7&l=radar" width="100%" height="100%" frameborder="0" style="border:0;display:block" loading="lazy" allowfullscreen></iframe>
+  </div>
+  <figcaption>Ventusky &mdash; Radar, rain, wind, temperature interactive</figcaption>
+</section>
+
+<!-- ===== TIER: SATELLITE ===== -->
+<div class="tier-header"><span class="tier-label t2">SATELLITE</span><span class="tier-line"></span><span class="tier-title">GOES &amp; Regional Imagery</span><span class="tier-line"></span></div>
+
+<section class="card span-2">
+  <h2>GOES Satellite Imagery</h2>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('sat','g19car',this)">GOES-19 Caribbean</button>
+    <button class="tab-btn" onclick="switchTab('sat','g19pr',this)">GOES-19 Puerto Rico</button>
+    <button class="tab-btn" onclick="switchTab('sat','g16taw',this)">GOES-16 Tropical Atlantic</button>
+  </div>
+
+  <!-- GOES-19 Caribbean -->
+  <div id="sat-g19car" class="tab-panel active">
+    <div class="img-grid-2" style="grid-template-columns:1fr 1fr 1fr">
+      <figure><img class="img-fluid auto-refresh" src="https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/car/GEOCOLOR/latest.jpg" alt="GOES-19 GeoColor Caribbean" loading="lazy" /><figcaption>GeoColor</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/car/13/latest.jpg" alt="GOES-19 Clean IR Caribbean" loading="lazy" /><figcaption>Clean IR (Band 13)</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/taw/Sandwich/latest.jpg" alt="GOES-19 Sandwich TAW" loading="lazy" /><figcaption>Sandwich</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- GOES-19 Puerto Rico -->
+  <div id="sat-g19pr" class="tab-panel">
+    <img class="img-fluid auto-refresh" src="https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/pr/GEOCOLOR/GOES19-PR-GEOCOLOR-600x600.gif" alt="GOES-19 PR Geocolor GIF" loading="lazy" style="max-width:700px;margin:0 auto" />
+    <figcaption>GOES-19 &mdash; Puerto Rico Geocolor (animated)</figcaption>
+  </div>
+
+  <!-- GOES-16 Tropical Atlantic -->
+  <div id="sat-g16taw" class="tab-panel">
+    <div class="img-grid-2">
+      <figure><img class="img-fluid auto-refresh" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/GIFS/GOES16-TAW-GEOCOLOR-900x540.gif" alt="GOES-16 TAW Geocolor" loading="lazy" /><figcaption>TAW Geocolor</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/GIFS/GOES16-TAW-13-900x540.gif" alt="GOES-16 TAW IR Band 13" loading="lazy" /><figcaption>IR Band 13</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/GIFS/GOES16-TAW-08-900x540.gif" alt="GOES-16 TAW Water Vapor Band 8" loading="lazy" /><figcaption>Water Vapor (Band 8)</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/ga/GEOCOLOR/GOES19-GA-GEOCOLOR-1000x1000.gif" alt="GOES-19 GM Geocolor" loading="lazy" /><figcaption>GM Geocolor</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- Regional Satellite cards -->
+<section class="card">
+  <h2>TWC Caribbean Satellite</h2>
+  <img class="img-fluid auto-refresh" src="https://s.w-x.co/staticmaps/caribsat_1280x720.jpg?crop=16:9&width=800&format=pjpg&auto=webp&quality=60" alt="TWC Caribbean Satellite" loading="lazy" />
+  <figcaption>The Weather Channel &mdash; Caribbean</figcaption>
+</section>
+
+<section class="card">
+  <h2>TWC Atlantic Satellite</h2>
+  <img class="img-fluid auto-refresh" src="https://s.w-x.co/staticmaps/atl_oce_sat_1280x720.jpg?crop=16:9&width=800&format=pjpg&auto=webp&quality=60" alt="TWC Atlantic Satellite" loading="lazy" />
+  <figcaption>The Weather Channel &mdash; Atlantic</figcaption>
+</section>
+
+<section class="card">
+  <h2>AccuWeather Mosaic Caribbean</h2>
+  <img class="img-fluid auto-refresh" src="https://sirocco.accuweather.com/sat_mosaic_640x480_public/ei/isaecar.gif" alt="AccuWeather Mosaic Caribbean" loading="lazy" />
+  <figcaption>AccuWeather &mdash; Satellite Mosaic Caribbean</figcaption>
+</section>
+
+<section class="card">
+  <h2>Saharan Air Layer</h2>
+  <a href="https://cimss.ssec.wisc.edu/tropic2/real-time/sal/splitE.jpg" target="_blank">
+    <img class="img-fluid auto-refresh" src="https://images.weserv.nl/?url=cimss.ssec.wisc.edu/tropic2/real-time/sal/splitE.jpg&w=900" alt="Saharan Air Layer" loading="lazy" />
+  </a>
+  <figcaption>CIMSS &mdash; Saharan Air Layer (click for full resolution)</figcaption>
+</section>
+
+<!-- ===== TIER: OCEAN ===== -->
+<div class="tier-header"><span class="tier-label t3">OCEAN</span><span class="tier-line"></span><span class="tier-title">Marine &amp; Sea Surface</span><span class="tier-line"></span></div>
+
+<section class="card span-2">
+  <h2>Ocean &amp; Marine</h2>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('ocean','sst',this)">SST</button>
+    <button class="tab-btn" onclick="switchTab('ocean','tpw',this)">TPW</button>
+    <button class="tab-btn" onclick="switchTab('ocean','anom',this)">Anomalies</button>
+  </div>
+  <div id="ocean-sst" class="tab-panel active"><img class="img-fluid" src="https://www.seatemperature.org/public/sea-temperature.webp" alt="Sea Surface Temperature" loading="lazy" style="max-width:1000px;margin:0 auto" /><figcaption>Sea Surface Temperature &mdash; Global</figcaption></div>
+  <div id="ocean-tpw" class="tab-panel"><img class="img-fluid auto-refresh" src="https://tropic.ssec.wisc.edu/real-time/mtpw2/webAnims/tpw_nrl_colors/natl/mimictpw_natl_latest.gif" alt="Total Precipitable Water" loading="lazy" style="max-width:1000px;margin:0 auto" /><figcaption>MIMIC &mdash; Total Precipitable Water (animated)</figcaption></div>
+  <div id="ocean-anom" class="tab-panel"><img class="img-fluid auto-refresh" src="https://www.nhc.noaa.gov/tafb/atl_anom.gif" alt="SST Anomalies" loading="lazy" style="max-width:1000px;margin:0 auto" /><figcaption>NHC &mdash; Atlantic SST Anomalies</figcaption></div>
+</section>
+
+</main>
+
+<footer class="card span-2">
+  <p style="color:var(--gold);font-weight:700">Communications &mdash; FCC Licensed</p>
+  <div class="callsigns"><span class="callsign">KP4PSS</span><span class="callsign">GMRS: WRCH686</span></div>
+  <p style="margin-top:10px;color:var(--text-dim);font-size:.75rem">Launched Jan 2017 &mdash; Last update Jun 2026</p>
+</footer>
+</div>
+
+<script>
+(function(){
+function pad(n){return String(n).padStart(2,'0')}
+function getAST(){var d=new Date();return new Date(d.getTime()+(d.getTimezoneOffset()-240)*60000)}
+
+// Clock
+setInterval(function(){var a=getAST();var h24=a.getHours(),mn=a.getMinutes(),sc=a.getSeconds();
+var ap=h24>=12?'PM':'AM',h12=h24%12||12;
+document.getElementById('navClock').textContent=h12+':'+pad(mn)+':'+pad(sc)+' '+ap+' AST'},1000);
+
+// Auto-refresh images every 5 min
+setInterval(function(){document.querySelectorAll('.auto-refresh').forEach(function(img){var s=img.getAttribute('src'),b=s.split(/[?&]_t=/)[0],sep=b.indexOf('?')!==-1?'&':'?';img.src=b+sep+'_t='+Date.now()})},300000);
+
+// Lightbox
+window.openLightbox=function(s){document.getElementById('lightbox-img').src=s;document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden'};
+window.closeLightbox=function(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow=''};
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox()});
+document.addEventListener('click',function(e){if(e.target.classList&&e.target.classList.contains('img-fluid')&&!e.target.closest('a')){e.preventDefault();openLightbox(e.target.src)}});
+
+// Tabs
+window.switchTab=function(g,t,b){document.querySelectorAll('[id^="'+g+'-"]').forEach(function(p){p.classList.remove('active')});var el=document.getElementById(g+'-'+t);if(el)el.classList.add('active');b.parentElement.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active')};
+
+// Scroll animations
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:.05});
+document.querySelectorAll('.card:not(.no-anim)').forEach(function(c){obs.observe(c)});
+})();
+</script>
+</body>
+</html>

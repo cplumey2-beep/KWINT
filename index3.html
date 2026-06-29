@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KWINT — Forecast & Resources | Puerto Rico</title>
+  <style>
+    :root {
+      --gold:#ffd700;--gold-dim:rgba(255,215,0,.12);--text:#e8e8e8;--text-dim:rgba(255,255,255,.5);
+      --bg:#06081a;--card:rgba(14,18,45,.88);--card-hover:rgba(22,28,62,.94);
+      --border:rgba(255,215,0,.1);--border-hover:rgba(255,215,0,.3);
+      --accent:#06d121;--blue:#4fc3f7;--red:#ff4444;--orange:#ff9800;--yellow:#ffeb3b;
+      --nav-bg:rgba(6,8,22,.96);--radius:14px;--shadow:0 4px 24px rgba(0,0,0,.5);
+      --tr:.3s cubic-bezier(.4,0,.2,1);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;scroll-padding-top:60px}
+    body{color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);line-height:1.6;overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:0;background:url("https://pbs.twimg.com/media/A4Z1bJ7CQAEKEF3.jpg:large") center/cover no-repeat;opacity:.1;z-index:-1}
+
+    nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+    .nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:4px;padding:0 16px;height:50px;overflow-x:auto;scrollbar-width:none}
+    .nav-inner::-webkit-scrollbar{display:none}
+    .nav-brand{color:var(--gold);font-weight:800;font-size:.95rem;white-space:nowrap;margin-right:8px}
+    .nav-link{color:var(--text);text-decoration:none;font-size:.76rem;font-weight:500;padding:5px 10px;border-radius:20px;white-space:nowrap;transition:var(--tr);opacity:.6}
+    .nav-link:hover,.nav-link.active{background:var(--gold-dim);color:var(--gold);opacity:1}
+    .nav-clock{margin-left:auto;font-size:.78rem;color:var(--gold);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+    .wrap{max-width:1400px;margin:0 auto;padding:16px 16px 40px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}.span-2{grid-column:1/-1}}
+
+    .tier-header{grid-column:1/-1;display:flex;align-items:center;gap:12px;margin:16px 0 2px;padding:0 4px}
+    .tier-label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;white-space:nowrap}
+    .t1{color:var(--red)}.t2{color:var(--orange)}.t3{color:var(--blue)}.t4{color:var(--text-dim)}
+    .tier-line{flex:1;height:1px;background:var(--border)}
+    .tier-title{font-size:.85rem;font-weight:600;color:var(--text);opacity:.8}
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;backdrop-filter:blur(10px);box-shadow:var(--shadow);transition:var(--tr);opacity:0;transform:translateY(20px)}
+    .card.visible{animation:fu .4s ease forwards}
+    .card:hover{background:var(--card-hover);border-color:var(--border-hover)}
+    .card.no-anim{opacity:1;transform:none;animation:none}
+    @keyframes fu{to{opacity:1;transform:translateY(0)}}
+
+    h1{font-size:clamp(1.3rem,4vw,1.9rem);color:var(--gold);text-align:center;margin-bottom:6px;line-height:1.3}
+    h2{font-size:1.1rem;color:var(--gold);text-align:center;margin-bottom:14px;position:relative;padding-bottom:10px}
+    h2::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:32px;height:2px;background:var(--gold);border-radius:2px}
+    h3{font-size:.95rem;color:var(--gold);text-align:center;margin:8px 0 6px}
+    .subtitle{text-align:center;opacity:.8;font-size:.9rem}
+    .author{text-align:center;font-weight:600;font-size:.85rem;color:var(--blue)}
+
+    .img-fluid{max-width:100%;width:100%;height:auto;display:block;margin:6px auto;border-radius:8px;cursor:pointer;transition:var(--tr)}
+    .img-fluid:hover{transform:scale(1.008);box-shadow:0 4px 20px rgba(255,215,0,.12)}
+    .img-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+    @media(max-width:700px){.img-grid-2{grid-template-columns:1fr}}
+    .img-grid-4{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+    @media(max-width:500px){.img-grid-4{grid-template-columns:1fr}}
+    figure{margin:6px 0}
+    figcaption{font-size:.73rem;color:var(--text-dim);text-align:center;margin-top:4px}
+
+    .tabs{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;justify-content:center;flex-wrap:wrap}
+    .tab-btn{background:transparent;color:var(--text-dim);border:1px solid var(--border);padding:5px 12px;border-radius:20px;font-size:.74rem;font-weight:600;cursor:pointer;transition:var(--tr);white-space:nowrap}
+    .tab-btn:hover{border-color:var(--gold);color:var(--text)}
+    .tab-btn.active{background:var(--gold);color:#000;border-color:var(--gold)}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+
+    .lightbox{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.93);backdrop-filter:blur(10px);justify-content:center;align-items:center;cursor:zoom-out;padding:20px}
+    .lightbox.open{display:flex}
+    .lightbox img{max-width:95vw;max-height:92vh;border-radius:8px;box-shadow:0 0 40px rgba(255,215,0,.15)}
+    .lightbox-close{position:absolute;top:14px;right:20px;color:#fff;font-size:2rem;cursor:pointer;background:none;border:none}
+
+    .btn{display:inline-block;padding:8px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold),#f0c800);color:#000;font-weight:700;font-size:.82rem;cursor:pointer;transition:var(--tr);box-shadow:0 4px 16px rgba(255,215,0,.2);text-decoration:none}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,215,0,.35)}
+    .btn-sm{padding:6px 14px;font-size:.75rem;border-radius:8px}
+    .btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold);box-shadow:none}
+    .btn-outline:hover{background:var(--gold-dim);box-shadow:none;transform:none}
+
+    .center{text-align:center}
+    .badge{display:inline-block;background:var(--gold-dim);color:var(--gold);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px}
+    .refresh-info{text-align:center;font-size:.7rem;color:var(--text-dim);margin-top:8px}
+    .live-dot{display:inline-block;width:7px;height:7px;background:var(--accent);border-radius:50%;margin-right:5px;animation:p 2s infinite}
+    @keyframes p{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(6,209,33,.5)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(6,209,33,0)}}
+
+    .storm-model-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:10px;transition:var(--tr)}
+    .storm-model-card:hover{border-color:var(--border-hover)}
+    .storm-model-name{font-weight:700;font-size:1rem;color:var(--gold);margin-bottom:4px}
+    .storm-model-class{font-size:.78rem;color:var(--text-dim);margin-bottom:10px}
+    .storm-model-imgs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    @media(max-width:700px){.storm-model-imgs{grid-template-columns:1fr}}
+    .storm-model-links{display:flex;gap:8px;flex-wrap:wrap}
+    .storm-no-active{background:rgba(6,209,33,.08);border:1px solid rgba(6,209,33,.2);border-radius:10px;padding:20px;text-align:center;margin-top:10px}
+    .storm-no-active strong{color:var(--accent);font-size:1rem;display:block;margin-bottom:6px}
+    .storm-no-active span{color:var(--text-dim);font-size:.85rem}
+
+    .img-placeholder{display:flex;align-items:center;justify-content:center;min-height:200px;background:rgba(255,255,255,.03);border:1px dashed var(--border);border-radius:8px;color:var(--text-dim);font-size:.82rem;text-align:center;padding:20px}
+
+    footer{text-align:center;padding:20px}
+    footer p{margin:4px 0;font-size:.82rem}
+    .callsigns{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+    .callsign{background:var(--gold-dim);color:var(--gold);padding:4px 14px;border-radius:20px;font-weight:700;font-size:.8rem;letter-spacing:1px}
+
+    @media(max-width:640px){.nav-brand{font-size:.85rem}.card{padding:12px}}
+  </style>
+</head>
+<body>
+
+<nav><div class="nav-inner">
+  <span class="nav-brand">KWINT</span>
+  <a class="nav-link" href="index.html">Dashboard</a>
+  <a class="nav-link" href="index2.html">Radar &amp; Satellite</a>
+  <a class="nav-link active" href="index3.html">Forecast &amp; Resources</a>
+  <span class="nav-clock" id="navClock">--:--:-- AST</span>
+</div></nav>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<div class="wrap">
+
+<header class="card span-2 no-anim">
+  <h1>KWINT &mdash; Forecast &amp; Resources</h1>
+  <p class="subtitle"><strong>Puerto Rico Weather &amp; Space Monitoring System</strong></p>
+  <p class="author">Engineered by Eng. Christian Plumey &mdash; KP4PSS</p>
+</header>
+
+<main class="grid">
+
+<!-- ===== TIER 1: SPAGHETTI MODELS ===== -->
+<div class="tier-header">
+  <span class="tier-label t1">MODELS</span>
+  <span class="tier-line"></span>
+  <span class="tier-title">Storm Track Models &amp; Ensembles</span>
+</div>
+
+<section class="card span-2" id="models">
+  <h2>Spaghetti Models &mdash; Active Storms</h2>
+  <p class="refresh-info"><span class="live-dot"></span>Auto-refresh every 10 min</p>
+  <div id="stormModelsContainer">
+    <div class="storm-no-active">
+      <strong>Loading...</strong>
+      <span>Checking NHC for active tropical systems</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TIER 2: TROPICAL OUTLOOK ===== -->
+<div class="tier-header">
+  <span class="tier-label t2">OUTLOOK</span>
+  <span class="tier-line"></span>
+  <span class="tier-title">Tropical Atlantic Outlook</span>
+</div>
+
+<section class="card span-2" id="outlook">
+  <h2>Tropical Outlook</h2>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('outlook','2day',this)">2-Day</button>
+    <button class="tab-btn" onclick="switchTab('outlook','7day',this)">7-Day</button>
+    <button class="tab-btn" onclick="switchTab('outlook','cpc',this)">CPC Precipitation</button>
+  </div>
+  <div id="outlook-2day" class="tab-panel active">
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.nhc.noaa.gov/xgtwo/two_atl_2d0.png" alt="2-Day Tropical Outlook" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>NHC 2-Day Tropical Weather Outlook &mdash; Atlantic</figcaption>
+    </figure>
+  </div>
+  <div id="outlook-7day" class="tab-panel">
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.nhc.noaa.gov/xgtwo/two_atl_7d0.png" alt="7-Day Tropical Outlook" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>NHC 7-Day Tropical Weather Outlook &mdash; Atlantic</figcaption>
+    </figure>
+  </div>
+  <div id="outlook-cpc" class="tab-panel">
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.cpc.ncep.noaa.gov/products/precip/CWlink/ghaz/gth_full_TConly_ATL.png" alt="CPC Tropical Cyclone Precipitation" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>CPC Tropical Cyclone Rainfall Forecast</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ENSO Monitor -->
+<section class="card span-2">
+  <h2>ENSO Monitor &mdash; El Niño / La Niña</h2>
+  <div class="img-grid-2">
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/figure01.gif" alt="ENSO SST Map" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>SST Anomaly Map</figcaption>
+    </figure>
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/figure02.gif" alt="ENSO Nino Indices" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>Niño Indices (3.4, 3, 4, 1+2)</figcaption>
+    </figure>
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/figure06.gif" alt="ENSO NMME Forecast" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>NMME Forecast (modelos)</figcaption>
+    </figure>
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/figure07.gif" alt="ENSO Probability" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>Probabilidad El Niño / La Niña</figcaption>
+    </figure>
+  </div>
+  <p class="refresh-info" style="margin-top:10px"><span class="live-dot"></span>Fuente: <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/" target="_blank" style="color:var(--blue);text-decoration:none">CPC ENSO Diagnostic Discussion</a> &mdash; Actualización oficial NOAA</p>
+</section>
+
+<!-- ===== TIER 3: NWS FORECAST MAPS ===== -->
+<div class="tier-header">
+  <span class="tier-label t3">FORECAST</span>
+  <span class="tier-line"></span>
+  <span class="tier-title">NOAA National Digital Forecast &mdash; PR</span>
+</div>
+
+<section class="card span-2" id="forecast">
+  <h2>NWS Forecast Maps</h2>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('fcst','rain',this)">Rainfall</button>
+    <button class="tab-btn" onclick="switchTab('fcst','temp',this)">Temperature</button>
+    <button class="tab-btn" onclick="switchTab('fcst','wind',this)">Wind</button>
+    <button class="tab-btn" onclick="switchTab('fcst','gust',this)">Gusts</button>
+    <button class="tab-btn" onclick="switchTab('fcst','rh',this)">Humidity</button>
+    <button class="tab-btn" onclick="switchTab('fcst','sky',this)">Sky Cover</button>
+    <button class="tab-btn" onclick="switchTab('fcst','td',this)">Dew Point</button>
+    <button class="tab-btn" onclick="switchTab('fcst','wave',this)">Waves</button>
+    <button class="tab-btn" onclick="switchTab('fcst','qpf',this)">QPF</button>
+  </div>
+
+  <!-- Rainfall -->
+  <div id="fcst-rain" class="tab-panel active">
+    <div class="img-grid-4">
+      <figure><img class="img-fluid auto-refresh" src="https://www.weather.gov/images/sju/marine/wrf/nbm24hr_prec.png" alt="NBM 24h Precipitation" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>NBM 24h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://www.weather.gov/images/sju/marine/wrf/nbm48hr_prec.png" alt="NBM 48h Precipitation" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>NBM 48h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://www.weather.gov/images/sju/marine/wrf/nbm72hr_prec.png" alt="NBM 72h Precipitation" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>NBM 72h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=pop12&n=1" alt="POP12" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>POP12</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- Temperature -->
+  <div id="fcst-temp" class="tab-panel">
+    <div class="img-grid-4">
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=t&n=2" alt="Temperature 12h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>12h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=t&n=10" alt="Temperature 24h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>24h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=t&n=18" alt="Temperature 36h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>36h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=t&n=26" alt="Temperature 48h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>48h</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- Wind Speed -->
+  <div id="fcst-wind" class="tab-panel">
+    <div class="img-grid-4">
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=windspd&n=2" alt="Wind Speed 12h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>12h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=windspd&n=10" alt="Wind Speed 24h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>24h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=windspd&n=18" alt="Wind Speed 36h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>36h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=windspd&n=26" alt="Wind Speed 48h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>48h</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- Gusts -->
+  <div id="fcst-gust" class="tab-panel">
+    <div class="img-grid-4">
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=windgust&n=2" alt="Wind Gust 12h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>12h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=windgust&n=10" alt="Wind Gust 24h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>24h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=windgust&n=18" alt="Wind Gust 36h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>36h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=windgust&n=26" alt="Wind Gust 48h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>48h</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- Humidity -->
+  <div id="fcst-rh" class="tab-panel">
+    <div class="img-grid-4">
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=rh&n=2" alt="Humidity 12h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>12h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=rh&n=10" alt="Humidity 24h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>24h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=rh&n=18" alt="Humidity 36h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>36h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=rh&n=26" alt="Humidity 48h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>48h</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- Sky Cover -->
+  <div id="fcst-sky" class="tab-panel">
+    <div class="img-grid-4">
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=sky&n=2" alt="Sky Cover 12h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>12h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=sky&n=10" alt="Sky Cover 24h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>24h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=sky&n=18" alt="Sky Cover 36h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>36h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=sky&n=26" alt="Sky Cover 48h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>48h</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- Dew Point -->
+  <div id="fcst-td" class="tab-panel">
+    <div class="img-grid-4">
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=td&n=2" alt="Dew Point 12h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>12h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=td&n=10" alt="Dew Point 24h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>24h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=td&n=18" alt="Dew Point 36h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>36h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=td&n=26" alt="Dew Point 48h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>48h</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- Waves -->
+  <div id="fcst-wave" class="tab-panel">
+    <div class="img-grid-4">
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=waveheight&n=2" alt="Wave Height 12h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>12h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=waveheight&n=10" alt="Wave Height 24h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>24h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=waveheight&n=18" alt="Wave Height 36h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>36h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=waveheight&n=26" alt="Wave Height 48h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>48h</figcaption></figure>
+    </div>
+  </div>
+
+  <!-- QPF -->
+  <div id="fcst-qpf" class="tab-panel">
+    <div class="img-grid-4">
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=qpf&n=1" alt="QPF 12h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>12h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=qpf&n=5" alt="QPF 24h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>24h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=qpf&n=9" alt="QPF 36h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>36h</figcaption></figure>
+      <figure><img class="img-fluid auto-refresh" src="https://graphical.weather.gov/GraphicalNDFD.php?width=515&timezone=GMT-4&sector=PUERTORICO&element=qpf&n=13" alt="QPF 48h" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="img-placeholder" style="display:none">Image not available</div><figcaption>48h</figcaption></figure>
+    </div>
+  </div>
+
+  <p class="refresh-info"><span class="live-dot"></span>Images auto-refresh every 5 min</p>
+</section>
+
+<!-- ===== TIER 4: REFERENCE ===== -->
+<div class="tier-header">
+  <span class="tier-label t4">REF</span>
+  <span class="tier-line"></span>
+  <span class="tier-title">Reference &amp; Tools</span>
+</div>
+
+<!-- Solar & HF/VHF Propagation -->
+<section class="card span-2" id="solar">
+  <h2>Solar &amp; HF/VHF Propagation</h2>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('solar','vhf',this)">VHF</button>
+    <button class="tab-btn" onclick="switchTab('solar','muf',this)">MUF</button>
+    <button class="tab-btn" onclick="switchTab('solar','hf',this)">HF</button>
+  </div>
+  <div id="solar-vhf" class="tab-panel active">
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.hamqsl.com/solar101vhfpic.php" alt="VHF Propagation" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>VHF Propagation Conditions</figcaption>
+    </figure>
+  </div>
+  <div id="solar-muf" class="tab-panel">
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.hamqsl.com/solarmuf.php" alt="MUF Map" style="max-width:650px;margin:0 auto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>Maximum Usable Frequency (MUF) Map</figcaption>
+    </figure>
+  </div>
+  <div id="solar-hf" class="tab-panel">
+    <figure class="center">
+      <img class="img-fluid auto-refresh" src="https://www.hrdlog.net/graph.aspx?type=p&square=1&pid=Sat%20May%208%2021%3A00%3A12%20UTC+0300%202010" alt="HF Propagation" style="max-width:550px;margin:0 auto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>HF Propagation Graph</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Volcanic Caldera Activity -->
+<section class="card span-2" id="volcano">
+  <h2>Volcanic Caldera Activity</h2>
+  <div class="img-grid-2">
+    <figure>
+      <a href="https://www.volcanodiscovery.com/campi-flegrei-earthquakes.html" target="_blank" rel="noopener">
+        <img class="img-fluid auto-refresh" src="https://ww2.volcanodiscovery.com/fileadmin/charts/quakes-v129.png" alt="Campi Flegrei Seismicity" onerror="this.style.display='none';this.parentElement.nextElementSibling.style.display='flex'" />
+      </a>
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>Campi Flegrei &mdash; Italy</figcaption>
+    </figure>
+    <figure>
+      <a href="https://www.volcanodiscovery.com/yellowstone-earthquakes.html" target="_blank" rel="noopener">
+        <img class="img-fluid auto-refresh" src="https://ww2.volcanodiscovery.com/fileadmin/charts/quakes-v1357.png" alt="Yellowstone Seismicity" onerror="this.style.display='none';this.parentElement.nextElementSibling.style.display='flex'" />
+      </a>
+      <div class="img-placeholder" style="display:none">Image not available</div>
+      <figcaption>Yellowstone &mdash; USA</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Saffir-Simpson Scale -->
+<section class="card span-2" id="saffir">
+  <h2>Saffir-Simpson Hurricane Wind Scale</h2>
+  <figure class="center">
+    <img class="img-fluid" src="https://actualidadinfo.files.wordpress.com/2012/06/huracanes-categorias-velocidad.jpg" alt="Saffir-Simpson Scale" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+    <div class="img-placeholder" style="display:none">Image not available</div>
+    <figcaption>Saffir-Simpson Hurricane Wind Scale &mdash; Reference Chart</figcaption>
+  </figure>
+</section>
+
+<!-- ISS Tracker -->
+<section class="card" id="iss">
+  <h2>ISS Tracker</h2>
+  <div class="center" style="padding:20px 0">
+    <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:14px">Track the International Space Station in real time</p>
+    <button class="btn" onclick="window.open('https://isstracker.spaceflight.esa.int/index.php','iss_popup','width=1100,height=700,scrollbars=yes,resizable=yes')">Open ISS Tracker</button>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer class="card span-2">
+  <p style="color:var(--gold);font-weight:700">Communications &mdash; FCC Licensed</p>
+  <div class="callsigns"><span class="callsign">KP4PSS</span><span class="callsign">GMRS: WRCH686</span></div>
+  <p style="margin-top:10px;color:var(--text-dim);font-size:.75rem">Launched Jan 2017 &mdash; Last update Jun 2026</p>
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+// ===== CLOCK =====
+function updateClock(){
+  var now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Puerto_Rico'}));
+  var h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+  var ts=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+' AST';
+  var el=document.getElementById('navClock');
+  if(el)el.textContent=ts;
+}
+updateClock();setInterval(updateClock,1000);
+
+// ===== LIGHTBOX =====
+window.openLightbox=function(s){document.getElementById('lightbox-img').src=s;document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden'};
+window.closeLightbox=function(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow=''};
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox()});
+document.addEventListener('click',function(e){if(e.target.classList&&e.target.classList.contains('img-fluid')&&!e.target.closest('a')){e.preventDefault();openLightbox(e.target.src)}});
+
+// ===== TABS =====
+window.switchTab=function(g,t,b){document.querySelectorAll('[id^="'+g+'-"]').forEach(function(p){p.classList.remove('active')});var el=document.getElementById(g+'-'+t);if(el)el.classList.add('active');b.parentElement.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active')};
+
+// ===== SCROLL ANIMATIONS =====
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:.05});
+document.querySelectorAll('.card:not(.no-anim)').forEach(function(c){obs.observe(c)});
+
+// ===== AUTO-REFRESH IMAGES (5 min) =====
+setInterval(function(){document.querySelectorAll('.auto-refresh').forEach(function(img){var s=img.getAttribute('src'),b=s.split(/[?&]_t=/)[0],sep=b.indexOf('?')!==-1?'&':'?';img.src=b+sep+'_t='+Date.now()})},300000);
+
+// ===== STORM MODELS (NHC CurrentStorms.json) =====
+function getClassLabel(c){
+  var map={TD:'Tropical Depression',TS:'Tropical Storm',HU:'Hurricane',MH:'Major Hurricane',
+           STD:'Subtropical Depression',STS:'Subtropical Storm',PTC:'Post-Tropical Cyclone',
+           TW:'Tropical Wave',DB:'Disturbance',EX:'Extratropical'};
+  return map[c]||c||'Tropical System';
+}
+
+function fetchStormModels(){
+  var container=document.getElementById('stormModelsContainer');
+  fetch('https://www.nhc.noaa.gov/CurrentStorms.json')
+    .then(function(r){return r.json()})
+    .then(function(data){
+      var storms=data.activeStorms||[];
+      // Filter Atlantic and East Pacific basins
+      var filtered=storms.filter(function(s){return s.id&&(s.id.substring(0,2)==='AL'||s.id.substring(0,2)==='EP')});
+
+      if(filtered.length===0){
+        container.innerHTML='<div class="storm-no-active"><strong>SIN SISTEMAS ACTIVOS</strong><span>No hay tormentas activas para mostrar modelos de trayectoria</span></div>';
+        return;
+      }
+
+      var html='';
+      filtered.forEach(function(storm){
+        var stormId=storm.id; // e.g. "AL012026"
+        var idLower=stormId.toLowerCase(); // e.g. "al012026"
+        var basinNum=stormId.substring(0,4); // e.g. "AL01"
+        var name=storm.name||'UNNAMED';
+        var classification=storm.classification||'';
+        var classLabel=getClassLabel(classification);
+
+        var base='https://www.tropicaltidbits.com/storminfo/'+idLower;
+        var ttTracks=base+'_tracks_latest.png';
+        var ttGefs=base+'_gefs_latest.png';
+        var ttEps=base+'_eps_latest.png';
+        var ttPage='https://www.tropicaltidbits.com/storminfo/#'+idLower;
+        var wnUrl='https://www.weathernerds.org/tc_guidance/storm.php?tcid='+basinNum;
+
+        html+='<div class="storm-model-card">';
+        html+='<div class="storm-model-name">'+name+'</div>';
+        html+='<div class="storm-model-class"><span class="badge">'+classification+'</span> '+classLabel+' &mdash; '+stormId+'</div>';
+
+        html+='<h3 style="color:var(--gold);font-size:.85rem;margin:12px 0 6px">Multi-Model Track Forecast (Spaghetti)</h3>';
+        html+='<figure>';
+        html+='<img class="img-fluid auto-refresh" src="'+ttTracks+'" alt="'+name+' Multi-Model Tracks" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" />';
+        html+='<div class="img-placeholder" style="display:none">Track models not available yet</div>';
+        html+='<figcaption>Tropical Tidbits &mdash; All Models (GFS, ECMWF, HWRF, HMON, UKMET, etc.)</figcaption>';
+        html+='</figure>';
+
+        html+='<h3 style="color:var(--gold);font-size:.85rem;margin:16px 0 6px">Ensemble Models (GEFS vs ECMWF)</h3>';
+        html+='<div class="storm-model-imgs">';
+        html+='<figure>';
+        html+='<img class="img-fluid auto-refresh" src="'+ttGefs+'" alt="'+name+' GEFS Ensemble" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" />';
+        html+='<div class="img-placeholder" style="display:none">GEFS data not available</div>';
+        html+='<figcaption>GEFS Ensemble (Americano)</figcaption>';
+        html+='</figure>';
+        html+='<figure>';
+        html+='<img class="img-fluid auto-refresh" src="'+ttEps+'" alt="'+name+' ECMWF Ensemble" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'" />';
+        html+='<div class="img-placeholder" style="display:none">ECMWF data not available</div>';
+        html+='<figcaption>ECMWF Ensemble (Europeo)</figcaption>';
+        html+='</figure>';
+        html+='</div>';
+
+        html+='<div class="storm-model-links">';
+        html+='<a class="btn btn-sm" href="'+ttPage+'" target="_blank" rel="noopener">Ver en Tropical Tidbits &rarr;</a>';
+        html+='<a class="btn btn-sm btn-outline" href="'+wnUrl+'" target="_blank" rel="noopener">Ver en Weathernerds &rarr;</a>';
+        html+='</div>';
+        html+='</div>';
+      });
+
+      container.innerHTML=html;
+    })
+    .catch(function(err){
+      console.error('Storm model fetch error:',err);
+      container.innerHTML='<div class="storm-no-active"><strong>SIN SISTEMAS ACTIVOS</strong><span>No hay tormentas activas para mostrar modelos de trayectoria</span></div>';
+    });
+}
+
+fetchStormModels();
+setInterval(fetchStormModels,600000); // 10 min
+
+})();
+</script>
+</body>
+</html>
