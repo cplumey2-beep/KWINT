@@ -308,6 +308,14 @@
     <div class="risk-label" id="riskLevel">Loading...</div>
     <div class="risk-bar"><div class="risk-fill" id="riskFill" style="width:0%;background:var(--accent)"></div></div>
     <div class="risk-action" id="riskAction">Calculating risk based on live weather data...</div>
+    <div style="display:flex;justify-content:space-between;font-size:.6rem;font-weight:700;letter-spacing:.5px;margin-top:6px;padding:0 2px">
+      <span style="color:var(--accent)">0-19 NORMAL</span>
+      <span style="color:var(--yellow)">20-39 LOW</span>
+      <span style="color:var(--orange)">40-64 MODERATE</span>
+      <span style="color:var(--red)">65-84 HIGH</span>
+      <span style="color:#ff0040">85-100 EXTREME</span>
+    </div>
+    <div style="font-size:.68rem;color:var(--text-dim);text-align:center;margin-top:6px;line-height:1.5">Índice compuesto basado en: calor, viento, ráfagas, lluvia, presión, humedad, UV, CAPE y visibilidad.<br>Los valores se actualizan cada 5 min desde Open-Meteo API para Centro PR.</div>
   </div>
   <div class="zone-grid" id="currentData" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
     <div class="zone-card"><div class="zone-name">Temp</div><div class="zone-temp" id="dTemp">--</div><div class="zone-detail">Actual</div></div>
@@ -634,7 +642,9 @@ var tf=cToF(c.temperature_2m),hi=heatIndex(tf,c.relative_humidity_2m),hic=fToC(h
 var uv=c.uv_index!=null?Math.round(c.uv_index*10)/10:null;
 var w={temp_f:tf,feels_f:cToF(fc),heat_index_f:hi,humidity:c.relative_humidity_2m,wind_kmh:c.wind_speed_10m,gust_kmh:c.wind_gusts_10m,precipitation:c.precipitation,pressure_msl:c.pressure_msl,code:c.weather_code,uv_index:uv,cape:c.cape||0,visibility:c.visibility!=null?c.visibility/1000:null,dew_point:c.dew_point_2m,cloud_cover:c.cloud_cover};
 var eTmp=document.getElementById('dTemp');eTmp.textContent=tempStr(tc);eTmp.setAttribute('data-tc',tc);
+if(tc>=38)eTmp.style.color='var(--red)';else if(tc>=34)eTmp.style.color='var(--orange)';else if(tc>=31)eTmp.style.color='var(--yellow)';
 var eFl=document.getElementById('dFeels');eFl.textContent=tempStr(fc);eFl.setAttribute('data-tc',fc);
+if(fc>=40)eFl.style.color='var(--red)';else if(fc>=35)eFl.style.color='var(--orange)';else if(fc>=32)eFl.style.color='var(--yellow)';
 var eHi=document.getElementById('dHeat');eHi.textContent=tempStr(hic);eHi.setAttribute('data-tc',hic);
 var uvInfo=uvLabel(uv);document.getElementById('dUV').textContent=uv!=null?uv:'--';document.getElementById('dUV').style.color=uvInfo.cl;document.getElementById('dUVLabel').textContent=uvInfo.txt;
 var dew=c.dew_point_2m!=null?Math.round(c.dew_point_2m*10)/10:null;
@@ -649,15 +659,21 @@ var cape=c.cape!=null?Math.round(c.cape):null;
 if(cape!=null){document.getElementById('dCape').textContent=cape;var capeLbl=cape>=2500?'Extremo':cape>=1500?'Tormentas severas':cape>=1000?'Tormentas':cape>=500?'Convección moderada':'Estable';document.getElementById('dCapeLabel').textContent=capeLbl;if(cape>=2500)document.getElementById('dCape').style.color='var(--red)';else if(cape>=1500)document.getElementById('dCape').style.color='var(--orange)';else if(cape>=1000)document.getElementById('dCape').style.color='var(--yellow)'}
 if(prevWeather&&prevWeather.pressure_msl){var pDiff=Math.round((c.pressure_msl-prevWeather.pressure_msl)*10)/10;var pArrow=pDiff>0.5?'↑ +'+pDiff:pDiff<-0.5?'↓ '+pDiff:'→ '+pDiff;document.getElementById('dPressTrend').textContent=pArrow;document.getElementById('dPressTrendLabel').textContent='hPa vs anterior';if(pDiff<-2)document.getElementById('dPressTrend').style.color='var(--red)';else if(pDiff<-0.5)document.getElementById('dPressTrend').style.color='var(--orange)';else if(pDiff>0.5)document.getElementById('dPressTrend').style.color='var(--accent)'}
 var eWn=document.getElementById('dWind');eWn.textContent=windStr(c.wind_speed_10m);eWn.setAttribute('data-kmh',c.wind_speed_10m);
+if(c.wind_speed_10m>=119)eWn.style.color='var(--red)';else if(c.wind_speed_10m>=63)eWn.style.color='var(--red)';else if(c.wind_speed_10m>=45)eWn.style.color='var(--orange)';else if(c.wind_speed_10m>=30)eWn.style.color='var(--yellow)';
 document.getElementById('dWindDir').textContent=degToDir(c.wind_direction_10m)+' | '+windUnit()+' ('+toKt(c.wind_speed_10m)+' kt)';
 var eGu=document.getElementById('dGust');eGu.textContent=windStr(c.wind_gusts_10m);eGu.setAttribute('data-kmh',c.wind_gusts_10m);
+if(c.wind_gusts_10m>=120)eGu.style.color='var(--red)';else if(c.wind_gusts_10m>=90)eGu.style.color='var(--red)';else if(c.wind_gusts_10m>=60)eGu.style.color='var(--orange)';else if(c.wind_gusts_10m>=45)eGu.style.color='var(--yellow)';
 document.getElementById('dGustUnit').textContent=windUnit()+' ('+toKt(c.wind_gusts_10m)+' kt)';
-document.getElementById('dRain').textContent=c.precipitation;
-document.getElementById('dHumid').textContent=c.relative_humidity_2m;
+var eRn=document.getElementById('dRain');eRn.textContent=c.precipitation;
+if(c.precipitation>=20)eRn.style.color='var(--red)';else if(c.precipitation>=10)eRn.style.color='var(--orange)';else if(c.precipitation>=5)eRn.style.color='var(--yellow)';else if(c.precipitation>0)eRn.style.color='var(--blue)';
+var eHm=document.getElementById('dHumid');eHm.textContent=c.relative_humidity_2m;
+if(c.relative_humidity_2m>=95)eHm.style.color='var(--red)';else if(c.relative_humidity_2m>=90)eHm.style.color='var(--orange)';else if(c.relative_humidity_2m>=80)eHm.style.color='var(--yellow)';
 var ePr=document.getElementById('dPress');ePr.textContent=pressStr(c.pressure_msl);ePr.setAttribute('data-hpa',c.pressure_msl);
+if(c.pressure_msl<=990)ePr.style.color='var(--red)';else if(c.pressure_msl<=1000)ePr.style.color='var(--orange)';else if(c.pressure_msl<=1006)ePr.style.color='var(--yellow)';
 document.getElementById('dPressUnit').textContent=pressUnit();
 document.getElementById('dCondIcon').textContent=CICONS[c.weather_code]||'🌡️';
-document.getElementById('dCondText').textContent=CODES[c.weather_code]||'Unknown';
+var eCond=document.getElementById('dCondText');eCond.textContent=CODES[c.weather_code]||'Unknown';
+if(c.weather_code>=95)eCond.style.color='var(--red)';else if(c.weather_code>=80)eCond.style.color='var(--orange)';else if(c.weather_code>=61)eCond.style.color='var(--yellow)';
 var risk=calcRisk(w);
 document.getElementById('riskScore').textContent=risk.score;document.getElementById('riskScore').style.color=risk.color;
 document.getElementById('riskLevel').textContent=risk.level;document.getElementById('riskLevel').style.color=risk.color;
