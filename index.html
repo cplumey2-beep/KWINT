@@ -597,6 +597,7 @@ var MUNICIPIOS=[
 {name:'Yabucoa',lat:18.0505,lon:-65.8793},{name:'Yauco',lat:18.0349,lon:-66.8496}
 ];
 var savedLoc=JSON.parse(localStorage.getItem('kwint_location')||'null');
+if(savedLoc&&!savedLoc.name)savedLoc.name='Centro PR';
 var PR=savedLoc||{lat:18.2208,lon:-66.5901,name:'Centro PR'};
 var ZONES=[
   {name:"Norte",lat:18.4505,lon:-66.5385,ref:"Barceloneta"},
@@ -707,7 +708,7 @@ var lat=pos.coords.latitude,lon=pos.coords.longitude;
 if(lat<17.5||lat>18.7||lon<-67.5||lon>-65.0){
 btn.textContent='📡 GPS';alert(langES?'Ubicación fuera de Puerto Rico. Seleccione un municipio manualmente.':'Location outside Puerto Rico. Please select a municipality manually.');return}
 var closest=null,minD=Infinity;
-MUNICIPIOS.forEach(function(m){var d=haversine(lat,m.lat,lon,m.lon);if(d<minD){minD=d;closest=m}});
+MUNICIPIOS.forEach(function(m){var d=haversine(lat,lon,m.lat,m.lon);if(d<minD){minD=d;closest=m}});
 PR.lat=lat;PR.lon=lon;PR.name=(closest?closest.name:'GPS')+' (GPS)';PR.gps=true;
 localStorage.setItem('kwint_location',JSON.stringify(PR));
 document.getElementById('locSelect').value='centro';
@@ -722,7 +723,7 @@ navigator.geolocation.getCurrentPosition(function(pos){
 var lat=pos.coords.latitude,lon=pos.coords.longitude;
 if(lat>=17.5&&lat<=18.7&&lon>=-67.5&&lon<=-65.0){
 var closest=null,minD=Infinity;
-MUNICIPIOS.forEach(function(m){var d=haversine(lat,m.lat,lon,m.lon);if(d<minD){minD=d;closest=m}});
+MUNICIPIOS.forEach(function(m){var d=haversine(lat,lon,m.lat,m.lon);if(d<minD){minD=d;closest=m}});
 PR.lat=lat;PR.lon=lon;PR.name=(closest?closest.name:'GPS')+' (GPS)';PR.gps=true;
 localStorage.setItem('kwint_location',JSON.stringify(PR));
 updateLocIndicator();prevWeather=null;fetchWeather();fetchForecast();fetchDust()}},function(){},{enableHighAccuracy:false,timeout:8000})}
