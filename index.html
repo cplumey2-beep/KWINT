@@ -190,6 +190,11 @@
     .toggle-switch input:checked+.toggle-slider::before{transform:translateX(18px)}
     .toggle-switch input:checked+.toggle-slider{background:rgba(255,215,0,.15);border-color:var(--border-hover)}
 
+    .about-modal{display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);overflow-y:auto;padding:20px}
+    .about-modal.open{display:flex;justify-content:center;align-items:flex-start}
+    .about-modal-inner{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);max-width:800px;width:100%;padding:24px;margin:20px auto;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+    .about-close{position:absolute;top:12px;right:16px;color:var(--text);font-size:1.6rem;cursor:pointer;background:none;border:none;opacity:.6;transition:var(--tr)}
+    .about-close:hover{opacity:1;color:var(--gold)}
     .about-hero{text-align:center;padding:8px 0 16px}
     .about-logo{font-size:2.4rem;font-weight:900;color:var(--gold);letter-spacing:3px;margin-bottom:2px}
     .about-tagline{font-size:.92rem;color:var(--text);font-weight:600;margin-bottom:4px}
@@ -212,7 +217,7 @@
 
 <nav><div class="nav-inner">
   <span class="nav-brand">KWINT</span>
-  <a class="nav-link" href="#about">About</a>
+  <a class="nav-link" href="#" onclick="openAbout();return false">About</a>
   <a class="nav-link" href="#dashboard">Dashboard</a>
   <a class="nav-link" href="#zones">Zones</a>
   <a class="nav-link" href="#alerts">Alerts</a>
@@ -253,122 +258,6 @@
 </header>
 
 <main class="grid">
-
-<!-- ===== ABOUT KWINT ===== -->
-<section class="card span-2 no-anim" id="about">
-  <div class="about-hero">
-    <div class="about-logo">KWINT</div>
-    <div class="about-tagline">Kriz Weather Intelligence</div>
-    <div class="about-since">Plataforma de Inteligencia Meteorol&oacute;gica &bull; Desde 2017</div>
-  </div>
-
-  <div class="about-block">
-    <div class="about-block-title">&#127758; &iquest;Qu&eacute; es KWINT?</div>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
-      KWINT es una plataforma de inteligencia meteorol&oacute;gica avanzada dise&ntilde;ada para Puerto Rico. Integra m&aacute;s de 15 fuentes de datos en tiempo real &mdash; desde condiciones atmosf&eacute;ricas locales hasta seguimiento de huracanes, alertas del NWS, monitoreo de embalses, incendios forestales, polvo sahariano y actividad s&iacute;smica &mdash; en un solo panel operacional. A diferencia de las herramientas convencionales que muestran datos aislados, KWINT procesa, correlaciona y analiza m&uacute;ltiples variables simult&aacute;neamente para generar inteligencia accionable.
-    </p>
-  </div>
-
-  <div class="about-grid">
-    <div class="about-stat"><div class="av">15+</div><div class="al">Fuentes de Datos Integradas</div></div>
-    <div class="about-stat"><div class="av">78</div><div class="al">Municipios con Datos Localizados</div></div>
-    <div class="about-stat"><div class="av">5 min</div><div class="al">Frecuencia de Actualizaci&oacute;n</div></div>
-    <div class="about-stat"><div class="av">2017</div><div class="al">A&ntilde;o de Creaci&oacute;n</div></div>
-  </div>
-
-  <div class="about-block">
-    <div class="about-block-title">&#9889; Origen: Hurac&aacute;n Mar&iacute;a (2017)</div>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
-      KWINT naci&oacute; de una necesidad real: durante la temporada de huracanes de 2017, no exist&iacute;a una herramienta que consolidara todos los sistemas meteorol&oacute;gicos disponibles en una sola plataforma. Las primeras versiones se lanzaron como prueba justo antes del Hurac&aacute;n Mar&iacute;a, y se convirtieron en una herramienta cr&iacute;tica para cientos de usuarios que la utilizaron para prepararse y tomar decisiones en tiempo real durante uno de los eventos m&aacute;s devastadores en la historia de Puerto Rico.
-    </p>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text);margin-top:8px">
-      Esa experiencia demostr&oacute; que la informaci&oacute;n fragmentada cuesta vidas, y que centralizar la inteligencia meteorol&oacute;gica no es un lujo &mdash; es una necesidad operacional.
-    </p>
-  </div>
-
-  <div class="about-block">
-    <div class="about-block-title">&#129504; Inteligencia Din&aacute;mica &mdash; Versi&oacute;n 2026</div>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
-      En 2026, KWINT evoluciona de un agregador de datos a un sistema de inteligencia din&aacute;mica. La nueva versi&oacute;n introduce:
-    </p>
-    <ul class="about-list" style="margin-top:8px">
-      <li><strong>Risk Score Compuesto</strong> &mdash; &iacute;ndice 0-100 que pondera calor, viento, r&aacute;fagas, lluvia, presi&oacute;n, humedad, UV, CAPE y visibilidad en una sola m&eacute;trica accionable</li>
-      <li><strong>Geolocalizaci&oacute;n Inteligente</strong> &mdash; datos localizados por GPS o selecci&oacute;n de municipio, no promedios generales de la isla</li>
-      <li><strong>Detecci&oacute;n de Tendencias</strong> &mdash; el sistema compara lecturas consecutivas para identificar ca&iacute;das de presi&oacute;n, aumento de vientos, cambios de nivel en embalses y patrones de deterioro</li>
-      <li><strong>Predicci&oacute;n Operacional</strong> &mdash; proyecciones a 1-6 horas basadas en modelos de Open-Meteo con alertas anticipadas</li>
-      <li><strong>Alertas Multicapa</strong> &mdash; correlaci&oacute;n de NWS, condiciones locales, tormentas activas, incendios y polvo sahariano en un solo panel de alertas</li>
-      <li><strong>Monitoreo de Embalses</strong> &mdash; niveles USGS en tiempo real con umbrales AAA y detecci&oacute;n de cambios de nivel</li>
-    </ul>
-  </div>
-
-  <div class="about-block">
-    <div class="about-block-title">&#128200; &iquest;C&oacute;mo se compara KWINT?</div>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
-      En Puerto Rico y el Caribe, las herramientas meteorol&oacute;gicas disponibles operan de forma aislada: el NWS emite alertas, Windy muestra mapas, las apps del tel&eacute;fono dan el pron&oacute;stico b&aacute;sico, y los embalses se consultan en un sitio aparte. No existe otra plataforma que:
-    </p>
-    <ul class="about-list" style="margin-top:8px">
-      <li>Integre <strong>condiciones en tiempo real + pron&oacute;stico + alertas + huracanes + embalses + incendios + polvo sahariano + s&iacute;smica</strong> en un solo dashboard</li>
-      <li>Genere un <strong>&iacute;ndice de riesgo compuesto</strong> que sintetice m&uacute;ltiples variables en una m&eacute;trica clara</li>
-      <li>Ofrezca <strong>datos localizados por municipio o GPS</strong>, no un promedio genérico de toda la isla</li>
-      <li>Detecte <strong>tendencias y cambios</strong> autom&aacute;ticamente entre lecturas consecutivas</li>
-      <li>Funcione <strong>sin apps, sin cuentas, sin costo</strong> &mdash; accesible desde cualquier navegador</li>
-    </ul>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text);margin-top:8px">
-      KWINT no reemplaza al NWS ni a las fuentes oficiales &mdash; las amplifica, las integra y las hace accionables para la toma de decisiones.
-    </p>
-  </div>
-
-  <div class="about-block">
-    <div class="about-block-title">&#128736; Ingenier&iacute;a del Sistema</div>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
-      KWINT fue dise&ntilde;ado, desarrollado y es mantenido por <strong>Christian Plumey D&iacute;az</strong> &mdash; Ingeniero El&eacute;ctrico, Ingeniero de Sistemas e Ingeniero Aeroespacial. La arquitectura del sistema refleja principios de ingenier&iacute;a de sistemas aplicados a la meteorolog&iacute;a operacional:
-    </p>
-    <ul class="about-list" style="margin-top:8px">
-      <li><strong>Resiliencia</strong> &mdash; opera sin servidores propios, sin bases de datos, sin dependencias cr&iacute;ticas. Si una fuente falla, las dem&aacute;s contin&uacute;an</li>
-      <li><strong>Velocidad</strong> &mdash; actualizaci&oacute;n cada 5 minutos en datos cr&iacute;ticos, 1 hora en embalses, 12 horas en incendios</li>
-      <li><strong>Accesibilidad</strong> &mdash; funciona en cualquier dispositivo con un navegador web, sin instalaci&oacute;n</li>
-      <li><strong>Autonom&iacute;a</strong> &mdash; APIs p&uacute;blicas de NOAA, NWS, USGS, Open-Meteo, NASA FIRMS y NHC. Sin intermediarios</li>
-      <li><strong>Inteligencia Artificial</strong> &mdash; desarrollo acelerado mediante plataformas de IA para optimizaci&oacute;n de c&oacute;digo, an&aacute;lisis de datos y automatizaci&oacute;n de procesos</li>
-    </ul>
-    <div class="about-cred" style="margin-top:14px">
-      <span class="about-badge">Ing. El&eacute;ctrico</span>
-      <span class="about-badge">Ing. de Sistemas</span>
-      <span class="about-badge">Ing. Aeroespacial</span>
-      <span class="about-badge">FCC Licensed Operator</span>
-      <span class="about-badge">FEMA ICS-100</span>
-      <span class="about-badge">FEMA ICS-200</span>
-      <span class="about-badge">AI-Powered Development</span>
-      <span class="about-badge">KWINT &bull; Desde 2017</span>
-    </div>
-  </div>
-
-  <div class="about-block">
-    <div class="about-block-title">&#128225; Comunicaciones de Emergencia</div>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
-      KWINT no es solo software &mdash; est&aacute; respaldado por capacidad real de comunicaci&oacute;n en emergencias. Christian Plumey D&iacute;az es operador licenciado por la FCC (Federal Communications Commission) con indicativos activos en m&uacute;ltiples bandas:
-    </p>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:12px 0">
-      <div class="about-stat" style="min-width:160px"><div class="av">KP4PSS</div><div class="al">Amateur Radio &bull; HF/VHF/UHF</div></div>
-      <div class="about-stat" style="min-width:160px"><div class="av">WRCH686</div><div class="al">GMRS &bull; UHF Repeater</div></div>
-    </div>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
-      Adem&aacute;s, cuenta con certificaciones FEMA en manejo de incidentes: <strong>ICS-100</strong> (Introduction to Incident Command System) e <strong>ICS-200</strong> (Basic Incident Command System for Initial Response) &mdash; el mismo marco operacional utilizado por PREMA, FEMA y agencias de primera respuesta.
-    </p>
-    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
-      Durante el Hurac&aacute;n Mar&iacute;a (2017), cuando las telecomunicaciones colapsaron en Puerto Rico, la radio aficionada fue uno de los &uacute;nicos medios de comunicaci&oacute;n funcionales. Esta capacidad complementa a KWINT: donde el software provee inteligencia meteorol&oacute;gica, las comunicaciones de radio y la formaci&oacute;n en manejo de emergencias garantizan que esa informaci&oacute;n pueda coordinarse y transmitirse cuando todo lo dem&aacute;s falla.
-    </p>
-  </div>
-
-  <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-    <p style="font-size:.82rem;color:var(--text);line-height:1.6">
-      <strong style="color:var(--gold)">KWINT</strong> es una de m&uacute;ltiples plataformas de alertas inteligentes desarrolladas por Christian Plumey D&iacute;az.<br>
-      Dise&ntilde;ada para Puerto Rico. Probada en huracanes. Impulsada por ingenier&iacute;a.
-    </p>
-    <p style="font-size:.72rem;color:var(--text-dim);margin-top:8px">
-      &copy; 2017&ndash;2026 Christian Plumey D&iacute;az &bull; KWINT &bull; Todos los derechos reservados
-    </p>
-  </div>
-</section>
 
 <!-- Quick Access — top for immediate navigation -->
 <section class="card span-2 no-anim" id="links">
@@ -683,6 +572,124 @@
   <div class="callsigns"><span class="callsign">KP4PSS</span><span class="callsign">GMRS: WRCH686</span></div>
   <p style="margin-top:10px;color:var(--text-dim);font-size:.75rem">Launched Jan 2017 &mdash; Last update Jun 2026</p>
 </footer>
+</div>
+
+<div class="about-modal" id="aboutModal" onclick="if(event.target===this)closeAbout()">
+<div class="about-modal-inner">
+  <button class="about-close" onclick="closeAbout()">&times;</button>
+  <div class="about-hero">
+    <div class="about-logo">KWINT</div>
+    <div class="about-tagline">Kriz Weather Intelligence</div>
+    <div class="about-since">Plataforma de Inteligencia Meteorol&oacute;gica &bull; Desde 2017</div>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">&#127758; &iquest;Qu&eacute; es KWINT?</div>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
+      KWINT es una plataforma de inteligencia meteorol&oacute;gica avanzada dise&ntilde;ada para Puerto Rico. Integra m&aacute;s de 15 fuentes de datos en tiempo real &mdash; desde condiciones atmosf&eacute;ricas locales hasta seguimiento de huracanes, alertas del NWS, monitoreo de embalses, incendios forestales, polvo sahariano y actividad s&iacute;smica &mdash; en un solo panel operacional. A diferencia de las herramientas convencionales que muestran datos aislados, KWINT procesa, correlaciona y analiza m&uacute;ltiples variables simult&aacute;neamente para generar inteligencia accionable.
+    </p>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-stat"><div class="av">15+</div><div class="al">Fuentes de Datos Integradas</div></div>
+    <div class="about-stat"><div class="av">78</div><div class="al">Municipios con Datos Localizados</div></div>
+    <div class="about-stat"><div class="av">5 min</div><div class="al">Frecuencia de Actualizaci&oacute;n</div></div>
+    <div class="about-stat"><div class="av">2017</div><div class="al">A&ntilde;o de Creaci&oacute;n</div></div>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">&#9889; Origen: Hurac&aacute;n Mar&iacute;a (2017)</div>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
+      KWINT naci&oacute; de una necesidad real: durante la temporada de huracanes de 2017, no exist&iacute;a una herramienta que consolidara todos los sistemas meteorol&oacute;gicos disponibles en una sola plataforma. Las primeras versiones se lanzaron como prueba justo antes del Hurac&aacute;n Mar&iacute;a, y se convirtieron en una herramienta cr&iacute;tica para cientos de usuarios que la utilizaron para prepararse y tomar decisiones en tiempo real durante uno de los eventos m&aacute;s devastadores en la historia de Puerto Rico.
+    </p>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text);margin-top:8px">
+      Esa experiencia demostr&oacute; que la informaci&oacute;n fragmentada cuesta vidas, y que centralizar la inteligencia meteorol&oacute;gica no es un lujo &mdash; es una necesidad operacional.
+    </p>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">&#129504; Inteligencia Din&aacute;mica &mdash; Versi&oacute;n 2026</div>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
+      En 2026, KWINT evoluciona de un agregador de datos a un sistema de inteligencia din&aacute;mica. La nueva versi&oacute;n introduce:
+    </p>
+    <ul class="about-list" style="margin-top:8px">
+      <li><strong>Risk Score Compuesto</strong> &mdash; &iacute;ndice 0-100 que pondera calor, viento, r&aacute;fagas, lluvia, presi&oacute;n, humedad, UV, CAPE y visibilidad en una sola m&eacute;trica accionable</li>
+      <li><strong>Geolocalizaci&oacute;n Inteligente</strong> &mdash; datos localizados por GPS o selecci&oacute;n de municipio, no promedios generales de la isla</li>
+      <li><strong>Detecci&oacute;n de Tendencias</strong> &mdash; el sistema compara lecturas consecutivas para identificar ca&iacute;das de presi&oacute;n, aumento de vientos, cambios de nivel en embalses y patrones de deterioro</li>
+      <li><strong>Predicci&oacute;n Operacional</strong> &mdash; proyecciones a 1-6 horas basadas en modelos de Open-Meteo con alertas anticipadas</li>
+      <li><strong>Alertas Multicapa</strong> &mdash; correlaci&oacute;n de NWS, condiciones locales, tormentas activas, incendios y polvo sahariano en un solo panel de alertas</li>
+      <li><strong>Monitoreo de Embalses</strong> &mdash; niveles USGS en tiempo real con umbrales AAA y detecci&oacute;n de cambios de nivel</li>
+    </ul>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">&#128200; &iquest;C&oacute;mo se compara KWINT?</div>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
+      En Puerto Rico y el Caribe, las herramientas meteorol&oacute;gicas disponibles operan de forma aislada: el NWS emite alertas, Windy muestra mapas, las apps del tel&eacute;fono dan el pron&oacute;stico b&aacute;sico, y los embalses se consultan en un sitio aparte. No existe otra plataforma que:
+    </p>
+    <ul class="about-list" style="margin-top:8px">
+      <li>Integre <strong>condiciones en tiempo real + pron&oacute;stico + alertas + huracanes + embalses + incendios + polvo sahariano + s&iacute;smica</strong> en un solo dashboard</li>
+      <li>Genere un <strong>&iacute;ndice de riesgo compuesto</strong> que sintetice m&uacute;ltiples variables en una m&eacute;trica clara</li>
+      <li>Ofrezca <strong>datos localizados por municipio o GPS</strong>, no un promedio gen&eacute;rico de toda la isla</li>
+      <li>Detecte <strong>tendencias y cambios</strong> autom&aacute;ticamente entre lecturas consecutivas</li>
+      <li>Funcione <strong>sin apps, sin cuentas, sin costo</strong> &mdash; accesible desde cualquier navegador</li>
+    </ul>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text);margin-top:8px">
+      KWINT no reemplaza al NWS ni a las fuentes oficiales &mdash; las amplifica, las integra y las hace accionables para la toma de decisiones.
+    </p>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">&#128736; Ingenier&iacute;a del Sistema</div>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
+      KWINT fue dise&ntilde;ado, desarrollado y es mantenido por <strong>Christian Plumey D&iacute;az</strong> &mdash; Ingeniero El&eacute;ctrico, Ingeniero de Sistemas e Ingeniero Aeroespacial. La arquitectura del sistema refleja principios de ingenier&iacute;a de sistemas aplicados a la meteorolog&iacute;a operacional:
+    </p>
+    <ul class="about-list" style="margin-top:8px">
+      <li><strong>Resiliencia</strong> &mdash; opera sin servidores propios, sin bases de datos, sin dependencias cr&iacute;ticas. Si una fuente falla, las dem&aacute;s contin&uacute;an</li>
+      <li><strong>Velocidad</strong> &mdash; actualizaci&oacute;n cada 5 minutos en datos cr&iacute;ticos, 1 hora en embalses, 12 horas en incendios</li>
+      <li><strong>Accesibilidad</strong> &mdash; funciona en cualquier dispositivo con un navegador web, sin instalaci&oacute;n</li>
+      <li><strong>Autonom&iacute;a</strong> &mdash; APIs p&uacute;blicas de NOAA, NWS, USGS, Open-Meteo, NASA FIRMS y NHC. Sin intermediarios</li>
+      <li><strong>Inteligencia Artificial</strong> &mdash; desarrollo acelerado mediante plataformas de IA para optimizaci&oacute;n de c&oacute;digo, an&aacute;lisis de datos y automatizaci&oacute;n de procesos</li>
+    </ul>
+    <div class="about-cred" style="margin-top:14px">
+      <span class="about-badge">Ing. El&eacute;ctrico</span>
+      <span class="about-badge">Ing. de Sistemas</span>
+      <span class="about-badge">Ing. Aeroespacial</span>
+      <span class="about-badge">FCC Licensed Operator</span>
+      <span class="about-badge">FEMA ICS-100</span>
+      <span class="about-badge">FEMA ICS-200</span>
+      <span class="about-badge">AI-Powered Development</span>
+      <span class="about-badge">KWINT &bull; Desde 2017</span>
+    </div>
+  </div>
+
+  <div class="about-block">
+    <div class="about-block-title">&#128225; Comunicaciones de Emergencia</div>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
+      KWINT no es solo software &mdash; est&aacute; respaldado por capacidad real de comunicaci&oacute;n en emergencias. Christian Plumey D&iacute;az es operador licenciado por la FCC (Federal Communications Commission) con indicativos activos en m&uacute;ltiples bandas:
+    </p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:12px 0">
+      <div class="about-stat" style="min-width:160px"><div class="av">KP4PSS</div><div class="al">Amateur Radio &bull; HF/VHF/UHF</div></div>
+      <div class="about-stat" style="min-width:160px"><div class="av">WRCH686</div><div class="al">GMRS &bull; UHF Repeater</div></div>
+    </div>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
+      Adem&aacute;s, cuenta con certificaciones FEMA en manejo de incidentes: <strong>ICS-100</strong> (Introduction to Incident Command System) e <strong>ICS-200</strong> (Basic Incident Command System for Initial Response) &mdash; el mismo marco operacional utilizado por PREMA, FEMA y agencias de primera respuesta.
+    </p>
+    <p style="font-size:.84rem;line-height:1.7;color:var(--text)">
+      Durante el Hurac&aacute;n Mar&iacute;a (2017), cuando las telecomunicaciones colapsaron en Puerto Rico, la radio aficionada fue uno de los &uacute;nicos medios de comunicaci&oacute;n funcionales. Esta capacidad complementa a KWINT: donde el software provee inteligencia meteorol&oacute;gica, las comunicaciones de radio y la formaci&oacute;n en manejo de emergencias garantizan que esa informaci&oacute;n pueda coordinarse y transmitirse cuando todo lo dem&aacute;s falla.
+    </p>
+  </div>
+
+  <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+    <p style="font-size:.82rem;color:var(--text);line-height:1.6">
+      <strong style="color:var(--gold)">KWINT</strong> es una de m&uacute;ltiples plataformas de alertas inteligentes desarrolladas por Christian Plumey D&iacute;az.<br>
+      Dise&ntilde;ada para Puerto Rico. Probada en huracanes. Impulsada por ingenier&iacute;a.
+    </p>
+    <p style="font-size:.72rem;color:var(--text-dim);margin-top:8px">
+      &copy; 2017&ndash;2026 Christian Plumey D&iacute;az &bull; KWINT &bull; Todos los derechos reservados
+    </p>
+  </div>
+</div>
 </div>
 
 <script>
@@ -1794,7 +1801,11 @@ setInterval(function(){document.querySelectorAll('.auto-refresh').forEach(functi
 // Lightbox
 window.openLightbox=function(s){document.getElementById('lightbox-img').src=s;document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden'};
 window.closeLightbox=function(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow=''};
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeLightbox();closeAbout()}});
+
+// About modal
+window.openAbout=function(){document.getElementById('aboutModal').classList.add('open');document.body.style.overflow='hidden'};
+window.closeAbout=function(){document.getElementById('aboutModal').classList.remove('open');document.body.style.overflow=''};
 document.addEventListener('click',function(e){if(e.target.classList&&e.target.classList.contains('img-fluid')&&!e.target.closest('a')){e.preventDefault();openLightbox(e.target.src)}});
 
 // Tabs
