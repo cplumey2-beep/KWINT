@@ -2010,8 +2010,8 @@ window.addEventListener('scroll',function(){var p=window.scrollY+80;secs.forEach
 
 // Edge scroll: move mouse near top/bottom edge to scroll without wheel
 (function(){
-  var ZONE=80,BASE=8,dir=0,active=false;
-  function tick(){if(dir===0){active=false;return;}var dist=dir<0?edgeY:window.innerHeight-edgeY;var speed=BASE+Math.round((1-dist/ZONE)*40);window.scrollBy(0,dir*speed);requestAnimationFrame(tick);}
+  var ZONE=80,SPEED=18,dir=0,active=false;
+  function tick(){if(dir===0){active=false;return;}window.scrollBy(0,dir*SPEED);requestAnimationFrame(tick);}
   var edgeY=0;
   document.addEventListener('mousemove',function(e){edgeY=e.clientY;var h=window.innerHeight;var nd=e.clientY<ZONE?-1:e.clientY>h-ZONE?1:0;if(nd!==dir){dir=nd;if(dir!==0&&!active){active=true;requestAnimationFrame(tick);}}},{passive:true});
   document.addEventListener('mouseleave',function(){dir=0;});
