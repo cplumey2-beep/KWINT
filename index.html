@@ -1721,12 +1721,25 @@ newEmb[r.s]={idx:cl.idx,level:d.level,name:r.n};
 var chgHtml='';
 if(prevEmb[r.s]&&prevEmb[r.s].idx!==cl.idx){var prev=EMB_LEVELS[prevEmb[r.s].idx];var arrow=cl.idx>prevEmb[r.s].idx?'📈 MEJORA':'📉 BAJA';changes.push({name:r.n,from:prev,to:info,arrow:arrow});chgHtml='<div style="font-size:.72rem;margin-top:4px;padding:3px 8px;border-radius:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);display:inline-block">'+arrow+' — '+prev.e+' '+prev.l+' → '+info.e+' '+info.l+'</div>'}
 
+var deltaHtml='';
+if(prevEmb[r.s]&&prevEmb[r.s].level!==undefined){
+var diff=Math.round((d.level-prevEmb[r.s].level)*1000)/1000;
+if(Math.abs(diff)>=0.001){var dArrow=diff>0?'▲':'▼';var dColor=diff>0?'var(--accent)':'var(--red)';
+var diffFt=(diff*3.28084).toFixed(2);
+deltaHtml='<div style="font-size:.72rem;color:'+dColor+';margin-top:5px">'+dArrow+' '+(diff>0?'+':'')+diff.toFixed(3)+' m ('+(diff>0?'+':'')+diffFt+' ft) vs. lectura anterior</div>';}
+else{deltaHtml='<div style="font-size:.72rem;color:var(--text-dim);margin-top:5px">━ Sin cambio vs. lectura anterior</div>';}}
+
 var barColor=info.cl;
+var levelFt=(d.level*3.28084).toFixed(2);
+var opDepM=(d.level-r.u.f);var opDepFt=(opDepM*3.28084).toFixed(2);opDepM=opDepM.toFixed(2);
+var opSign=parseFloat(opDepM)>=0?'+':'';
 
 html+='<div class="emb-card"><div class="emb-header"><span>'+info.e+'</span><span class="emb-name">'+r.n+'</span><span class="emb-entity">'+r.e+'</span>'+
 '<span class="emb-level-tag" style="background:'+info.bg+';color:'+info.cl+'">'+info.l+'</span></div>'+chgHtml+
 '<div class="emb-bar-wrap"><div class="emb-bar-fill" style="width:'+Math.max(0,Math.min(100,cl.pct))+'%;background:'+barColor+'"></div></div>'+
-'<div class="emb-stats"><span>'+embProgressBar(cl.pct)+' '+cl.pct.toFixed(1)+'%</span><span>'+d.level.toFixed(2)+'m / '+r.u.s.toFixed(2)+'m</span></div></div>'});
+'<div class="emb-stats"><span>'+embProgressBar(cl.pct)+' '+cl.pct.toFixed(1)+'%</span><span>Elevación: '+d.level.toFixed(2)+' m / '+levelFt+' ft sobre el nivel del mar</span></div>'+
+'<div style="font-size:.72rem;color:var(--text-dim);margin-top:3px">📏 '+opSign+opDepM+' m ('+opSign+opDepFt+' ft) sobre mínimo operacional</div>'+
+deltaHtml+'</div>'});
 
 html+='<div class="emb-sec-title">🏞 EMBALSES SECUNDARIOS</div>';
 secundarios.forEach(function(r){
@@ -1738,12 +1751,21 @@ newEmb[r.s]={idx:cl.idx,level:d.level,name:r.n};
 var chgHtml='';
 if(prevEmb[r.s]&&prevEmb[r.s].idx!==cl.idx){var prev=EMB_LEVELS[prevEmb[r.s].idx];var arrow=cl.idx>prevEmb[r.s].idx?'📈 MEJORA':'📉 BAJA';changes.push({name:r.n,from:prev,to:info,arrow:arrow});chgHtml='<div style="font-size:.7rem;margin:4px 0 0;padding:2px 8px;border-radius:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);display:inline-block">'+arrow+' — '+prev.e+' '+prev.l+' → '+info.e+' '+info.l+'</div>'}
 
+var deltaHtml2='';
+if(prevEmb[r.s]&&prevEmb[r.s].level!==undefined){
+var diff2=Math.round((d.level-prevEmb[r.s].level)*1000)/1000;
+if(Math.abs(diff2)>=0.001){var dArrow2=diff2>0?'▲':'▼';var dColor2=diff2>0?'var(--accent)':'var(--red)';
+var diffFt2=(diff2*3.28084).toFixed(2);
+deltaHtml2='<div style="font-size:.68rem;color:'+dColor2+';margin-top:4px">'+dArrow2+' '+(diff2>0?'+':'')+diff2.toFixed(3)+' m ('+(diff2>0?'+':'')+diffFt2+' ft) vs. lectura anterior</div>';}
+else{deltaHtml2='<div style="font-size:.68rem;color:var(--text-dim);margin-top:4px">━ Sin cambio vs. lectura anterior</div>';}}
+
 html+='<div class="emb-card" style="padding:8px 12px"><div class="emb-header" style="margin-bottom:0">'+
 '<span>'+info.e+'</span><span class="emb-name" style="font-size:.82rem">'+r.n+'</span>'+
 '<span class="emb-entity">'+r.e+'</span>'+
 '<span style="font-size:.78rem;color:var(--text-dim)">'+info.l+' ('+cl.pct.toFixed(1)+'%)</span></div>'+
 chgHtml+
-'<div class="emb-bar-wrap" style="height:6px;margin:6px 0 0"><div class="emb-bar-fill" style="width:'+Math.max(0,Math.min(100,cl.pct))+'%;background:'+info.cl+'"></div></div></div>'});
+'<div class="emb-bar-wrap" style="height:6px;margin:6px 0 0"><div class="emb-bar-fill" style="width:'+Math.max(0,Math.min(100,cl.pct))+'%;background:'+info.cl+'"></div></div>'+
+deltaHtml2+'</div>'});
 
 // Summary
 var overall=EMB_LEVELS[worstIdx];
