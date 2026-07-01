@@ -79,6 +79,7 @@
     h1{font-size:clamp(1.3rem,4vw,1.9rem);color:var(--gold);text-align:center;margin-bottom:6px;line-height:1.3}
     h2{font-size:1.1rem;color:var(--gold);text-align:center;margin-bottom:14px;position:relative;padding-bottom:10px}
     h2::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:32px;height:2px;background:var(--gold);border-radius:2px}
+    .update-badge{text-align:center;font-size:.63rem;color:var(--text-dim);margin-top:-8px;margin-bottom:10px;letter-spacing:.2px}
     h3{font-size:.95rem;color:var(--gold);text-align:center;margin:8px 0 6px}
     .subtitle{text-align:center;opacity:.8;font-size:.9rem}
     .author{text-align:center;font-weight:600;font-size:.85rem;color:var(--blue)}
@@ -271,7 +272,7 @@
 </div></nav>
 
 <div class="alert-banner" id="alertBanner"><div class="alert-banner-inner">
-  <div class="alert-header"><div class="alert-pulse"></div><span style="color:var(--red)">ACTIVE NWS ALERTS &mdash; PUERTO RICO</span></div>
+  <div class="alert-header"><div class="alert-pulse"></div><span style="color:var(--red)">ACTIVE NWS ALERTS &mdash; PUERTO RICO</span><span style="font-size:.65rem;color:var(--text-dim);margin-left:10px">📡 Act. cada 5 min</span></div>
   <div class="alert-scroll" id="alertScroll"><div class="alert-ok">Loading alerts...</div></div>
 </div></div>
 
@@ -379,6 +380,7 @@
 <!-- Risk Score + Current Conditions -->
 <section class="card no-anim" id="dashboard">
   <h2><span class="live-dot"></span>Risk Score &amp; Current Conditions</h2>
+  <div class="update-badge">📡 Actualización cada 5 min — Open-Meteo + NWS</div>
   <div class="unit-toggle" style="gap:18px;flex-wrap:wrap;justify-content:center">
     <div style="display:flex;align-items:center;gap:6px">
       <label id="lblC" class="active">°C | hPa</label>
@@ -435,6 +437,7 @@
 <!-- Live Weather Widget -->
 <section class="card no-anim">
   <h2><span class="live-dot"></span>Forecast Widget</h2>
+  <div class="update-badge">📡 Widget auto-actualizable — weatherwidget.org</div>
   <div class="widget-wrap" id="forecastWidgetWrap">
     <div id="ww_2b36e76aa8005" v='1.3' loc='auto' a='{"t":"horizontal","lang":"en","sl_lpl":1,"ids":["wl392"],"font":"Arial","sl_ics":"one_a","sl_sot":"celsius","cl_bkg":"image","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722"}'><a href="https://weatherwidget.org/" id="ww_2b36e76aa8005_u" target="_blank">Weather Widget</a></div>
     <script>(function(){var el=document.getElementById('ww_2b36e76aa8005');if(el){var u=localStorage.getItem('kwint_unit')==='F'?'fahrenheit':'celsius';el.setAttribute('a',el.getAttribute('a').replace(/"sl_sot":"[^"]*"/,'"sl_sot":"'+u+'"'))}})()</script>
@@ -451,6 +454,7 @@
 <!-- Alertas Detectadas -->
 <section class="card span-2 no-anim" id="alertasDetectadas">
   <h2>🚨 Alertas Detectadas</h2>
+  <div class="update-badge">📡 Consolidado de todas las fuentes — Act. cada 5 min</div>
   <div id="alertasContent"><p class="center" style="color:var(--text-dim);font-size:.82rem">Scanning...</p></div>
 </section>
 
@@ -463,12 +467,14 @@
 <!-- Forecast 1-6 hours -->
 <section class="card" id="forecastHourly">
   <h2 id="hHourly">🔮 Pronóstico 1-6 Horas — Centro PR</h2>
+  <div class="update-badge">📡 Actualización cada 5 min — Open-Meteo</div>
   <div id="forecastContent"><p class="center" style="color:var(--text-dim);font-size:.82rem">Loading forecast...</p></div>
 </section>
 
 <!-- Hurricane Season Detail -->
 <section class="card span-2" id="seasonDetail">
   <h2>🌀 Temporada de Huracanes</h2>
+  <div class="update-badge">📡 Actualización cada 10 min — NHC · Información de temporada estática</div>
   <div id="seasonContent"></div>
   <details style="margin-top:14px;cursor:pointer">
     <summary style="font-size:.88rem;font-weight:700;color:var(--gold);padding:8px 0">🎒 LISTA DE PREPARACIÓN — Click para expandir</summary>
@@ -512,6 +518,7 @@
 <!-- Zone Comparison -->
 <section class="card span-2" id="zones">
   <h2>PR Zone Comparison</h2>
+  <div class="update-badge">📡 Actualización cada 5 min — Open-Meteo</div>
   <div class="zone-grid" id="zoneGrid">
     <div class="zone-card"><div class="zone-name">Norte</div><div class="zone-temp">...</div><div class="zone-detail">Loading</div></div>
     <div class="zone-card"><div class="zone-name">Oeste</div><div class="zone-temp">...</div><div class="zone-detail">Loading</div></div>
@@ -527,6 +534,7 @@
 <!-- Saharan Dust -->
 <section class="card" id="alerts">
   <h2>Saharan Dust Monitor</h2>
+  <div class="update-badge">📡 Actualización cada 5 min — NASA MERRA-2</div>
   <div class="dust-meter" id="dustMeter">
     <div class="dust-icon" id="dustIcon">...</div>
     <div class="dust-info">
@@ -540,6 +548,7 @@
 <!-- NHC Storm Tracker -->
 <section class="card span-2" id="storms">
   <h2>🌀 NHC Storm Tracker</h2>
+  <div class="update-badge">📡 Actualización cada 10 min — National Hurricane Center</div>
   <div id="stormList"><p class="center" style="color:var(--text-dim);font-size:.85rem">Loading NHC data...</p></div>
   <div class="season-bar" id="seasonBar" style="display:none">
     <span style="font-size:1.2rem">&#127744;</span>
@@ -550,12 +559,14 @@
 <!-- Embalses de Puerto Rico -->
 <section class="card span-2" id="embalses">
   <h2>🌊 Embalses de Puerto Rico</h2>
+  <div class="update-badge">📡 Actualización cada hora — USGS Real-Time Water Data</div>
   <div id="embalsesContent"><p class="center" style="color:var(--text-dim)">Loading USGS data...</p></div>
 </section>
 
 <!-- NASA FIRMS Fire Monitor -->
 <section class="card span-2" id="fires">
   <h2>🔥 Fire Hotspot Monitor &mdash; Puerto Rico</h2>
+  <div class="update-badge">📡 Actualización cada 12 horas — NASA FIRMS (paso de satélite)</div>
   <div id="fireContent">
     <div id="fireResults">
       <div class="fire-summary" id="fireSummary"></div>
@@ -568,6 +579,7 @@
 <!-- Tropical Outlook -->
 <section class="card span-2">
   <h2>Tropical Outlook</h2>
+  <div class="update-badge">📡 Imágenes act. cada 5 min — NHC / CPC</div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('tropical','2day',this)">2-Day</button>
     <button class="tab-btn" onclick="switchTab('tropical','7day',this)">7-Day</button>
@@ -583,6 +595,7 @@
 
 <section class="card" id="radar">
   <h2><span class="live-dot"></span>Live Radar — PR</h2>
+  <div class="update-badge">📡 Imagen act. cada 5 min — WeatherPR / NWS</div>
   <img class="img-fluid auto-refresh" src="https://www.weatherpr.com/GR3/tjua_br1_0.jpg" alt="WeatherPR Radar" loading="lazy" />
   <figcaption>WeatherPR &mdash; Radar de reflectividad TJUA</figcaption>
   <p class="refresh-info"><span class="live-dot"></span>Auto-refresh every 5 min</p>
@@ -590,6 +603,7 @@
 
 <section class="card">
   <h2><span class="live-dot"></span>Lightning &amp; Thunderstorms</h2>
+  <div class="update-badge">📡 Tiempo real — Blitzortung</div>
   <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3">
     <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=7&overlay=thunder&product=ecmwf&level=surface&lat=18.22&lon=-66.5&message=true" width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen></iframe>
   </div>
@@ -598,6 +612,7 @@
 
 <section class="card">
   <h2><span class="live-dot"></span>Doppler Radar</h2>
+  <div class="update-badge">📡 Imagen act. cada 5 min — AccuWeather</div>
   <img class="img-fluid auto-refresh" src="https://sirocco.accuweather.com/nxssa_r1_640x480d/r1/inxr1TJUAa.gif" alt="AccuWeather Doppler" loading="lazy" />
   <figcaption>AccuWeather &mdash; Doppler Base Reflectivity TJUA</figcaption>
   <p class="refresh-info"><span class="live-dot"></span>Auto-refresh every 5 min</p>
@@ -605,6 +620,7 @@
 
 <section class="card">
   <h2><span class="live-dot"></span>Wind Map</h2>
+  <div class="update-badge">📡 Tiempo real — Windy.com</div>
   <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3">
     <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=7&overlay=wind&product=ecmwf&level=surface&lat=18.22&lon=-66.5&message=true" width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen></iframe>
   </div>
