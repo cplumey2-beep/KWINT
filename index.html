@@ -2007,6 +2007,15 @@ var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isInte
 document.querySelectorAll('.card:not(.no-anim)').forEach(function(c){obs.observe(c)});
 var secs=document.querySelectorAll('section[id]'),navs=document.querySelectorAll('.nav-link');
 window.addEventListener('scroll',function(){var p=window.scrollY+80;secs.forEach(function(s){if(s.offsetTop<=p&&s.offsetTop+s.offsetHeight>p)navs.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+s.id)})})},{passive:true});
+
+// Edge scroll: move mouse near top/bottom edge to scroll without wheel
+(function(){
+  var ZONE=80,BASE=4,dir=0,active=false;
+  function tick(){if(dir===0){active=false;return;}var dist=dir<0?edgeY:window.innerHeight-edgeY;var speed=BASE+Math.round((1-dist/ZONE)*10);window.scrollBy(0,dir*speed);requestAnimationFrame(tick);}
+  var edgeY=0;
+  document.addEventListener('mousemove',function(e){edgeY=e.clientY;var h=window.innerHeight;var nd=e.clientY<ZONE?-1:e.clientY>h-ZONE?1:0;if(nd!==dir){dir=nd;if(dir!==0&&!active){active=true;requestAnimationFrame(tick);}}},{passive:true});
+  document.addEventListener('mouseleave',function(){dir=0;});
+})();
 })();
 </script>
 </body>
