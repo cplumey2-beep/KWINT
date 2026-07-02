@@ -194,10 +194,7 @@
     .emb-stats{display:flex;gap:12px;flex-wrap:wrap;font-size:.78rem;color:var(--text-dim)}
     .emb-level-tag{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:6px;display:inline-block}
     .emb-sec-title{font-size:.9rem;font-weight:700;color:var(--gold);margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-    details.emb-collapse>summary{list-style:none;cursor:pointer;user-select:none}
-    details.emb-collapse>summary::-webkit-details-marker{display:none}
-    details.emb-collapse .emb-arrow{font-size:.75rem;margin-right:4px;display:inline-block}
-    details.emb-collapse:not([open]) .emb-arrow{transform:rotate(-90deg)}
+    details.emb-collapse>summary{cursor:pointer;user-select:none}
     .emb-summary{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px}
     .emb-summary-title{font-weight:700;font-size:.9rem;color:var(--gold);margin-bottom:8px}
     .emb-rec{font-size:.82rem;line-height:1.5;margin-top:8px}
@@ -1714,7 +1711,7 @@ var principales=RESERVOIRS.filter(function(r){return r.g==='p'});
 var secundarios=RESERVOIRS.filter(function(r){return r.g==='s'});
 var worstIdx=5;var alertas=[];
 
-html+='<details open class="emb-collapse"><summary class="emb-sec-title"><span class="emb-arrow">▼</span> 🏞 EMBALSES PRINCIPALES</summary>';
+html+='<details open class="emb-collapse"><summary class="emb-sec-title">🏞 EMBALSES PRINCIPALES</summary>';
 principales.forEach(function(r){
 var d=levels[r.s];
 if(!d){html+='<div class="emb-card"><div class="emb-header"><span>⚪</span><span class="emb-name">'+r.n+'</span><span class="emb-entity">'+r.e+'</span></div><div style="font-size:.8rem;color:var(--text-dim)">Sin datos disponibles</div></div>';return}
@@ -1748,7 +1745,7 @@ html+='<div class="emb-card"><div class="emb-header"><span>'+info.e+'</span><spa
 deltaHtml+'</div>'});
 html+='</details>';
 
-html+='<details open class="emb-collapse"><summary class="emb-sec-title"><span class="emb-arrow">▼</span> 🏞 EMBALSES SECUNDARIOS</summary>';
+html+='<details open class="emb-collapse"><summary class="emb-sec-title">🏞 EMBALSES SECUNDARIOS</summary>';
 secundarios.forEach(function(r){
 var d=levels[r.s];
 if(!d){html+='<div class="emb-card" style="padding:8px 12px"><span>⚪ '+r.n+' — sin datos</span></div>';return}
