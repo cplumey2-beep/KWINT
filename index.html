@@ -956,7 +956,7 @@ if(gust>=120){s+=35;reasons.push('🌬️ Ráfagas destructivas: +35')}else if(g
 if(rain>=20){s+=25;reasons.push('🌧️ Lluvia muy intensa: +25')}else if(rain>=10){s+=18;reasons.push('🌧️ Lluvia intensa: +18')}else if(rain>=5){s+=12;reasons.push('🌧️ Lluvia significativa: +12')}else if(rain>0){s+=5;reasons.push('🌧️ Lluvia detectada: +5')}
 if(press<=990){s+=35;reasons.push('📉 Presión muy baja: +35')}else if(press<=1000){s+=25;reasons.push('📉 Presión baja: +25')}else if(press<=1006){s+=12;reasons.push('📉 Presión bajando: +12')}
 if(code>=95){s+=25;var st=getCode(code)||'Tormenta';reasons.push('⛈️ '+st+' detectada: +25')}else if(code>=61){s+=10;reasons.push('🌧️ Condiciones de lluvia: +10')}
-if(cape>=2500){s+=15;reasons.push('⚡ CAPE extremo ('+cape+' J/kg): +15')}else if(cape>=1500){s+=10;reasons.push('⚡ CAPE severo ('+cape+' J/kg): +10')}else if(cape>=1000){s+=5;reasons.push('⚡ CAPE elevado ('+cape+' J/kg): +5')}
+if(cape>=2500){s+=15;reasons.push('⚡ Potencial de tormenta extremo (CAPE: '+cape+' J/kg): +15')}else if(cape>=1500){s+=10;reasons.push('⚡ Potencial de tormenta severo (CAPE: '+cape+' J/kg): +10')}else if(cape>=1000){s+=5;reasons.push('⚡ Potencial de tormenta elevado (CAPE: '+cape+' J/kg): +5')}
 if(vis!=null&&vis<1){s+=10;reasons.push('🌫️ Visibilidad muy pobre (<1 km): +10')}else if(vis!=null&&vis<4){s+=5;reasons.push('🌫️ Visibilidad reducida ('+vis.toFixed(1)+' km): +5')}
 s=Math.min(s,100);
 var lv,cl,ac;
