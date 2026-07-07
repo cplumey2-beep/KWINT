@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -313,68 +313,6 @@
 
 <main class="grid">
 
-<!-- Quick Access — top for immediate navigation -->
-<section class="card span-2 no-anim" id="links">
-  <h2>Quick Access</h2>
-  <div class="qa-categories">
-    <button class="tab-btn active" onclick="filterQA('all',this)">All</button>
-    <button class="tab-btn" onclick="filterQA('weather',this)">Weather</button>
-    <button class="tab-btn" onclick="filterQA('hurricane',this)">Hurricanes</button>
-    <button class="tab-btn" onclick="filterQA('radio',this)">Radio</button>
-    <button class="tab-btn" onclick="filterQA('emergency',this)">Emergency</button>
-    <button class="tab-btn" onclick="filterQA('infrastructure',this)">Infrastructure</button>
-    <button class="tab-btn" onclick="filterQA('aviation',this)">Aviation</button>
-    <button class="tab-btn" onclick="filterQA('osint',this)">OSINT</button>
-    <button class="tab-btn" onclick="filterQA('science',this)">Science</button>
-  </div>
-  <div class="qa-grid">
-    <a class="qa-link" data-cat="weather" href="https://www.noaa.gov/" target="_blank"><span class="qa-icon">&#127758;</span> NOAA</a>
-    <a class="qa-link" data-cat="hurricane" href="https://www.nhc.noaa.gov/" target="_blank"><span class="qa-icon">&#127744;</span> NHC Hurricane Center</a>
-    <a class="qa-link" data-cat="weather" href="https://www.weather.gov/ncep/" target="_blank"><span class="qa-icon">&#9729;</span> NOAA Predicciones</a>
-    <a class="qa-link" data-cat="hurricane" href="https://www.weathernerds.org/tc_guidance/" target="_blank"><span class="qa-icon">&#127744;</span> Trayectorias</a>
-    <a class="qa-link" data-cat="weather" href="https://www.weathernerds.org/" target="_blank"><span class="qa-icon">&#128202;</span> Weather Nerds</a>
-    <a class="qa-link" data-cat="weather" href="https://www.windy.com/-Radar-lightning-radar?radar,18.398,-66.087,7" target="_blank"><span class="qa-icon">&#127752;</span> Windy Radar PR</a>
-    <a class="qa-link" data-cat="weather" href="https://www.windy.com" target="_blank"><span class="qa-icon">&#128168;</span> Windy</a>
-    <a class="qa-link" data-cat="weather" href="https://www.tropicaltidbits.com/analysis/" target="_blank"><span class="qa-icon">&#128200;</span> T.Tidbits Analysis</a>
-    <a class="qa-link" data-cat="weather" href="https://www.tropicaltidbits.com" target="_blank"><span class="qa-icon">&#127758;</span> Tropical Tidbits</a>
-    <a class="qa-link" data-cat="weather" href="https://www.seatemperature.org/" target="_blank"><span class="qa-icon">&#127754;</span> Ocean Temp</a>
-    <a class="qa-link" data-cat="weather" href="https://zoom.earth/" target="_blank"><span class="qa-icon">&#127760;</span> Zoom Earth</a>
-    <a class="qa-link" data-cat="weather" href="https://www.ndbc.noaa.gov/maps/Puerto_Rico.shtml" target="_blank"><span class="qa-icon">&#127754;</span> NDBC Buoys PR</a>
-    <a class="qa-link" data-cat="weather" href="https://www.surf-forecast.com/breaks/Rincon_Puerto-Rico" target="_blank"><span class="qa-icon">&#127940;</span> Surf Forecast PR</a>
-    <a class="qa-link" data-cat="weather" href="https://magicseaweed.com/Puerto-Rico-Surf-Forecast/3560/" target="_blank"><span class="qa-icon">&#127754;</span> MagicSeaweed PR</a>
-    <a class="qa-link" data-cat="weather" href="https://earth.nullschool.net/#current/ocean/surface/currents/orthographic=-66.50,18.20,2000" target="_blank"><span class="qa-icon">&#127758;</span> Earth Nullschool Waves</a>
-    <a class="qa-link" data-cat="weather" href="https://www.ventusky.com/?p=18.2;-66.5;7&l=waves" target="_blank"><span class="qa-icon">&#127754;</span> Ventusky Waves</a>
-    <a class="qa-link" data-cat="weather" href="https://www.windy.com/-Waves-waves?waves,18.220,-66.590,8" target="_blank"><span class="qa-icon">&#127754;</span> Windy Waves PR</a>
-    <a class="qa-link" data-cat="emergency" href="https://www.servir.net/servir_alertas/index-new.php" target="_blank"><span class="qa-icon">&#9888;</span> Monitor Alertas</a>
-    <a class="qa-link" data-cat="emergency" href="https://rsoe-edis.org/eventMap" target="_blank"><span class="qa-icon">&#127755;</span> Disaster Map</a>
-    <a class="qa-link" data-cat="emergency" href="https://redsismica.uprm.edu/Spanish/" target="_blank"><span class="qa-icon">&#128200;</span> Red Sismica PR</a>
-    <a class="qa-link" data-cat="emergency" href="https://www.marinevesseltraffic.com/war-map" target="_blank"><span class="qa-icon">&#9875;</span> War &amp; Conflict Map</a>
-    <a class="qa-link" data-cat="emergency" href="https://www.marinevesseltraffic.com/2013/04/marine-traffic.html" target="_blank"><span class="qa-icon">&#128674;</span> Marine Traffic</a>
-    <a class="qa-link" data-cat="emergency" href="https://firms.modaps.eosdis.nasa.gov/map/#d:2026-06-23;@-66.30,18.24,10.20z" target="_blank"><span class="qa-icon">&#128293;</span> NASA FIRMS Map</a>
-    <a class="qa-link" data-cat="emergency" href="https://nmead.pr.gov/" target="_blank"><span class="qa-icon">&#127987;</span> PREMA / NMEAD PR</a>
-    <a class="qa-link" data-cat="emergency" href="https://tsunami.gov/" target="_blank"><span class="qa-icon">&#127754;</span> PTWC Tsunami Alerts</a>
-    <a class="qa-link" data-cat="emergency" href="https://www.gdacs.org/" target="_blank"><span class="qa-icon">&#127760;</span> GDACS Global Disasters</a>
-    <a class="qa-link" data-cat="emergency" href="https://emergency.copernicus.eu/" target="_blank"><span class="qa-icon">&#128752;</span> Copernicus Emergency</a>
-    <a class="qa-link" data-cat="emergency" href="https://reliefweb.int/disasters" target="_blank"><span class="qa-icon">&#127988;</span> ReliefWeb Disasters</a>
-    <a class="qa-link" data-cat="infrastructure" href="https://miluma.lumapr.com/outages/outageMap" target="_blank"><span class="qa-icon">&#9889;</span> LUMA Outage Map</a>
-    <a class="qa-link" data-cat="aviation" href="https://globe.adsbexchange.com/?lat=18.24&lon=-66.30&zoom=8" target="_blank"><span class="qa-icon">&#9992;</span> ADS-B Exchange PR</a>
-    <a class="qa-link" data-cat="aviation" href="https://www.flightradar24.com/18.24,-66.30/8" target="_blank"><span class="qa-icon">&#128747;</span> FlightRadar24 PR</a>
-    <a class="qa-link" data-cat="aviation" href="https://www.flightaware.com/live/airport/TJSJ" target="_blank"><span class="qa-icon">&#9992;</span> FlightAware SJU</a>
-    <a class="qa-link" data-cat="osint" href="https://liveuamap.com/" target="_blank"><span class="qa-icon">&#127758;</span> LiveUA Map</a>
-    <a class="qa-link" data-cat="radio" href="http://www.weatherhamradio.com/" target="_blank"><span class="qa-icon">&#128251;</span> Weather Ham</a>
-    <a class="qa-link" data-cat="radio" href="https://solarham.net" target="_blank"><span class="qa-icon">&#9728;</span> SolarHam</a>
-    <a class="qa-link" data-cat="radio" href="https://prvi-vfc.org/web/" target="_blank"><span class="qa-icon">&#128225;</span> PRVI Frequencies</a>
-    <a class="qa-link" data-cat="radio" href="https://mygmrs.com/" target="_blank"><span class="qa-icon">&#128225;</span> GMRS</a>
-    <a class="qa-link" data-cat="science" href="https://www.volcanodiscovery.com/campi-flegrei.html" target="_blank"><span class="qa-icon">&#127755;</span> Campi Flegrei</a>
-    <a class="qa-link" data-cat="science" href="https://www.volcanodiscovery.com/yellowstone.html" target="_blank"><span class="qa-icon">&#127755;</span> Yellowstone</a>
-    <a class="qa-link" data-cat="science" href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank"><span class="qa-icon">&#127758;</span> USGS Earthquakes</a>
-    <a class="qa-link" data-cat="science" href="https://isstracker.spaceflight.esa.int/" target="_blank"><span class="qa-icon">&#128752;</span> ISS Tracker</a>
-    <a class="qa-link" data-cat="science" href="https://www.spaceweatherlive.com/" target="_blank"><span class="qa-icon">&#9728;</span> Space Weather Live</a>
-    <a class="qa-link" data-cat="science" href="https://www.swpc.noaa.gov/" target="_blank"><span class="qa-icon">&#9889;</span> NOAA Space Weather</a>
-    <a class="qa-link" data-cat="science" href="https://redsismica.uprm.edu/Spanish/" target="_blank"><span class="qa-icon">&#128200;</span> Red Sísmica PR</a>
-  </div>
-</section>
-
 <!-- ===== TIER 1: LIVE DASHBOARD ===== -->
 <div class="tier-header"><span class="tier-label t1">LIVE</span><span class="tier-line"></span><span class="tier-title">Real-Time Dashboard</span><span class="tier-line"></span></div>
 
@@ -626,6 +564,69 @@
     <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=km%2Fh&zoom=7&overlay=wind&product=ecmwf&level=surface&lat=18.22&lon=-66.5&message=true" width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen></iframe>
   </div>
   <figcaption>Windy.com &mdash; Patrón de vientos, dirección e intensidad</figcaption>
+</section>
+
+
+<!-- Quick Access — top for immediate navigation -->
+<section class="card span-2 no-anim" id="links">
+  <h2>Quick Access</h2>
+  <div class="qa-categories">
+    <button class="tab-btn active" onclick="filterQA('all',this)">All</button>
+    <button class="tab-btn" onclick="filterQA('weather',this)">Weather</button>
+    <button class="tab-btn" onclick="filterQA('hurricane',this)">Hurricanes</button>
+    <button class="tab-btn" onclick="filterQA('radio',this)">Radio</button>
+    <button class="tab-btn" onclick="filterQA('emergency',this)">Emergency</button>
+    <button class="tab-btn" onclick="filterQA('infrastructure',this)">Infrastructure</button>
+    <button class="tab-btn" onclick="filterQA('aviation',this)">Aviation</button>
+    <button class="tab-btn" onclick="filterQA('osint',this)">OSINT</button>
+    <button class="tab-btn" onclick="filterQA('science',this)">Science</button>
+  </div>
+  <div class="qa-grid">
+    <a class="qa-link" data-cat="weather" href="https://www.noaa.gov/" target="_blank"><span class="qa-icon">&#127758;</span> NOAA</a>
+    <a class="qa-link" data-cat="hurricane" href="https://www.nhc.noaa.gov/" target="_blank"><span class="qa-icon">&#127744;</span> NHC Hurricane Center</a>
+    <a class="qa-link" data-cat="weather" href="https://www.weather.gov/ncep/" target="_blank"><span class="qa-icon">&#9729;</span> NOAA Predicciones</a>
+    <a class="qa-link" data-cat="hurricane" href="https://www.weathernerds.org/tc_guidance/" target="_blank"><span class="qa-icon">&#127744;</span> Trayectorias</a>
+    <a class="qa-link" data-cat="weather" href="https://www.weathernerds.org/" target="_blank"><span class="qa-icon">&#128202;</span> Weather Nerds</a>
+    <a class="qa-link" data-cat="weather" href="https://www.windy.com/-Radar-lightning-radar?radar,18.398,-66.087,7" target="_blank"><span class="qa-icon">&#127752;</span> Windy Radar PR</a>
+    <a class="qa-link" data-cat="weather" href="https://www.windy.com" target="_blank"><span class="qa-icon">&#128168;</span> Windy</a>
+    <a class="qa-link" data-cat="weather" href="https://www.tropicaltidbits.com/analysis/" target="_blank"><span class="qa-icon">&#128200;</span> T.Tidbits Analysis</a>
+    <a class="qa-link" data-cat="weather" href="https://www.tropicaltidbits.com" target="_blank"><span class="qa-icon">&#127758;</span> Tropical Tidbits</a>
+    <a class="qa-link" data-cat="weather" href="https://www.seatemperature.org/" target="_blank"><span class="qa-icon">&#127754;</span> Ocean Temp</a>
+    <a class="qa-link" data-cat="weather" href="https://zoom.earth/" target="_blank"><span class="qa-icon">&#127760;</span> Zoom Earth</a>
+    <a class="qa-link" data-cat="weather" href="https://www.ndbc.noaa.gov/maps/Puerto_Rico.shtml" target="_blank"><span class="qa-icon">&#127754;</span> NDBC Buoys PR</a>
+    <a class="qa-link" data-cat="weather" href="https://www.surf-forecast.com/breaks/Rincon_Puerto-Rico" target="_blank"><span class="qa-icon">&#127940;</span> Surf Forecast PR</a>
+    <a class="qa-link" data-cat="weather" href="https://magicseaweed.com/Puerto-Rico-Surf-Forecast/3560/" target="_blank"><span class="qa-icon">&#127754;</span> MagicSeaweed PR</a>
+    <a class="qa-link" data-cat="weather" href="https://earth.nullschool.net/#current/ocean/surface/currents/orthographic=-66.50,18.20,2000" target="_blank"><span class="qa-icon">&#127758;</span> Earth Nullschool Waves</a>
+    <a class="qa-link" data-cat="weather" href="https://www.ventusky.com/?p=18.2;-66.5;7&l=waves" target="_blank"><span class="qa-icon">&#127754;</span> Ventusky Waves</a>
+    <a class="qa-link" data-cat="weather" href="https://www.windy.com/-Waves-waves?waves,18.220,-66.590,8" target="_blank"><span class="qa-icon">&#127754;</span> Windy Waves PR</a>
+    <a class="qa-link" data-cat="emergency" href="https://www.servir.net/servir_alertas/index-new.php" target="_blank"><span class="qa-icon">&#9888;</span> Monitor Alertas</a>
+    <a class="qa-link" data-cat="emergency" href="https://rsoe-edis.org/eventMap" target="_blank"><span class="qa-icon">&#127755;</span> Disaster Map</a>
+    <a class="qa-link" data-cat="emergency" href="https://redsismica.uprm.edu/Spanish/" target="_blank"><span class="qa-icon">&#128200;</span> Red Sismica PR</a>
+    <a class="qa-link" data-cat="emergency" href="https://www.marinevesseltraffic.com/war-map" target="_blank"><span class="qa-icon">&#9875;</span> War &amp; Conflict Map</a>
+    <a class="qa-link" data-cat="emergency" href="https://www.marinevesseltraffic.com/2013/04/marine-traffic.html" target="_blank"><span class="qa-icon">&#128674;</span> Marine Traffic</a>
+    <a class="qa-link" data-cat="emergency" href="https://firms.modaps.eosdis.nasa.gov/map/#d:2026-06-23;@-66.30,18.24,10.20z" target="_blank"><span class="qa-icon">&#128293;</span> NASA FIRMS Map</a>
+    <a class="qa-link" data-cat="emergency" href="https://nmead.pr.gov/" target="_blank"><span class="qa-icon">&#127987;</span> PREMA / NMEAD PR</a>
+    <a class="qa-link" data-cat="emergency" href="https://tsunami.gov/" target="_blank"><span class="qa-icon">&#127754;</span> PTWC Tsunami Alerts</a>
+    <a class="qa-link" data-cat="emergency" href="https://www.gdacs.org/" target="_blank"><span class="qa-icon">&#127760;</span> GDACS Global Disasters</a>
+    <a class="qa-link" data-cat="emergency" href="https://emergency.copernicus.eu/" target="_blank"><span class="qa-icon">&#128752;</span> Copernicus Emergency</a>
+    <a class="qa-link" data-cat="emergency" href="https://reliefweb.int/disasters" target="_blank"><span class="qa-icon">&#127988;</span> ReliefWeb Disasters</a>
+    <a class="qa-link" data-cat="infrastructure" href="https://miluma.lumapr.com/outages/outageMap" target="_blank"><span class="qa-icon">&#9889;</span> LUMA Outage Map</a>
+    <a class="qa-link" data-cat="aviation" href="https://globe.adsbexchange.com/?lat=18.24&lon=-66.30&zoom=8" target="_blank"><span class="qa-icon">&#9992;</span> ADS-B Exchange PR</a>
+    <a class="qa-link" data-cat="aviation" href="https://www.flightradar24.com/18.24,-66.30/8" target="_blank"><span class="qa-icon">&#128747;</span> FlightRadar24 PR</a>
+    <a class="qa-link" data-cat="aviation" href="https://www.flightaware.com/live/airport/TJSJ" target="_blank"><span class="qa-icon">&#9992;</span> FlightAware SJU</a>
+    <a class="qa-link" data-cat="osint" href="https://liveuamap.com/" target="_blank"><span class="qa-icon">&#127758;</span> LiveUA Map</a>
+    <a class="qa-link" data-cat="radio" href="http://www.weatherhamradio.com/" target="_blank"><span class="qa-icon">&#128251;</span> Weather Ham</a>
+    <a class="qa-link" data-cat="radio" href="https://solarham.net" target="_blank"><span class="qa-icon">&#9728;</span> SolarHam</a>
+    <a class="qa-link" data-cat="radio" href="https://prvi-vfc.org/web/" target="_blank"><span class="qa-icon">&#128225;</span> PRVI Frequencies</a>
+    <a class="qa-link" data-cat="radio" href="https://mygmrs.com/" target="_blank"><span class="qa-icon">&#128225;</span> GMRS</a>
+    <a class="qa-link" data-cat="science" href="https://www.volcanodiscovery.com/campi-flegrei.html" target="_blank"><span class="qa-icon">&#127755;</span> Campi Flegrei</a>
+    <a class="qa-link" data-cat="science" href="https://www.volcanodiscovery.com/yellowstone.html" target="_blank"><span class="qa-icon">&#127755;</span> Yellowstone</a>
+    <a class="qa-link" data-cat="science" href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank"><span class="qa-icon">&#127758;</span> USGS Earthquakes</a>
+    <a class="qa-link" data-cat="science" href="https://isstracker.spaceflight.esa.int/" target="_blank"><span class="qa-icon">&#128752;</span> ISS Tracker</a>
+    <a class="qa-link" data-cat="science" href="https://www.spaceweatherlive.com/" target="_blank"><span class="qa-icon">&#9728;</span> Space Weather Live</a>
+    <a class="qa-link" data-cat="science" href="https://www.swpc.noaa.gov/" target="_blank"><span class="qa-icon">&#9889;</span> NOAA Space Weather</a>
+    <a class="qa-link" data-cat="science" href="https://redsismica.uprm.edu/Spanish/" target="_blank"><span class="qa-icon">&#128200;</span> Red Sísmica PR</a>
+  </div>
 </section>
 
 
