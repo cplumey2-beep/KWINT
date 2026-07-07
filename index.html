@@ -1720,7 +1720,7 @@ if(cl.idx<worstIdx)worstIdx=cl.idx;
 if(cl.idx!==4)alertas.push({name:r.n,info:info,pct:cl.pct});
 newEmb[r.s]={idx:cl.idx,level:d.level,name:r.n};
 var chgHtml='';
-if(prevEmb[r.s]&&prevEmb[r.s].idx!==cl.idx){var prev=EMB_LEVELS[prevEmb[r.s].idx];var arrow=cl.idx>prevEmb[r.s].idx?'📈 MEJORA':'📉 BAJA';changes.push({name:r.n,from:prev,to:info,arrow:arrow});chgHtml='<div style="font-size:.72rem;margin-top:4px;padding:3px 8px;border-radius:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);display:inline-block">'+arrow+' — '+prev.e+' '+prev.l+' → '+info.e+' '+info.l+'</div>'}
+if(prevEmb[r.s]&&prevEmb[r.s].idx!==cl.idx){var prev=EMB_LEVELS[prevEmb[r.s].idx];var arrow=cl.idx>prevEmb[r.s].idx?'📈 MEJORA':'📉 BAJA';changes.push({name:r.n,from:prev,to:info,arrow:arrow});chgHtml='<div style="font-size:.72rem;margin-top:4px;padding:3px 8px;border-radius:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);display:inline-block">'+arrow+': '+prev.e+' '+prev.l+' → '+info.e+' '+info.l+'</div>'}
 
 var deltaHtml='';
 if(prevEmb[r.s]&&prevEmb[r.s].level!==undefined){
@@ -1753,7 +1753,7 @@ var cl=classifyEmb(d.level,r.u);var info=EMB_LEVELS[cl.idx];
 if(cl.idx!==4)alertas.push({name:r.n,info:info,pct:cl.pct});
 newEmb[r.s]={idx:cl.idx,level:d.level,name:r.n};
 var chgHtml='';
-if(prevEmb[r.s]&&prevEmb[r.s].idx!==cl.idx){var prev=EMB_LEVELS[prevEmb[r.s].idx];var arrow=cl.idx>prevEmb[r.s].idx?'📈 MEJORA':'📉 BAJA';changes.push({name:r.n,from:prev,to:info,arrow:arrow});chgHtml='<div style="font-size:.7rem;margin:4px 0 0;padding:2px 8px;border-radius:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);display:inline-block">'+arrow+' — '+prev.e+' '+prev.l+' → '+info.e+' '+info.l+'</div>'}
+if(prevEmb[r.s]&&prevEmb[r.s].idx!==cl.idx){var prev=EMB_LEVELS[prevEmb[r.s].idx];var arrow=cl.idx>prevEmb[r.s].idx?'📈 MEJORA':'📉 BAJA';changes.push({name:r.n,from:prev,to:info,arrow:arrow});chgHtml='<div style="font-size:.7rem;margin:4px 0 0;padding:2px 8px;border-radius:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);display:inline-block">'+arrow+': '+prev.e+' '+prev.l+' → '+info.e+' '+info.l+'</div>'}
 
 var deltaHtml2='';
 if(prevEmb[r.s]&&prevEmb[r.s].level!==undefined){
